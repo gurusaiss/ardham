@@ -2,10 +2,11 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from model_client import GemmaClient
-from schemas import FIELD_IDS, LoanField, LoanTerms
+from schemas import FIELD_IDS, NUMERIC_FIELD_IDS, LoanField, LoanTerms
 
 _PROMPT_TEMPLATE = (
     "You are reading a photographed loan Key Fact Statement or loan card for a "
@@ -23,7 +24,11 @@ _PROMPT_TEMPLATE = (
 
 _FIELD_SCHEMA = {
     "type": "object",
-    "properties": {"value": {"type": ["number", "string", "null"]}, "source_text": {"type": "string"}, "confidence": {"type": "number"}},
+    "properties": {
+        "value": {"type": "string"},
+        "source_text": {"type": "string"},
+        "confidence": {"type": "number"},
+    },
     "required": ["value", "source_text", "confidence"],
 }
 
@@ -48,9 +53,20 @@ def extract_terms(
     terms: LoanTerms = {}
     for field_id in FIELD_IDS:
         field_raw = raw.get(field_id) or {"value": None, "source_text": "", "confidence": 0.0}
+        val = field_raw.get("value")
+        if isinstance(val, str) and field_id in NUMERIC_FIELD_IDS:
+            digits = re.findall(r"\d+(?:\.\d+)?", val.replace(",", ""))
+            if digits:
+                try:
+                    val = float(digits[0]) if "." in digits[0] else int(digits[0])
+                except ValueError:
+                    pass
+        elif isinstance(val, (int, float)):
+            val = float(val) if isinstance(val, float) else int(val)
+
         terms[field_id] = LoanField(
-            value=field_raw.get("value"),
-            source_text=field_raw.get("source_text", ""),
+            value=val,
+            source_text=str(field_raw.get("source_text", "")),
             confidence=float(field_raw.get("confidence", 0.0)),
         )
     return terms, float(result.get("latency_s", 0.0))
