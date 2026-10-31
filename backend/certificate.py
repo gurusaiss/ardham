@@ -33,12 +33,21 @@ def build_certificate(
 
 
 def render_html(cert: Certificate) -> str:
-    rows = "".join(
-        f"<tr><td><strong>{r.field_id.replace('_', ' ').title()}</strong></td>"
-        f"<td style='text-align:center;'>{'<span style=\"color:#16a34a; font-weight:bold;\">✓ PASS</span>' if r.correct else '<span style=\"color:#dc2626; font-weight:bold;\">✗ RE-EXPLAINED</span>'}</td>"
-        f"<td>{r.heard or '—'}</td></tr>"
-        for r in cert.results
-    )
+    row_list = []
+    for r in cert.results:
+        status_html = (
+            "<span style='color:#16a34a; font-weight:bold;'>✓ PASS</span>"
+            if r.correct
+            else "<span style='color:#dc2626; font-weight:bold;'>✗ RE-EXPLAINED</span>"
+        )
+        field_title = r.field_id.replace('_', ' ').title()
+        heard_text = r.heard or "—"
+        row_list.append(
+            f"<tr><td><strong>{field_title}</strong></td>"
+            f"<td style='text-align:center;'>{status_html}</td>"
+            f"<td>{heard_text}</td></tr>"
+        )
+    rows = "".join(row_list)
     borrower = cert.terms.get("borrower_name")
     borrower_name = borrower.value if borrower and borrower.value else "Borrower"
     lender = cert.terms.get("lender")

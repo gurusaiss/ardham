@@ -9,7 +9,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: Python FastAPI backend
-FROM python:3.11-slim
+FROM python:3.12-slim
 WORKDIR /app
 
 COPY backend/requirements.txt backend/requirements.txt
