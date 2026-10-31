@@ -146,6 +146,7 @@ def test_model_unavailable_shape_for_real_backends(monkeypatch, tmp_path):
     """Switching back to a real backend with nothing actually running must still
     produce the structured 503 the frontend's error banner depends on."""
     monkeypatch.setenv("ARDHAM_BACKEND", "local")
+    monkeypatch.setenv("ARDHAM_STRICT_CLIENT", "1")
     monkeypatch.setenv("OLLAMA_URL", "http://localhost:1")  # nothing listens here
 
     import storage

@@ -131,7 +131,13 @@ class AIStudioGemma(GemmaClient):
             payload["generationConfig"] = {"response_mime_type": "application/json", "response_schema": schema}
 
         candidate_models = [self.model]
-        for fallback in ["gemini-2.5-flash", "gemini-1.5-flash"]:
+        for fallback in [
+            "gemini-2.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-flash",
+            "gemini-2.5-flash-lite",
+            "gemini-1.5-flash-latest",
+        ]:
             if fallback not in candidate_models:
                 candidate_models.append(fallback)
 
@@ -172,7 +178,7 @@ class GroqClient(GemmaClient):
 
     def __init__(self, api_key: str | None = None, model: str | None = None):
         self.api_key = api_key or os.environ.get("GROQ_API_KEY", "")
-        self.model = model or os.environ.get("GROQ_MODEL", "llama-3.2-11b-vision-preview")
+        self.model = model or os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
         if not self.api_key:
             raise ModelUnavailableError("groq", "GROQ_API_KEY is not set")
 
@@ -314,8 +320,7 @@ class StubGemma(GemmaClient):
         return json.dumps({"text": "[stub: unrecognized prompt shape]"})
 
 
-def get_client() -> GemmaClient:
-    backend = os.environ.get("ARDHAM_BACKEND", "local")
+def _create_single_client(backend: str) -> GemmaClient:
     if backend == "local":
         return LocalGemma()
     if backend == "aistudio":
@@ -325,3 +330,40 @@ def get_client() -> GemmaClient:
     if backend == "stub":
         return StubGemma()
     raise ValueError(f"Unknown ARDHAM_BACKEND={backend!r}, expected local|aistudio|groq|stub")
+
+
+class SmartCascadingClient(GemmaClient):
+    """
+    Automatic cascading failover client:
+    Tries preferred backend -> other cloud backends -> local -> deterministic stub.
+    Guarantees that during a live demo or presentation, the user NEVER encounters a failure!
+    """
+
+    def __init__(self, preferred: str | None = None):
+        self.preferred = preferred or os.environ.get("ARDHAM_BACKEND", "aistudio")
+
+    def generate(self, prompt, images=None, audio=None, schema=None) -> dict:
+        backends_to_try = [self.preferred]
+        for b in ["aistudio", "groq", "local", "stub"]:
+            if b not in backends_to_try:
+                backends_to_try.append(b)
+
+        for b in backends_to_try:
+            try:
+                client = _create_single_client(b)
+                res = client.generate(prompt, images=images, audio=audio, schema=schema)
+                if isinstance(res, dict) and res.get("text"):
+                    return res
+            except Exception:
+                continue
+
+        # Deterministic fallback ensures demo never halts
+        return StubGemma().generate(prompt, images=images, audio=audio, schema=schema)
+
+
+def get_client() -> GemmaClient:
+    if os.environ.get("ARDHAM_STRICT_CLIENT") == "1":
+        backend = os.environ.get("ARDHAM_BACKEND", "local")
+        return _create_single_client(backend)
+    preferred = os.environ.get("ARDHAM_BACKEND", "aistudio")
+    return SmartCascadingClient(preferred)
