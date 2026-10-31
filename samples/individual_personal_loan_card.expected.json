@@ -1,0 +1,13 @@
+{
+  "lender": {"value": "Andhra Pragathi Rural Bank (fictional)", "source_text": "Lender: Andhra Pragathi Rural Bank (fictional)"},
+  "borrower_name": {"value": "Srinivas Rao (fictional)", "source_text": "Borrower Name: Srinivas Rao (fictional)"},
+  "loan_amount": {"value": 60000, "unit": "INR", "source_text": "Loan Amount Sanctioned: Rs. 60,000"},
+  "interest_rate": {"value": 14, "unit": "percent_per_annum", "source_text": "Interest Rate: 14% per annum"},
+  "tenure": {"value": 12, "unit": "months", "source_text": "Tenure: 12 months"},
+  "instalment_amount": {"value": 5387, "unit": "INR_per_month", "source_text": "Instalment Amount: Rs. 5,387 per month"},
+  "num_instalments": {"value": 12, "source_text": "Number of Instalments: 12"},
+  "processing_fee": {"value": 1200, "unit": "INR", "source_text": "Processing Fee: Rs. 1,200 (deducted upfront)"},
+  "insurance_premium": {"value": 350, "unit": "INR", "source_text": "Insurance Premium: Rs. 350"},
+  "total_payable": {"value": 64644, "unit": "INR", "source_text": "Total Amount Payable: Rs. 64,644"},
+  "penalty": {"value": 250, "unit": "INR_per_month_overdue", "source_text": "Penalty for Late Payment: Rs. 250 per month overdue"}
+}

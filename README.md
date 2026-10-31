@@ -86,21 +86,26 @@ number, a mismatched total, a sentence with no traceable field).
 
 ## Setup
 
+### macOS / Linux
 ```bash
 git clone <this-repo>
 cd ardham
 ./scripts/setup.sh
-```
-
-This creates the backend virtualenv, installs frontend dependencies, copies
-`.env.example` to `.env`, and pulls `gemma4:e4b` via Ollama if it's installed.
-
-```bash
 ./scripts/run_demo.sh
 ```
 
-Opens the backend on `http://localhost:8000` (docs at `/docs`) and the frontend on
-`http://localhost:5173`.
+### Windows (PowerShell or Command Prompt)
+```powershell
+git clone <this-repo>
+cd ardham
+.\scripts\setup.ps1
+.\scripts\run_demo.ps1
+# Or double-click .\scripts\run_demo.bat
+```
+
+This creates the backend virtualenv (`backend/.venv`), installs frontend dependencies (`npm install`), copies `.env.example` to `.env`, and checks for Ollama (`gemma4:e4b`).
+
+Opens the backend on `http://localhost:8000` (docs at `/docs`) and the frontend on `http://localhost:5173`.
 
 ### Offline
 

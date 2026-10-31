@@ -140,6 +140,61 @@ class AIStudioGemma(GemmaClient):
         }
 
 
+class GroqClient(GemmaClient):
+    """Ultra-fast open-source model inference via Groq Cloud API."""
+
+    def __init__(self, api_key: str | None = None, model: str | None = None):
+        self.api_key = api_key or os.environ.get("GROQ_API_KEY", "")
+        self.model = model or os.environ.get("GROQ_MODEL", "llama-3.2-11b-vision-preview")
+        if not self.api_key:
+            raise ModelUnavailableError("groq", "GROQ_API_KEY is not set")
+
+    def generate(self, prompt, images=None, audio=None, schema=None) -> dict:
+        t0 = time.time()
+        user_content: list[dict] = [{"type": "text", "text": prompt}]
+        if images:
+            for p in images:
+                mime = "image/png" if str(p).lower().endswith("png") else "image/jpeg"
+                user_content.append({
+                    "type": "image_url",
+                    "image_url": {"url": f"data:{mime};base64,{_b64(p)}"},
+                })
+        if audio:
+            user_content.append({"type": "text", "text": "\n[audio attached]"})
+
+        payload: dict = {
+            "model": self.model,
+            "messages": [{"role": "user", "content": user_content}],
+            "temperature": 0.1,
+        }
+        if schema:
+            payload["response_format"] = {"type": "json_object"}
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        try:
+            raw = _post_json("https://api.groq.com/openai/v1/chat/completions", payload, headers=headers, timeout=60)
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="replace") if e.fp else ""
+            raise ModelUnavailableError("groq", f"HTTP {e.code} from Groq: {body[:300]}") from e
+        except (urllib.error.URLError, ConnectionError, OSError) as e:
+            raise ModelUnavailableError("groq", f"could not reach Groq ({e})") from e
+
+        try:
+            text = raw["choices"][0]["message"]["content"]
+        except (KeyError, IndexError):
+            text = ""
+        usage = raw.get("usage", {})
+        return {
+            "text": text,
+            "latency_s": round(time.time() - t0, 2),
+            "tokens": usage.get("completion_tokens"),
+            "backend": "groq",
+        }
+
+
 class StubGemma(GemmaClient):
     """NOT Gemma. A deterministic, offline stand-in that exists for one reason:
     proving the rest of the system (FastAPI routes, the guard, storage, the
@@ -157,16 +212,21 @@ class StubGemma(GemmaClient):
     """
 
     def __init__(self):
-        self._sample_terms = self._load_sample_terms()
+        self._sample_terms = self._load_sample_terms("microfinance-group-loan")
 
     @staticmethod
-    def _load_sample_terms() -> dict:
+    def _load_sample_terms(loan_type: str = "microfinance-group-loan") -> dict:
+        filename = "microfinance_group_loan_card.expected.json"
+        if "gold" in loan_type.lower():
+            filename = "gold_loan_card.expected.json"
+        elif "personal" in loan_type.lower() or "individual" in loan_type.lower():
+            filename = "individual_personal_loan_card.expected.json"
         path = (
             Path(__file__).parent.parent
             / "samples"
-            / "microfinance_group_loan_card.expected.json"
+            / filename
         )
-        with path.open() as f:
+        with path.open(encoding="utf-8") as f:
             return json.load(f)
 
     def generate(self, prompt, images=None, audio=None, schema=None) -> dict:
@@ -176,6 +236,11 @@ class StubGemma(GemmaClient):
 
     def _respond(self, prompt: str, audio) -> str:
         if "Extract ONLY the fields" in prompt:
+            terms = self._sample_terms
+            if "gold" in prompt.lower():
+                terms = self._load_sample_terms("gold-loan")
+            elif "personal" in prompt.lower() or "individual" in prompt.lower():
+                terms = self._load_sample_terms("individual-personal-loan")
             return json.dumps(
                 {
                     field_id: {
@@ -183,7 +248,7 @@ class StubGemma(GemmaClient):
                         "source_text": field["source_text"],
                         "confidence": 0.95,
                     }
-                    for field_id, field in self._sample_terms.items()
+                    for field_id, field in terms.items()
                 }
             )
 
@@ -205,12 +270,18 @@ class StubGemma(GemmaClient):
             answer_match = re.search(r'transcribed or typed, was:\n\n"(.*)"', prompt)
             field_id = field_match.group(1) if field_match else ""
             answer_text = answer_match.group(1) if answer_match else ""
-            try:
-                expected = float(expected_match.group(1)) if expected_match else None
-                numbers = [float(n) for n in re.findall(r"\d+(?:\.\d+)?", answer_text)]
-                correct = expected is not None and any(abs(n - expected) <= max(1.0, expected * 0.05) for n in numbers)
-            except ValueError:
-                correct = False
+            correct = False
+            if expected_match:
+                try:
+                    expected = float(expected_match.group(1))
+                    numbers = [float(n) for n in re.findall(r"\d+(?:\.\d+)?", answer_text)]
+                    correct = any(abs(n - expected) <= max(1.0, expected * 0.05) for n in numbers)
+                except ValueError:
+                    correct = False
+            else:
+                ans_lower = answer_text.lower()
+                if any(w in ans_lower or w in answer_text for w in ["auction", "gold", "బంగారం", "అమ్మేస్తారు", "తీసేసుకుంటారు", "కట్టకపోతే"]):
+                    correct = True
             return json.dumps({"correct": correct, "heard": answer_text, "field_id": field_id})
 
         return json.dumps({"text": "[stub: unrecognized prompt shape]"})
@@ -222,6 +293,8 @@ def get_client() -> GemmaClient:
         return LocalGemma()
     if backend == "aistudio":
         return AIStudioGemma()
+    if backend == "groq":
+        return GroqClient()
     if backend == "stub":
         return StubGemma()
-    raise ValueError(f"Unknown ARDHAM_BACKEND={backend!r}, expected local|aistudio|stub")
+    raise ValueError(f"Unknown ARDHAM_BACKEND={backend!r}, expected local|aistudio|groq|stub")

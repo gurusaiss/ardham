@@ -5,6 +5,8 @@ import ErrorBanner from '../components/ErrorBanner'
 import { getExplanation, getTerms, type LoanTerms } from '../lib/api'
 
 function speak(text: string) {
+  if (!('speechSynthesis' in window)) return
+  window.speechSynthesis.cancel()
   const utterance = new SpeechSynthesisUtterance(text)
   const teVoice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('te'))
   if (teVoice) utterance.voice = teVoice
@@ -44,6 +46,12 @@ export default function Explain() {
 
   const current = sentences[index]
   const sourceField = current ? terms[current.field_id] : undefined
+
+  useEffect(() => {
+    if (current?.text_te) {
+      speak(current.text_te)
+    }
+  }, [current])
 
   if (error) {
     return (

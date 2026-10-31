@@ -1,0 +1,13 @@
+{
+  "lender": {"value": "Vizag Swarna Finance Ltd. (fictional)", "source_text": "Lender: Vizag Swarna Finance Ltd. (fictional)"},
+  "borrower_name": {"value": "Ramesh Naidu (fictional)", "source_text": "Borrower Name: Ramesh Naidu (fictional)"},
+  "loan_amount": {"value": 50000, "unit": "INR", "source_text": "Loan Amount Sanctioned: Rs. 50,000"},
+  "interest_rate": {"value": 18, "unit": "percent_per_annum", "source_text": "Interest Rate: 18% per annum"},
+  "tenure": {"value": 6, "unit": "months", "source_text": "Tenure: 6 months"},
+  "instalment_amount": {"value": 750, "unit": "INR_per_month", "source_text": "Instalment Amount: Rs. 750 per month (interest only)"},
+  "num_instalments": {"value": 6, "source_text": "Number of Instalments: 6"},
+  "processing_fee": {"value": 500, "unit": "INR", "source_text": "Processing Fee: Rs. 500 (one-time deduction)"},
+  "insurance_premium": {"value": 0, "unit": "INR", "source_text": "Insurance Premium: Rs. 0"},
+  "total_payable": {"value": 54500, "unit": "INR", "source_text": "Total Amount Payable: Rs. 54,500"},
+  "penalty": {"value": "Auction of pledged gold jewellery upon 90 days default", "source_text": "Penalty for Late Payment: Auction of pledged gold jewellery upon 90 days default"}
+}

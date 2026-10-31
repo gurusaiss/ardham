@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import StepLayout from '../components/StepLayout'
 import ErrorBanner from '../components/ErrorBanner'
-import { extractTerms } from '../lib/api'
+import { extractTerms, getSampleCardFile } from '../lib/api'
 
 export default function Scan() {
   const { loanType } = useParams<{ loanType: string }>()
@@ -27,6 +27,19 @@ export default function Scan() {
     }
   }
 
+  async function useSampleCard() {
+    if (!loanType) return
+    setBusy(true)
+    setError(null)
+    try {
+      const file = await getSampleCardFile(loanType)
+      await onFile(file)
+    } catch (e) {
+      setError(e)
+      setBusy(false)
+    }
+  }
+
   return (
     <StepLayout title="Scan the loan card" teluguTitle="రుణ పత్రాన్ని స్కాన్ చేయండి">
       <input
@@ -37,14 +50,29 @@ export default function Scan() {
         className="hidden"
         onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
       />
-      <button
-        disabled={busy}
-        onClick={() => inputRef.current?.click()}
-        className="w-full rounded-xl bg-slate-900 py-6 text-lg font-medium text-white disabled:opacity-50"
-      >
-        {busy ? 'Reading...' : 'Take photo / choose file'}
-      </button>
-      {error ? <div className="mt-4"><ErrorBanner error={error} onRetry={() => lastFile && onFile(lastFile)} /></div> : null}
+      <div className="flex flex-col gap-3">
+        <button
+          disabled={busy}
+          onClick={() => inputRef.current?.click()}
+          className="w-full rounded-xl bg-slate-900 py-6 text-lg font-medium text-white shadow hover:bg-slate-800 disabled:opacity-50"
+        >
+          {busy ? 'Reading loan card...' : '📷 Take photo / upload card'}
+        </button>
+
+        <button
+          disabled={busy}
+          onClick={useSampleCard}
+          className="w-full rounded-xl border-2 border-emerald-600 bg-emerald-50 py-4 text-base font-medium text-emerald-800 shadow-sm hover:bg-emerald-100 disabled:opacity-50"
+        >
+          {busy ? 'Processing sample...' : '⚡ Quick Demo: Use sample loan card'}
+        </button>
+      </div>
+
+      {error ? (
+        <div className="mt-4">
+          <ErrorBanner error={error} onRetry={() => (lastFile ? onFile(lastFile) : useSampleCard())} />
+        </div>
+      ) : null}
     </StepLayout>
   )
 }

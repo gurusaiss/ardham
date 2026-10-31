@@ -114,6 +114,34 @@ def test_full_flow_scan_to_certificate(client):
     assert "Comprehension Certificate" in resp.text
 
 
+def test_gold_loan_flow_stub(client):
+    image_path = SAMPLES_DIR / "gold_loan_card.png"
+    with image_path.open("rb") as f:
+        resp = client.post(
+            "/extract",
+            data={"loan_type": "gold-loan"},
+            files={"image": ("gold_loan_card.png", f, "image/png")},
+        )
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+    assert data["terms"]["loan_amount"]["value"] == 50000
+    assert data["consistency_warnings"] == []
+
+
+def test_individual_loan_flow_stub(client):
+    image_path = SAMPLES_DIR / "individual_personal_loan_card.png"
+    with image_path.open("rb") as f:
+        resp = client.post(
+            "/extract",
+            data={"loan_type": "individual-personal-loan"},
+            files={"image": ("individual_personal_loan_card.png", f, "image/png")},
+        )
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+    assert data["terms"]["loan_amount"]["value"] == 60000
+    assert data["consistency_warnings"] == []
+
+
 def test_model_unavailable_shape_for_real_backends(monkeypatch, tmp_path):
     """Switching back to a real backend with nothing actually running must still
     produce the structured 503 the frontend's error banner depends on."""

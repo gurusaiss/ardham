@@ -112,7 +112,12 @@ def check_consistency(terms: LoanTerms) -> list[str]:
 
     if instalment is not None and count is not None and total_payable is not None:
         computed = instalment * count
-        if abs(computed - total_payable) > max(1.0, total_payable * TOLERANCE):
+        matches_amortized = abs(computed - total_payable) <= max(1.0, total_payable * TOLERANCE)
+        matches_bullet = False
+        if loan_amount is not None:
+            matches_bullet = abs((loan_amount + computed) - total_payable) <= max(1.0, total_payable * TOLERANCE)
+
+        if not (matches_amortized or matches_bullet):
             warnings.append(
                 f"instalment x count = {computed:g} does not match stated total_payable "
                 f"= {total_payable:g}"

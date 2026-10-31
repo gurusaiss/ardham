@@ -1,60 +1,88 @@
-# Optional deployment (not the hackathon demo path)
+# Live Deployment Guide for Ardham (అర్థం)
 
-Ardham's whole point is running **on-device, offline**, on the field officer's own
-phone/laptop — that's the setup in the main `README.md` and the one judges see.
+Ardham is built as an **offline-first PWA**, designed to run on-device with zero internet in rural villages.
+However, for hackathon submissions (Devpost / MLH), having a **live URL** that judges and organizers can test from their own phones or laptops is crucial.
 
-This page is for the *optional* later step: if a lender pilot wants a shared backend
-instead of (or alongside) each officer's own on-device Gemma, the FastAPI backend can
-be containerized and pointed at the AI Studio API instead of local Ollama.
+FastAPI is configured to serve the production React frontend build (`frontend/dist`) as a **single unified full-stack web service**. You only need to deploy **one container or service** to get a single public URL.
 
-## What this does NOT change
+---
 
-- The guard, extraction, explanation, and quiz logic are identical either way.
-- Sample data is still fictional; this is not wired to any real lender system.
-- This does not add auth, a multi-tenant database, or HTTPS — a pilot deployment
-  would need those added on top; this is just "the backend runs somewhere that
-  isn't localhost."
+## The Winning Hackathon Strategy: The "Trinity"
 
-## Build and run
+1. **The Live Presentation**: Run locally on your laptop with **Wi-Fi OFF** (`ARDHAM_BACKEND=local` via Ollama) to prove the "village microfinance" offline concept.
+2. **The Safety Net Video**: A 2-3 minute screen recording of the full flow. If venue Wi-Fi or laptop battery fails, you have the video ready.
+3. **The Submission Form**: Provide the **Live URL** (from Render, Railway, or Hugging Face) and GitHub link so remote judges and attendees can try it out themselves.
+
+---
+
+## Option 1: Render.com (Recommended — 100% Free, Simplest)
+
+Render provides free Docker web services directly connected to your GitHub repository.
+
+### Steps:
+1. Push your repository to GitHub (public repo, e.g., `github.com/<your-username>/ardham`).
+2. Go to [dashboard.render.com](https://dashboard.render.com) and click **"New +" -> "Web Service"**.
+3. Connect your GitHub repository.
+4. Render will automatically detect `render.yaml` or you can configure manually:
+   - **Runtime**: `Docker`
+   - **Dockerfile Path**: `backend/Dockerfile`
+   - **Docker Context**: `.`
+   - **Instance Type**: `Free`
+5. Under **Environment Variables**, add:
+   - `ARDHAM_BACKEND`: `aistudio`
+   - `GOOGLE_API_KEY`: `<your_gemini_api_key>`
+   - `GROQ_API_KEY`: `<optional_groq_api_key>`
+6. Click **"Deploy Web Service"**.
+7. In ~2-3 minutes, you will get your live link: `https://ardham-xxxx.onrender.com`.
+
+---
+
+## Option 2: Railway.app (Ultra-Fast 1-Click Deploy)
+
+1. Go to [railway.com](https://railway.com) and log in with GitHub.
+2. Click **"New Project" -> "Deploy from GitHub repo"**.
+3. Select your `ardham` repository.
+4. In Project Settings:
+   - Set **Dockerfile Path**: `backend/Dockerfile`
+5. In **Variables**, add:
+   - `ARDHAM_BACKEND`: `aistudio`
+   - `GOOGLE_API_KEY`: `<your_gemini_api_key>`
+6. Railway automatically assigns a public domain under Settings -> Networking -> **Generate Domain**.
+
+---
+
+## Option 3: Hugging Face Spaces (Free Permanent URL)
+
+Hugging Face Spaces provides free hosting with open-source recognition.
+
+1. Go to [huggingface.co/spaces](https://huggingface.co/spaces) and click **"Create new Space"**.
+2. Name: `ardham`
+3. License: `apache-2.0`
+4. SDK: Select **Docker** (Blank).
+5. Push your code to the HF Space git repository:
+   - Place a `Dockerfile` at root (or symlink `backend/Dockerfile`).
+6. In Space Settings -> **Repository Secrets**, add:
+   - `GOOGLE_API_KEY`: `<your_gemini_api_key>`
+   - `ARDHAM_BACKEND`: `aistudio`
+
+---
+
+## Local Docker Testing
+
+To test the production container locally before deploying:
 
 ```bash
-docker build -t ardham-backend -f backend/Dockerfile .
+# Build frontend first
+cd frontend && npm run build && cd ..
+
+# Build docker image
+docker build -t ardham-fullstack -f backend/Dockerfile .
+
+# Run container
 docker run -p 8000:8000 \
   -e ARDHAM_BACKEND=aistudio \
   -e GOOGLE_API_KEY=your_key_here \
-  -v ardham-data:/app/data \
-  ardham-backend
+  ardham-fullstack
 ```
 
-The container has no Ollama and no GPU assumptions — it always runs against the
-AI Studio backend (`ARDHAM_BACKEND=aistudio` is the image default). Local Gemma via
-Ollama only makes sense on a machine the officer is physically holding, which a
-shared cloud container by definition isn't.
-
-`/app/data` is where SQLite and session uploads (loan card photos, answer audio)
-live — mount a volume so that survives container restarts. Given loan photos and
-voice recordings are sensitive, treat that volume the way you'd treat any PII
-store: encrypted at rest, access-controlled, not something you mount or back up
-casually.
-
-## docker-compose, for local testing of the container
-
-```yaml
-services:
-  ardham-backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      ARDHAM_BACKEND: aistudio
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
-    volumes:
-      - ardham-data:/app/data
-volumes:
-  ardham-data:
-```
-
-Point `frontend/.env`'s `VITE_API_BASE` at wherever this container ends up running,
-rebuild the frontend, and the rest of the app behaves exactly as it does locally.
+Open `http://localhost:8000` — both the React frontend and FastAPI backend will run on port 8000.

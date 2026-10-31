@@ -4,10 +4,12 @@ from __future__ import annotations
 import os
 import shutil
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import storage
@@ -69,7 +71,7 @@ def health() -> dict:
 def get_settings() -> dict:
     return {
         "backend": os.environ.get("ARDHAM_BACKEND", "local"),
-        "available_backends": ["local", "aistudio"],
+        "available_backends": ["local", "aistudio", "groq"],
     }
 
 
@@ -79,8 +81,8 @@ class BackendChoice(BaseModel):
 
 @app.post("/settings/backend")
 def set_backend(choice: BackendChoice) -> dict:
-    if choice.backend not in ("local", "aistudio"):
-        raise HTTPException(status_code=400, detail="backend must be 'local' or 'aistudio'")
+    if choice.backend not in ("local", "aistudio", "groq"):
+        raise HTTPException(status_code=400, detail="backend must be 'local', 'aistudio', or 'groq'")
     os.environ["ARDHAM_BACKEND"] = choice.backend
     return {"backend": choice.backend}
 
@@ -88,6 +90,25 @@ def set_backend(choice: BackendChoice) -> dict:
 @app.get("/loan-types")
 def loan_types() -> dict:
     return {"loan_types": list_loan_types()}
+
+
+SAMPLES_DIR = Path(__file__).parent.parent / "samples"
+
+
+@app.get("/samples/{loan_type}/card.png")
+def get_sample_card(loan_type: str):
+    name_map = {
+        "microfinance-group-loan": "microfinance_group_loan_card.png",
+        "gold-loan": "gold_loan_card.png",
+        "individual-personal-loan": "individual_personal_loan_card.png",
+    }
+    filename = name_map.get(loan_type)
+    if not filename:
+        raise HTTPException(status_code=404, detail="sample not found")
+    path = SAMPLES_DIR / filename
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="file not found")
+    return FileResponse(path, media_type="image/png")
 
 
 def _get_session_or_404(session_id: str) -> dict:
@@ -217,3 +238,18 @@ async def certificate_html(session_id: str) -> str:
     results = [GradeResult(**r) for r in session["results"]]
     cert = build_certificate(session_id, session["loan_type"], terms, questions, results)
     return render_html(cert)
+
+
+# Optional Full-Stack Deployment: Serve frontend SPA build if present
+FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    assets_dir = FRONTEND_DIST / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa(full_path: str):
+        file_path = FRONTEND_DIST / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(FRONTEND_DIST / "index.html")

@@ -1,4 +1,9 @@
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8000'
+const API_BASE =
+  import.meta.env.VITE_API_BASE !== undefined
+    ? import.meta.env.VITE_API_BASE
+    : import.meta.env.DEV
+    ? 'http://localhost:8000'
+    : ''
 
 export type LoanField = {
   value: unknown
@@ -102,7 +107,7 @@ export async function getSettings(): Promise<{ backend: string; available_backen
   return asJson(res)
 }
 
-export async function setBackend(backend: 'local' | 'aistudio'): Promise<{ backend: string }> {
+export async function setBackend(backend: 'local' | 'aistudio' | 'groq'): Promise<{ backend: string }> {
   const res = await fetch(`${API_BASE}/settings/backend`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -184,4 +189,15 @@ export async function submitAnswer(
 export async function getCertificate(sessionId: string): Promise<Certificate> {
   const res = await fetch(`${API_BASE}/sessions/${sessionId}/certificate`)
   return asJson(res)
+}
+
+export async function getSampleCardFile(loanType: string): Promise<File> {
+  const res = await fetch(`${API_BASE}/samples/${loanType}/card.png`)
+  if (!res.ok) throw new Error('Could not load sample card')
+  const blob = await res.blob()
+  return new File([blob], `${loanType}_card.png`, { type: 'image/png' })
+}
+
+export function getCertificateHtmlUrl(sessionId: string): string {
+  return `${API_BASE}/sessions/${sessionId}/certificate.html`
 }
