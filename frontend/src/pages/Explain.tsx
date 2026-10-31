@@ -3,16 +3,12 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import StepLayout from '../components/StepLayout'
 import ErrorBanner from '../components/ErrorBanner'
 import { getExplanation, getTerms, type LoanTerms } from '../lib/api'
-
-function speak(text: string) {
-  if (!('speechSynthesis' in window)) return
-  window.speechSynthesis.cancel()
-  const utterance = new SpeechSynthesisUtterance(text)
-  const teVoice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('te'))
-  if (teVoice) utterance.voice = teVoice
-  utterance.lang = teVoice ? 'te-IN' : 'hi-IN'
-  speechSynthesis.speak(utterance)
-}
+import {
+  speakTelugu,
+  stopSpeaking,
+  subscribeSpeaking,
+  isVoiceAssistantEnabled,
+} from '../lib/speech'
 
 export default function Explain() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -26,6 +22,15 @@ export default function Explain() {
   const [index, setIndex] = useState(0)
   const [error, setError] = useState<unknown>(null)
   const [loading, setLoading] = useState(true)
+  const [speaking, setSpeaking] = useState(false)
+
+  useEffect(() => {
+    const unsub = subscribeSpeaking(setSpeaking)
+    return () => {
+      unsub()
+      stopSpeaking()
+    }
+  }, [])
 
   function load() {
     if (!sessionId) return
@@ -48,14 +53,22 @@ export default function Explain() {
   const sourceField = current ? terms[current.field_id] : undefined
 
   useEffect(() => {
-    if (current?.text_te) {
-      speak(current.text_te)
+    if (current?.text_te && isVoiceAssistantEnabled()) {
+      speakTelugu(current.text_te)
     }
   }, [current])
 
+  function toggleAudio() {
+    if (speaking) {
+      stopSpeaking()
+    } else if (current?.text_te) {
+      speakTelugu(current.text_te)
+    }
+  }
+
   if (error) {
     return (
-      <StepLayout title="Explanation" teluguTitle="వివరణ">
+      <StepLayout title="Explanation" teluguTitle="రుణ వివరాలు">
         <ErrorBanner error={error} onRetry={load} />
       </StepLayout>
     )
@@ -63,31 +76,53 @@ export default function Explain() {
 
   return (
     <StepLayout
-      title={isReExplain ? 'Re-explaining missed parts' : 'Explanation'}
-      teluguTitle="వివరణ"
+      title={isReExplain ? 'Re-explaining missed parts' : 'Loan Terms Explanation'}
+      teluguTitle="రుణ వివరాలు — స్వచ్ఛమైన తెలుగులో"
     >
       {loading ? (
-        <p className="text-slate-500">Loading explanation...</p>
+        <div className="py-12 text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-r-transparent"></div>
+          <p className="mt-3 text-sm text-slate-500">తెలుగు వివరణ సిద్ధమవుతోంది...</p>
+        </div>
       ) : current ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-lg leading-relaxed">{current.text_te}</p>
+        <div className="rounded-2xl border-2 border-emerald-100 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between text-xs font-semibold text-emerald-800">
+            <span>అంశం {index + 1} / {sentences.length}</span>
+            <span className="rounded-full bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+              {current.field_id.replace('_', ' ')}
+            </span>
+          </div>
+
+          <p className="mt-4 text-xl font-medium text-slate-900 leading-relaxed">
+            {current.text_te}
+          </p>
 
           {sourceField && (
-            <div className="mt-4 rounded-lg border-l-4 border-amber-400 bg-amber-50 p-3">
-              <div className="text-xs font-medium uppercase tracking-wide text-amber-700">
-                source line on the card
+            <div className="mt-5 rounded-xl border-l-4 border-amber-400 bg-amber-50 p-3">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-amber-800">
+                కార్డుపై ముద్రించబడిన అసలు పంక్తి (Source text)
               </div>
-              <div className="mt-1 text-sm text-amber-900">"{sourceField.source_text}"</div>
-              <div className="mt-1 text-xs text-amber-600">value: {String(sourceField.value)}</div>
+              <div className="mt-1 text-sm font-medium text-amber-950 font-mono">
+                "{sourceField.source_text}"
+              </div>
+              <div className="mt-1 text-xs text-amber-700">
+                ధృవీకరించబడిన విలువ: <strong className="text-amber-900">{String(sourceField.value)}</strong>
+              </div>
             </div>
           )}
 
-          <button
-            onClick={() => speak(current.text_te)}
-            className="mt-4 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium"
-          >
-            🔊 Play again
-          </button>
+          <div className="mt-5 flex gap-2">
+            <button
+              onClick={toggleAudio}
+              className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold shadow-sm transition active:scale-95 ${
+                speaking
+                  ? 'bg-red-600 text-white hover:bg-red-700'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-700'
+              }`}
+            >
+              <span>{speaking ? '⏹️ ఆడియో ఆపు (Stop Audio)' : '🔊 వినండి (Listen in Pure Telugu)'}</span>
+            </button>
+          </div>
         </div>
       ) : (
         <p className="text-slate-500">No explanation sentences to show.</p>
@@ -97,31 +132,44 @@ export default function Explain() {
         <div className="mt-6 flex gap-3">
           <button
             disabled={index === 0}
-            onClick={() => setIndex((i) => i - 1)}
-            className="flex-1 rounded-xl border border-slate-300 py-3 disabled:opacity-40"
+            onClick={() => {
+              stopSpeaking()
+              setIndex((i) => i - 1)
+            }}
+            className="flex-1 rounded-xl border-2 border-slate-200 bg-white py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 active:scale-95"
           >
-            Back
+            ← వెనుకకు (Back)
           </button>
+
           {index < sentences.length - 1 ? (
             <button
-              onClick={() => setIndex((i) => i + 1)}
-              className="flex-1 rounded-xl bg-slate-900 py-3 text-white"
+              onClick={() => {
+                stopSpeaking()
+                setIndex((i) => i + 1)
+              }}
+              className="flex-1 rounded-xl bg-slate-900 py-3 text-sm font-bold text-white shadow hover:bg-slate-800 active:scale-95"
             >
-              Next
+              తర్వాత అంశం (Next) →
             </button>
           ) : isReExplain ? (
             <button
-              onClick={() => sessionId && navigate(`/result/${sessionId}`)}
-              className="flex-1 rounded-xl bg-slate-900 py-3 text-white"
+              onClick={() => {
+                stopSpeaking()
+                sessionId && navigate(`/result/${sessionId}`)
+              }}
+              className="flex-1 rounded-xl bg-slate-900 py-3 text-sm font-bold text-white shadow hover:bg-slate-800 active:scale-95"
             >
-              Back to results
+              ఫలితాలు చూడండి (Results)
             </button>
           ) : (
             <button
-              onClick={() => sessionId && navigate(`/quiz/${sessionId}`)}
-              className="flex-1 rounded-xl bg-slate-900 py-3 text-white"
+              onClick={() => {
+                stopSpeaking()
+                sessionId && navigate(`/quiz/${sessionId}`)
+              }}
+              className="flex-1 rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white shadow-lg hover:bg-emerald-700 active:scale-95"
             >
-              Start questions
+              ప్రశ్నలు ప్రారంభించండి (Start Quiz) →
             </button>
           )}
         </div>

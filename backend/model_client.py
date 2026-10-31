@@ -290,7 +290,19 @@ class StubGemma(GemmaClient):
             value_match = re.search(r"Value as printed on the card: (.+)", prompt)
             field_id = field_match.group(1) if field_match else "this"
             value = value_match.group(1).strip() if value_match else "?"
-            return f"{field_id.replace('_', ' ')} విలువ {value} రూపాయలు. (stub వివరణ)"
+            
+            PURE_TELUGU_STUBS = {
+                "loan_amount": f"మీకు మంజూరైన లోన్ మొత్తం {value} రూపాయలు.",
+                "instalment_amount": f"మీరు ప్రతి వాయిదాకి {value} రూపాయలు చెల్లించాలి.",
+                "interest_rate": f"మీ లోన్ వార్షిక వడ్డీ రేటు {value} శాతం.",
+                "num_instalments": f"ఈ రుణం మొత్తం {value} వాయిదాలలో తీర్చాలి.",
+                "processing_fee": f"ప్రాసెసింగ్ రుసుముగా {value} రూపాయలు మినహాయిస్తారు.",
+                "insurance_premium": f"బీమా ప్రీమియం కొరకు {value} రూపాయలు కట్టాలి.",
+                "total_payable": f"అప్పు మరియు వడ్డీ కలిపి మొత్తం మీద {value} రూపాయలు కట్టాలి.",
+                "penalty": f"వాయిదా ఆలస్యమైతే అపరాధ రుసుము {value} రూపాయలు పడుతుంది.",
+                "tenure": f"ఈ లోన్ కాలపరిమితి {value} నెలలు.",
+            }
+            return PURE_TELUGU_STUBS.get(field_id, f"{field_id.replace('_', ' ')} విలువ {value} రూపాయలు.")
 
         if prompt.startswith("Transcribe this spoken Telugu answer"):
             # Matches samples/sample_telugu_answer_correct.wav's script (690 rupees).

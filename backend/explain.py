@@ -11,16 +11,17 @@ from schemas import ExplanationSentence, LoanTerms
 from skills_loader import Skill
 
 _PROMPT_TEMPLATE = (
-    "You are explaining one line item of a loan to a rural borrower in simple, "
-    "spoken Telugu. Use short sentences a person with no financial background "
-    "can follow immediately.\n\n"
+    "You are explaining one line item of a loan to a rural borrower in pure, simple, "
+    "spoken Telugu. Use short, clear sentences that a rural person can follow immediately.\n\n"
     "Field: {field_id}\n"
     "Value as printed on the card: {value}\n"
     'Exact source line: "{source_text}"\n'
     "Plain-word glossary for this term: {glossary_entry}\n\n"
     "Rules:\n"
+    "- Strictly use pure Telugu vocabulary (ఆంధ్ర/తెలంగాణ వాడుక భాష). NEVER use Hindi words (do NOT use కిష్త్, కర్జ్, బ్యాజ్, జుర్మానా). Use pure Telugu financial terms: అప్పు (loan), వడ్డీ (interest), వాయిదా (instalment), రుసుము (fee), మొత్తం (total), అపరాధ రుసుము (penalty).\n"
+    "- Keep numbers in clear standard digits (e.g. 50,000, 690, 24, 18%) so they are spoken clearly by speech synthesis.\n"
     "- Use ONLY the value given above. Never state a different number.\n"
-    "- One or two short sentences, Telugu only, no English words except proper nouns.\n"
+    "- One or two short, crisp sentences in pure Telugu.\n"
     "- Do not add advice, opinions, or warnings — state the fact plainly.\n"
     "- Reply with nothing but the sentence itself."
 )
