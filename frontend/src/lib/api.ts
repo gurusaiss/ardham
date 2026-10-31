@@ -120,11 +120,19 @@ export async function setBackend(backend: 'local' | 'aistudio' | 'groq'): Promis
 
 export async function extractTerms(
   loanType: string,
-  image: File
+  imageOrImages: File | File[]
 ): Promise<{ session_id: string; terms: LoanTerms; consistency_warnings: string[] }> {
   const form = new FormData()
   form.append('loan_type', loanType)
-  form.append('image', image)
+  if (Array.isArray(imageOrImages)) {
+    imageOrImages.forEach((f) => form.append('images', f))
+    if (imageOrImages.length > 0) {
+      form.append('image', imageOrImages[0])
+    }
+  } else {
+    form.append('image', imageOrImages)
+    form.append('images', imageOrImages)
+  }
   const res = await fetch(`${API_BASE}/extract`, { method: 'POST', body: form })
   const data = await asJson<{
     session_id: string

@@ -9,15 +9,15 @@ from model_client import GemmaClient
 from schemas import FIELD_IDS, NUMERIC_FIELD_IDS, LoanField, LoanTerms
 
 _PROMPT_TEMPLATE = (
-    "You are reading a photographed loan Key Fact Statement or loan card for a "
-    "{loan_type} in India. Extract ONLY the fields listed below, using text and "
-    "numbers that literally appear on the card.\n\n"
+    "You are reading a photographed loan Key Fact Statement or multi-page loan agreement for a "
+    "{loan_type} in India. The document may contain multiple pages (1 to 10+ pages). Inspect ALL pages. "
+    "Extract ONLY the fields listed below, using text and numbers that literally appear on the pages.\n\n"
     "Rules:\n"
-    "- Do not calculate, round, or infer any value that is not printed on the card.\n"
-    "- For every field, also return the exact line of text it came from (source_text).\n"
+    "- Do not calculate, round, or infer any value that is not printed on the document.\n"
+    "- For every field, also return the exact line of text and page context it came from (source_text).\n"
     "- If you are not confident a field is read correctly, set confidence below 0.7.\n"
-    "- If a field is not present on the card, set its value to null and confidence to 0.\n"
-    "- Never invent a borrower name, amount, or rate that is not visible in the image.\n\n"
+    "- If a field is not present on any page, set its value to null and confidence to 0.\n"
+    "- Never invent a borrower name, amount, or rate that is not visible in the images.\n\n"
     f"Fields: {', '.join(FIELD_IDS)}.\n\n"
     "Return JSON matching the given schema exactly."
 )
@@ -40,11 +40,12 @@ EXTRACT_SCHEMA = {
 
 
 def extract_terms(
-    client: GemmaClient, image_path: str | Path, loan_type: str
+    client: GemmaClient, image_path: str | Path | list[str | Path], loan_type: str
 ) -> tuple[LoanTerms, float]:
     """Returns (terms, latency_s) — latency surfaced for the frontend's debug panel."""
     prompt = _PROMPT_TEMPLATE.format(loan_type=loan_type)
-    result = client.generate(prompt, images=[image_path], schema=EXTRACT_SCHEMA)
+    images = image_path if isinstance(image_path, list) else [image_path]
+    result = client.generate(prompt, images=images, schema=EXTRACT_SCHEMA)
     try:
         raw = json.loads(result["text"])
     except json.JSONDecodeError as e:

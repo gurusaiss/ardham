@@ -268,7 +268,7 @@ class StubGemma(GemmaClient):
         return {"text": text, "latency_s": round(time.time() - t0, 3), "backend": "stub"}
 
     def _respond(self, prompt: str, audio) -> str:
-        if "Extract ONLY the fields" in prompt:
+        if "extract only the fields" in prompt.lower():
             terms = self._sample_terms
             if "gold" in prompt.lower():
                 terms = self._load_sample_terms("gold-loan")

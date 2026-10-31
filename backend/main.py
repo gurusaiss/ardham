@@ -119,19 +119,41 @@ def _get_session_or_404(session_id: str) -> dict:
 
 
 @app.post("/extract")
-async def extract(loan_type: str = Form(...), image: UploadFile = File(...)) -> dict:
+async def extract(
+    loan_type: str = Form(...),
+    image: UploadFile | None = File(None),
+    images: list[UploadFile] | None = File(None),
+) -> dict:
     try:
         Skill(loan_type)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
+    upload_list: list[UploadFile] = []
+    if images:
+        upload_list.extend(images)
+    if image and (not images or image.filename != (images[0].filename if images else None)):
+        upload_list.append(image)
+
+    if not upload_list:
+        raise HTTPException(status_code=400, detail="At least one image or document page is required")
+
     session_id = storage.create_session(loan_type)
-    image_path = storage.session_dir(session_id) / "loan_card.png"
-    with image_path.open("wb") as f:
-        shutil.copyfileobj(image.file, f)
+    saved_paths: list[Path] = []
+    for idx, up in enumerate(upload_list):
+        filename = f"loan_card_page_{idx + 1}.png"
+        path = storage.session_dir(session_id) / filename
+        with path.open("wb") as f:
+            shutil.copyfileobj(up.file, f)
+        saved_paths.append(path)
+
+    # Maintain backward compatibility for loan_card.png
+    primary_path = storage.session_dir(session_id) / "loan_card.png"
+    if not primary_path.exists() and saved_paths:
+        shutil.copyfile(saved_paths[0], primary_path)
 
     client = _get_client_or_503()
-    terms, latency_s = _call_model_or_503(extract_terms, client, image_path, loan_type)
+    terms, latency_s = _call_model_or_503(extract_terms, client, saved_paths, loan_type)
     storage.save_terms(session_id, terms)
 
     warnings = check_consistency(terms)
