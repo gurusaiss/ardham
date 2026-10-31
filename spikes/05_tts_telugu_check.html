@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Ardham — Telugu TTS Voice Check</title></head>
+<body style="font-family: sans-serif; max-width: 600px; margin: 40px auto;">
+  <h2>Spike 5: Telugu (te-IN) Web Speech API check</h2>
+  <p>Open this file in the browser you'll demo with (Chrome recommended). It lists every
+  voice your OS/browser exposes to <code>speechSynthesis</code>, and tells you whether a
+  <code>te-IN</code> voice exists.</p>
+  <button onclick="run()">Check voices</button>
+  <pre id="out" style="background:#eee; padding:12px; white-space:pre-wrap;"></pre>
+  <script>
+    function run() {
+      const out = document.getElementById('out');
+      function list() {
+        const voices = speechSynthesis.getVoices();
+        const te = voices.filter(v => v.lang.toLowerCase().startsWith('te'));
+        const hi = voices.filter(v => v.lang.toLowerCase().startsWith('hi'));
+        out.textContent =
+          `Total voices: ${voices.length}\n\n` +
+          `te-IN (Telugu) voices found: ${te.length}\n` +
+          te.map(v => `  - ${v.name} (${v.lang})`).join('\n') + '\n\n' +
+          `hi-IN (Hindi) voices found as fallback: ${hi.length}\n` +
+          hi.map(v => `  - ${v.name} (${v.lang})`).join('\n') + '\n\n' +
+          `All voices:\n` + voices.map(v => `  - ${v.name} (${v.lang})`).join('\n');
+
+        if (te.length > 0) {
+          const u = new SpeechSynthesisUtterance('మీ వారపు వాయిదా రూ. 690.');
+          u.voice = te[0];
+          u.lang = 'te-IN';
+          speechSynthesis.speak(u);
+        }
+      }
+      // voices load async in some browsers
+      if (speechSynthesis.getVoices().length) list();
+      else speechSynthesis.onvoiceschanged = list;
+    }
+  </script>
+</body>
+</html>

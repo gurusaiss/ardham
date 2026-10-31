@@ -1,0 +1,17 @@
+[
+  {
+    "field_id": "interest_rate",
+    "prompt_te": "ఈ అప్పుకు సంవత్సరానికి ఎంత శాతం వడ్డీ కడతారు?",
+    "prompt_en": "What yearly interest rate are you paying on this loan?"
+  },
+  {
+    "field_id": "total_payable",
+    "prompt_te": "మొత్తం మీద మీరు ఎంత రూపాయలు కడతారు?",
+    "prompt_en": "In total, how much will you pay back?"
+  },
+  {
+    "field_id": "penalty",
+    "prompt_te": "మీరు కట్టకపోతే ఏమి జరుగుతుంది?",
+    "prompt_en": "What happens if you don't pay?"
+  }
+]

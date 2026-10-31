@@ -1,0 +1,18 @@
+# Backend
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+*.pyc
+
+# Local data (SQLite + session uploads — never commit real or demo-session data)
+data/
+
+# Env
+.env
+
+# Samples we generate but don't need to track as binaries forever (keep the PNG we committed on purpose)
+samples/*.tmp
+
+# OS
+.DS_Store

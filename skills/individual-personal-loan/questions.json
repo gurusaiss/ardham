@@ -1,0 +1,17 @@
+[
+  {
+    "field_id": "instalment_amount",
+    "prompt_te": "మీరు ప్రతి నెల ఎంత రూపాయలు EMI కడతారు?",
+    "prompt_en": "How much EMI will you pay every month?"
+  },
+  {
+    "field_id": "interest_rate",
+    "prompt_te": "ఈ అప్పుకు సంవత్సరానికి ఎంత శాతం వడ్డీ?",
+    "prompt_en": "What is the yearly interest rate on this loan?"
+  },
+  {
+    "field_id": "total_payable",
+    "prompt_te": "మొత్తం మీద మీరు ఎంత రూపాయలు కడతారు?",
+    "prompt_en": "In total, how much will you pay back?"
+  }
+]

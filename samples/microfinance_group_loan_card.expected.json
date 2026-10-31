@@ -1,0 +1,13 @@
+{
+  "lender": {"value": "Sample Rural Credit MFI Ltd.", "source_text": "Lender: Sample Rural Credit MFI Ltd."},
+  "borrower_name": {"value": "Lakshmi Devi (fictional)", "source_text": "Borrower Name: Lakshmi Devi (fictional)"},
+  "loan_amount": {"value": 30000, "unit": "INR", "source_text": "Loan Amount Sanctioned: Rs. 30,000"},
+  "interest_rate": {"value": 24, "unit": "percent_per_annum_reducing", "source_text": "Interest Rate (Reducing Balance): 24% per annum"},
+  "tenure": {"value": 50, "unit": "weeks", "source_text": "Tenure: 50 weeks"},
+  "instalment_amount": {"value": 690, "unit": "INR_per_week", "source_text": "Instalment Amount: Rs. 690 per week"},
+  "num_instalments": {"value": 50, "source_text": "Number of Instalments: 50"},
+  "processing_fee": {"value": 300, "unit": "INR", "source_text": "Processing Fee: Rs. 300 (one-time, deducted upfront)"},
+  "insurance_premium": {"value": 150, "unit": "INR", "source_text": "Insurance Premium: Rs. 150 (one-time)"},
+  "total_payable": {"value": 34500, "unit": "INR", "source_text": "Total Amount Payable: Rs. 34,500"},
+  "penalty": {"value": 20, "unit": "INR_per_missed_instalment", "source_text": "Penalty for Late Payment: Rs. 20 per missed weekly instalment"}
+}

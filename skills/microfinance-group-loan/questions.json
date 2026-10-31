@@ -1,0 +1,22 @@
+[
+  {
+    "field_id": "instalment_amount",
+    "prompt_te": "మీరు ప్రతి వారం ఎంత రూపాయలు కడతారు?",
+    "prompt_en": "How much will you pay every week?"
+  },
+  {
+    "field_id": "total_payable",
+    "prompt_te": "మొత్తం మీద మీరు ఎంత రూపాయలు కడతారు?",
+    "prompt_en": "In total, how much will you pay back?"
+  },
+  {
+    "field_id": "num_instalments",
+    "prompt_te": "మీరు ఎన్ని వారాల పాటు కడతారు?",
+    "prompt_en": "For how many weeks will you be paying?"
+  },
+  {
+    "field_id": "penalty",
+    "prompt_te": "ఒక వాయిదా మిస్ అయితే ఎంత జరిమానా కడతారు?",
+    "prompt_en": "If you miss one instalment, how much is the penalty?"
+  }
+]
