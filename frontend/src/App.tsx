@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import DebugPanel from './components/DebugPanel'
 import Home from './pages/Home'
+import Auth from './pages/Auth'
 import ChooseLoanType from './pages/ChooseLoanType'
 import Scan from './pages/Scan'
 import Review from './pages/Review'
@@ -14,6 +15,7 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/choose-loan" element={<ChooseLoanType />} />
         <Route path="/scan/:loanType" element={<Scan />} />
         <Route path="/review/:sessionId" element={<Review />} />
