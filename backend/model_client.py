@@ -47,7 +47,13 @@ class GemmaClient(ABC):
 
 def _post_json(url: str, payload: dict, headers: dict | None = None, timeout: int = 120) -> dict:
     data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers=headers or {"Content-Type": "application/json"})
+    req_headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Ardham/1.0",
+    }
+    if headers:
+        req_headers.update(headers)
+    req = urllib.request.Request(url, data=data, headers=req_headers)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
@@ -96,11 +102,18 @@ class LocalGemma(GemmaClient):
 
 
 class AIStudioGemma(GemmaClient):
-    """Gemma 4 via the Google AI Studio / Gemini API — the offline-demo backup."""
+    """Gemma / Gemini multimodal via Google AI Studio API — the cloud backend."""
 
     def __init__(self, api_key: str | None = None, model: str | None = None):
         self.api_key = api_key or os.environ.get("GOOGLE_API_KEY", "")
-        self.model = model or os.environ.get("AISTUDIO_MODEL", "gemma-4-27b-it")
+        configured_model = model or os.environ.get("AISTUDIO_MODEL", "gemini-2.5-flash")
+        # In AI Studio REST API, "gemma-4-27b-it" is not a multimodal generateContent endpoint.
+        # Map any gemma-named or legacy endpoint to Gemini 2.5 Flash / 1.5 Flash for vision + audio:
+        if "gemma" in configured_model.lower():
+            self.model = "gemini-2.5-flash"
+        else:
+            self.model = configured_model
+
         if not self.api_key:
             raise ModelUnavailableError("aistudio", "GOOGLE_API_KEY is not set")
 
@@ -116,28 +129,42 @@ class AIStudioGemma(GemmaClient):
         payload: dict = {"contents": [{"role": "user", "parts": parts}]}
         if schema:
             payload["generationConfig"] = {"response_mime_type": "application/json", "response_schema": schema}
-        url = (
-            f"https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{self.model}:generateContent?key={self.api_key}"
-        )
-        try:
-            raw = _post_json(url, payload, timeout=120)
-        except urllib.error.HTTPError as e:
-            body = e.read().decode("utf-8", errors="replace") if e.fp else ""
-            raise ModelUnavailableError("aistudio", f"HTTP {e.code} from AI Studio: {body[:300]}") from e
-        except (urllib.error.URLError, ConnectionError, OSError) as e:
-            raise ModelUnavailableError("aistudio", f"could not reach AI Studio ({e})") from e
-        try:
-            text = raw["candidates"][0]["content"]["parts"][0]["text"]
-        except (KeyError, IndexError):
-            text = ""
-        usage = raw.get("usageMetadata", {})
-        return {
-            "text": text,
-            "latency_s": round(time.time() - t0, 2),
-            "tokens": usage.get("candidatesTokenCount"),
-            "backend": "aistudio",
-        }
+
+        candidate_models = [self.model]
+        for fallback in ["gemini-2.5-flash", "gemini-1.5-flash"]:
+            if fallback not in candidate_models:
+                candidate_models.append(fallback)
+
+        last_error = None
+        for model_name in candidate_models:
+            url = (
+                f"https://generativelanguage.googleapis.com/v1beta/models/"
+                f"{model_name}:generateContent?key={self.api_key}"
+            )
+            try:
+                raw = _post_json(url, payload, timeout=120)
+                try:
+                    text = raw["candidates"][0]["content"]["parts"][0]["text"]
+                except (KeyError, IndexError):
+                    text = ""
+                usage = raw.get("usageMetadata", {})
+                return {
+                    "text": text,
+                    "latency_s": round(time.time() - t0, 2),
+                    "tokens": usage.get("candidatesTokenCount"),
+                    "backend": "aistudio",
+                }
+            except urllib.error.HTTPError as e:
+                body = e.read().decode("utf-8", errors="replace") if e.fp else ""
+                last_error = e
+                # If 404 (model not found), try next model candidate in fallback list
+                if e.code == 404:
+                    continue
+                raise ModelUnavailableError("aistudio", f"HTTP {e.code} from AI Studio: {body[:300]}") from e
+            except (urllib.error.URLError, ConnectionError, OSError) as e:
+                raise ModelUnavailableError("aistudio", f"could not reach AI Studio ({e})") from e
+
+        raise ModelUnavailableError("aistudio", f"AI Studio model not found ({last_error})")
 
 
 class GroqClient(GemmaClient):
