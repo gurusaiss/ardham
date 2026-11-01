@@ -43,16 +43,29 @@ export type ModelUnavailableDetail = {
   reason: string
 }
 
-/** Thrown for any non-2xx response. `.modelUnavailable` is set when the backend
- * returned our structured 503 shape, so the UI can offer a one-click backup switch. */
+export type ApiErrorDetail = {
+  error?: string
+  message?: string
+  message_en?: string
+  message_te?: string
+  message_hi?: string
+  backend?: string
+  reason?: string
+}
+
+/** Thrown for any non-2xx response. `.detail` preserves structured error responses,
+ * and `.modelUnavailable` is set when the backend returned 503. */
 export class ApiError extends Error {
   status: number
+  detail: ApiErrorDetail | null
   modelUnavailable: ModelUnavailableDetail | null
 
-  constructor(status: number, message: string, modelUnavailable: ModelUnavailableDetail | null = null) {
+  constructor(status: number, message: string, detail: ApiErrorDetail | null = null) {
     super(message)
     this.status = status
-    this.modelUnavailable = modelUnavailable
+    this.detail = detail
+    this.modelUnavailable =
+      detail?.error === 'model_unavailable' ? (detail as unknown as ModelUnavailableDetail) : null
   }
 }
 
@@ -89,14 +102,20 @@ export function clearLatencyLog() {
 async function asJson<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    let detail: ModelUnavailableDetail | null = null
+    let detail: ApiErrorDetail | null = null
     try {
       const parsed = JSON.parse(text)
-      if (parsed?.detail?.error === 'model_unavailable') detail = parsed.detail
+      detail = parsed?.detail || parsed
     } catch {
       // not JSON, or not our shape — fall through with detail=null
     }
-    throw new ApiError(res.status, detail ? `${detail.backend}: ${detail.reason}` : text || res.statusText, detail)
+    const msg =
+      detail?.message ||
+      detail?.message_en ||
+      (detail?.backend ? `${detail.backend}: ${detail.reason}` : '') ||
+      text ||
+      res.statusText
+    throw new ApiError(res.status, msg, detail)
   }
   return res.json() as Promise<T>
 }

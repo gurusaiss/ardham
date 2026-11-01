@@ -94,3 +94,61 @@ def test_compute_fairness_analysis():
     assert fairness["fairness_score"] >= 75
     assert fairness["moneylender_comparison"]["borrower_savings"] > 0
     assert len(fairness["warnings_te"]) >= 0
+
+
+def test_validate_file_boundaries_passes_valid():
+    from guard import validate_file_boundaries
+
+    # 50 KB PNG should pass
+    validate_file_boundaries("loan_card.png", 50000)
+    # 2 MB PDF should pass
+    validate_file_boundaries("sanction_letter.pdf", 2 * 1024 * 1024)
+
+
+def test_validate_file_boundaries_rejects_invalid_extension():
+    import pytest
+    from guard import DocumentBoundaryError, validate_file_boundaries
+
+    with pytest.raises(DocumentBoundaryError) as exc_info:
+        validate_file_boundaries("malicious.exe", 5000)
+    assert "Invalid file extension" in exc_info.value.message_en
+
+
+def test_validate_file_boundaries_rejects_oversized_file():
+    import pytest
+    from guard import DocumentBoundaryError, validate_file_boundaries
+
+    with pytest.raises(DocumentBoundaryError) as exc_info:
+        validate_file_boundaries("huge_loan.jpg", 16 * 1024 * 1024)
+    assert "exceeds maximum limit" in exc_info.value.message_en
+
+
+def test_validate_file_boundaries_rejects_corrupted_empty_file():
+    import pytest
+    from guard import DocumentBoundaryError, validate_file_boundaries
+
+    with pytest.raises(DocumentBoundaryError) as exc_info:
+        validate_file_boundaries("empty.png", 50)
+    assert "empty or corrupt" in exc_info.value.message_en
+
+
+def test_validate_loan_document_authenticity_accepts_valid_loan():
+    from guard import validate_loan_document_authenticity
+
+    # SAMPLE_TERMS contains loan_amount, interest_rate, etc.
+    validate_loan_document_authenticity(SAMPLE_TERMS)
+
+
+def test_validate_loan_document_authenticity_rejects_non_loan_doc():
+    import pytest
+    from guard import InvalidLoanDocumentError, validate_loan_document_authenticity
+
+    # Fake terms from a selfie, pet photo, or non-loan paper where fields are None
+    empty_terms = {
+        k: LoanField(value=None, source_text="", confidence=0.0)
+        for k in SAMPLE_TERMS
+    }
+    with pytest.raises(InvalidLoanDocumentError) as exc_info:
+        validate_loan_document_authenticity(empty_terms)
+    assert "does not appear to be a loan agreement" in exc_info.value.message_en
+

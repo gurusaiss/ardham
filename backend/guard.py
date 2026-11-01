@@ -18,11 +18,96 @@ enough to catch clearly invented figures, not a full NLP numeral parser.
 """
 from __future__ import annotations
 
+import os
 import re
 
 from schemas import ExplanationSentence, LoanTerms
 
 TOLERANCE = 0.02  # 2% relative tolerance for rounding in recomputed totals
+
+# --- System Barriers, Bounds & Integrity Guards ------------------------------------
+ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".pdf"}
+MAX_FILE_BYTES = 15 * 1024 * 1024  # 15 MB per page
+MIN_FILE_BYTES = 100  # Minimum 100 bytes (blocks empty/corrupted uploads)
+MAX_PAGES = 15
+
+
+class DocumentBoundaryError(Exception):
+    """Raised when an uploaded file violates size, format, or page boundaries."""
+
+    def __init__(self, message_en: str, message_te: str, message_hi: str):
+        self.message_en = message_en
+        self.message_te = message_te
+        self.message_hi = message_hi
+        super().__init__(message_en)
+
+
+class InvalidLoanDocumentError(Exception):
+    """Raised when an uploaded image is not a genuine loan document (e.g. selfie, receipt, pet)."""
+
+    def __init__(self, message_en: str, message_te: str, message_hi: str):
+        self.message_en = message_en
+        self.message_te = message_te
+        self.message_hi = message_hi
+        super().__init__(message_en)
+
+
+def validate_file_boundaries(filename: str, size_bytes: int) -> None:
+    """Enforces strict file type, file size, and page boundaries."""
+    ext = os.path.splitext(filename.lower())[1]
+    if ext not in ALLOWED_EXTENSIONS:
+        raise DocumentBoundaryError(
+            f"Invalid file extension '{ext}'. Only loan document photos (PNG, JPG, WEBP) or PDFs are accepted.",
+            f"చెల్లని ఫైల్ రకం '{ext}'. కేవలం లోన్ కార్డు ఫోటోలు (PNG, JPG, WEBP) లేదా PDF పత్రాలు మాత్రమే అనుమతించబడతాయి.",
+            f"अमान्य फ़ाइल प्रकार '{ext}'। केवल ऋण दस्तावेज़ की फोटो (PNG, JPG, WEBP) या PDF स्वीकार किए जाते हैं।",
+        )
+
+    if size_bytes > MAX_FILE_BYTES:
+        raise DocumentBoundaryError(
+            f"File '{filename}' exceeds maximum limit of 15MB. Please upload a smaller document image.",
+            f"ఫైల్ '{filename}' 15MB కంటే పెద్దదిగా ఉంది. దయచేసి చిన్న సైజు గల లోన్ కార్డు ఫోటోను అప్‌లోడ్ చేయండి.",
+            f"फ़ाइल '{filename}' 15MB सीमा से अधिक है। कृपया एक छोटी फ़ाइल अपलोड करें।",
+        )
+
+    if size_bytes < MIN_FILE_BYTES:
+        raise DocumentBoundaryError(
+            f"File '{filename}' appears empty or corrupt (under 100 bytes). Please take a clear photo of your loan card.",
+            f"ఫైల్ '{filename}' ఖాళీగా లేదా దెబ్బతిన్నట్లు ఉంది. దయచేసి లోన్ కార్డును స్పష్టంగా ఫోటో తీయండి.",
+            f"फ़ाइल '{filename}' खाली या दूषित प्रतीत होती है। कृपया स्पष्ट ऋण दस्तावेज़ अपलोड करें।",
+        )
+
+
+def validate_loan_document_authenticity(terms: LoanTerms) -> None:
+    """
+    Barrier: Strictly rejects non-loan documents (selfies, tickets, food, bills, random text).
+    A genuine loan document or agreement must contain at least one primary debt metric
+    (loan amount, interest rate, instalment amount, total payable, or tenure).
+    """
+    core_fields = [
+        "loan_amount",
+        "interest_rate",
+        "instalment_amount",
+        "num_instalments",
+        "total_payable",
+        "tenure",
+    ]
+
+    valid_core_count = 0
+    for field_id in core_fields:
+        f = terms.get(field_id)
+        if f and f.value is not None and f.confidence > 0.2:
+            if isinstance(f.value, (int, float)) and f.value > 0:
+                valid_core_count += 1
+            elif isinstance(f.value, str) and len(f.value.strip()) > 0:
+                valid_core_count += 1
+
+    if valid_core_count == 0:
+        raise InvalidLoanDocumentError(
+            "This document does not appear to be a loan agreement, passbook, or repayment schedule. Non-loan documents are strictly rejected. Please upload a valid microfinance loan card.",
+            "ఈ పత్రంలో ఎలాంటి లోన్ లేదా రుణ చెల్లింపు వివరాలు కనిపించడం లేదు. లోన్ సంబంధిత పత్రాలు మాత్రమే అనుమతించబడతాయి. దయచేసి సరైన లోన్ కార్డు లేదా బ్యాంక్ పాస్‌బుక్‌ను అప్‌లోడ్ చేయండి.",
+            "यह दस्तावेज़ ऋण अनुबंध, पासबुक या ऋण कार्ड नहीं लगता है। गैर-ऋण दस्तावेज़ अस्वीकार किए जाते हैं। कृपया एक वैध ऋण दस्तावेज़ अपलोड करें।",
+        )
+
 
 # Minimal Telugu numeral-word -> value table, combined additively/multiplicatively
 # (e.g. "ఆరు వందల తొంభై" -> 6*100 + 90 = 690). Covers what a borrower is likely to

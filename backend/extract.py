@@ -9,10 +9,14 @@ from model_client import GemmaClient
 from schemas import FIELD_IDS, NUMERIC_FIELD_IDS, LoanField, LoanTerms
 
 _PROMPT_TEMPLATE = (
-    "You are reading a photographed loan Key Fact Statement or multi-page loan agreement for a "
-    "{loan_type} in India. The document may contain multiple pages (1 to 10+ pages). Inspect ALL pages. "
-    "Extract ONLY the fields listed below, using text and numbers that literally appear on the pages.\n\n"
-    "Rules:\n"
+    "You are reading a photographed loan Key Fact Statement, loan card, or multi-page loan agreement for a "
+    "{loan_type} in India. The document may contain multiple pages (1 to 10+ pages). Inspect ALL pages.\n\n"
+    "SAFETY GUARDRAIL & DOCUMENT BARRIER:\n"
+    "- If the uploaded images are NOT a genuine loan agreement, microfinance passbook, loan sanction letter, "
+    "or debt repayment card (for example: user selfies, pets, landscapes, grocery bills, food, random receipts, blank paper), "
+    "DO NOT invent or guess any loan figures. Set every field value to null and confidence to 0.\n\n"
+    "Extraction Rules:\n"
+    "- Extract ONLY the fields listed below, using text and numbers that literally appear on the pages.\n"
     "- Do not calculate, round, or infer any value that is not printed on the document.\n"
     "- For every field, also return the exact line of text and page context it came from (source_text).\n"
     "- If you are not confident a field is read correctly, set confidence below 0.7.\n"

@@ -178,3 +178,18 @@ def test_tts_endpoint(client):
     if resp.status_code == 200:
         assert resp.headers["content-type"] == "audio/mpeg"
         assert len(resp.content) > 0
+
+
+def test_extract_rejects_invalid_file_extension(client):
+    """Barrier test: Rejects non-document files like .exe or .mp4 with HTTP 400."""
+    fake_exe = b"MZ\x90\x00\x03\x00\x00\x00\x04\x00\x00\x00\xff\xff" * 20
+    resp = client.post(
+        "/extract",
+        data={"loan_type": "microfinance-group-loan"},
+        files={"image": ("malware.exe", fake_exe, "application/octet-stream")},
+    )
+    assert resp.status_code == 400
+    data = resp.json()
+    assert data["detail"]["error"] == "DOCUMENT_BOUNDARY_ERROR"
+    assert "Invalid file extension" in data["detail"]["message_en"]
+

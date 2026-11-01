@@ -17,7 +17,15 @@ import storage
 from certificate import build_certificate, render_html
 from extract import extract_terms
 from explain import generate_explanation
-from guard import check_consistency, compute_fairness_analysis
+from guard import (
+    DocumentBoundaryError,
+    InvalidLoanDocumentError,
+    MAX_PAGES,
+    check_consistency,
+    compute_fairness_analysis,
+    validate_file_boundaries,
+    validate_loan_document_authenticity,
+)
 from model_client import ModelUnavailableError, get_client
 from quiz import generate_questions, grade_answer
 from schemas import GradeResult, LoanField, LoanTerms, Question
@@ -139,13 +147,60 @@ async def extract(
     if not upload_list:
         raise HTTPException(status_code=400, detail="At least one image or document page is required")
 
+    # Barrier 1: Page quantity limit
+    if len(upload_list) > MAX_PAGES:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "DOCUMENT_BOUNDARY_ERROR",
+                "message": f"Maximum {MAX_PAGES} pages allowed per session. You provided {len(upload_list)} pages.",
+                "message_en": f"Maximum {MAX_PAGES} pages allowed per session. You provided {len(upload_list)} pages.",
+                "message_te": f"ఒకేసారి గరిష్టంగా {MAX_PAGES} పేజీలు మాత్రమే అనుమతించబడతాయి. మీరు {len(upload_list)} పేజీలు ఇచ్చారు.",
+                "message_hi": f"प्रति सत्र अधिकतम {MAX_PAGES} पृष्ठों की अनुमति है। आपने {len(upload_list)} पृष्ठ दिए हैं।",
+            },
+        )
+
+    # Barrier 2: File extension preliminary check
+    for up in upload_list:
+        fname = up.filename or "unknown.png"
+        ext = os.path.splitext(fname.lower())[1]
+        if ext and ext not in {".png", ".jpg", ".jpeg", ".webp", ".pdf"}:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error": "DOCUMENT_BOUNDARY_ERROR",
+                    "message": f"Invalid file extension '{ext}'. Only loan document photos (PNG, JPG, WEBP) or PDFs are accepted.",
+                    "message_en": f"Invalid file extension '{ext}'. Only loan document photos (PNG, JPG, WEBP) or PDFs are accepted.",
+                    "message_te": f"చెల్లని ఫైల్ రకం '{ext}'. కేవలం లోన్ కార్డు ఫోటోలు (PNG, JPG, WEBP) లేదా PDF పత్రాలు మాత్రమే అనుమతించబడతాయి.",
+                    "message_hi": f"अमान्य फ़ाइल प्रकार '{ext}'। केवल ऋण दस्तावेज़ की फोटो (PNG, JPG, WEBP) या PDF स्वीकार किए जाते हैं।",
+                },
+            )
+
     session_id = storage.create_session(loan_type)
     saved_paths: list[Path] = []
     for idx, up in enumerate(upload_list):
-        filename = f"loan_card_page_{idx + 1}.png"
+        fname = up.filename or f"page_{idx + 1}.png"
+        ext = os.path.splitext(fname.lower())[1] or ".png"
+        filename = f"loan_card_page_{idx + 1}{ext}"
         path = storage.session_dir(session_id) / filename
         with path.open("wb") as f:
             shutil.copyfileobj(up.file, f)
+
+        file_size = path.stat().st_size
+        try:
+            validate_file_boundaries(fname, size_bytes=file_size)
+        except DocumentBoundaryError as e:
+            shutil.rmtree(storage.session_dir(session_id), ignore_errors=True)
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error": "DOCUMENT_BOUNDARY_ERROR",
+                    "message": e.message_en,
+                    "message_en": e.message_en,
+                    "message_te": e.message_te,
+                    "message_hi": e.message_hi,
+                },
+            )
         saved_paths.append(path)
 
     # Maintain backward compatibility for loan_card.png
@@ -155,6 +210,23 @@ async def extract(
 
     client = _get_client_or_503()
     terms, latency_s = _call_model_or_503(extract_terms, client, saved_paths, loan_type)
+
+    # Barrier 3: Enforce loan document authenticity (strictly rejects non-loan images)
+    try:
+        validate_loan_document_authenticity(terms)
+    except InvalidLoanDocumentError as e:
+        shutil.rmtree(storage.session_dir(session_id), ignore_errors=True)
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "INVALID_LOAN_DOCUMENT",
+                "message": e.message_en,
+                "message_en": e.message_en,
+                "message_te": e.message_te,
+                "message_hi": e.message_hi,
+            },
+        )
+
     storage.save_terms(session_id, terms)
 
     warnings = check_consistency(terms)
