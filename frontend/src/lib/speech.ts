@@ -19,6 +19,7 @@ const MODAL_ANSWERED_KEY = 'ardham_voice_modal_answered'
 type SpeakingListener = (speaking: boolean) => void
 const speakingListeners = new Set<SpeakingListener>()
 let currentSpeakingState = false
+let currentAudioElement: HTMLAudioElement | null = null
 
 function notifySpeaking(speaking: boolean) {
   currentSpeakingState = speaking
@@ -40,13 +41,29 @@ export function subscribeSpeaking(fn: SpeakingListener): () => void {
 }
 
 export function isSpeaking(): boolean {
+  if (currentAudioElement && !currentAudioElement.paused && !currentAudioElement.ended) return true
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false
   return window.speechSynthesis.speaking
 }
 
 export function stopSpeaking() {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-  window.speechSynthesis.cancel()
+  if (currentAudioElement) {
+    try {
+      currentAudioElement.pause()
+      currentAudioElement.currentTime = 0
+      currentAudioElement.src = ''
+    } catch {
+      // ignore
+    }
+    currentAudioElement = null
+  }
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel()
+    } catch {
+      // ignore
+    }
+  }
   notifySpeaking(false)
 }
 
@@ -239,7 +256,7 @@ export function teluguToPhonetic(text: string): string {
   let res = text
   const sorted = Object.keys(TELUGU_PHONETIC_PHRASES).sort((a, b) => b.length - a.length)
   for (const k of sorted) {
-    res = res.split(k).join(' ' + TELUGU_PHONETIC_PHRASES[k] + ' ')
+    res = res.split(k).join(TELUGU_PHONETIC_PHRASES[k])
   }
 
   let out = ''
@@ -282,7 +299,7 @@ export function teluguToPhonetic(text: string): string {
     }
   }
 
-  // Strip any lingering non-ASCII unicode to guarantee speech engines never drop words
+  // Strip any lingering non-ASCII unicode and collapse extra spaces while preserving natural sentences
   return out.replace(/[^\x00-\x7F]/g, '').replace(/\s+/g, ' ').trim()
 }
 
@@ -422,9 +439,59 @@ export function getYoungFemaleVoice(
 
 /**
  * Universal Speech Synthesizer:
- * Speaks with a young, soft, attractive, and reassuring female voice persona.
+ * 1. Prioritizes High-Fidelity Indian Neural Voices:
+ *    - Telugu: te-IN-ShrutiNeural (Pure local Andhra Pradesh / Telangana Telugu, fluent & natural)
+ *    - Hindi: hi-IN-SwaraNeural (Authentic polite Indian Hindi)
+ *    - English: en-IN-NeerjaExpressiveNeural (Warm, expressive young Indian English)
+ * 2. Seamlessly falls back to local Web Speech API when offline.
  */
 export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) {
+  stopSpeaking()
+
+  const targetLang = lang || getLanguage()
+  const sanitized = targetLang === 'te' ? sanitizeTeluguText(text) : text
+
+  // Try high-fidelity backend Neural TTS first
+  try {
+    const encoded = encodeURIComponent(sanitized.slice(0, 800))
+    const ttsUrl = `/api/tts?text=${encoded}&lang=${targetLang}`
+    const audio = new Audio(ttsUrl)
+    currentAudioElement = audio
+
+    let playbackStarted = false
+
+    audio.onplay = () => {
+      playbackStarted = true
+      notifySpeaking(true)
+    }
+
+    audio.onended = () => {
+      notifySpeaking(false)
+      currentAudioElement = null
+      onEnd?.()
+    }
+
+    audio.onerror = () => {
+      currentAudioElement = null
+      speakWithWebSpeech(sanitized, targetLang, onEnd)
+    }
+
+    audio.play().catch(() => {
+      if (!playbackStarted) {
+        currentAudioElement = null
+        speakWithWebSpeech(sanitized, targetLang, onEnd)
+      }
+    })
+    return
+  } catch {
+    speakWithWebSpeech(sanitized, targetLang, onEnd)
+  }
+}
+
+/**
+ * On-device Web Speech API fallback.
+ */
+export function speakWithWebSpeech(text: string, targetLang: AppLanguage, onEnd?: () => void) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     onEnd?.()
     return
@@ -432,13 +499,10 @@ export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) 
 
   stopSpeaking()
 
-  const targetLang = lang || getLanguage()
-  const sanitized = targetLang === 'te' ? sanitizeTeluguText(text) : text
   const voices = window.speechSynthesis.getVoices()
-
   const voiceToUse = getYoungFemaleVoice(voices, targetLang)
-  let textToSpeak = sanitized
-  let langTag = 'en-IN'
+  let textToSpeak = text
+  let langTag = targetLang === 'hi' ? 'hi-IN' : targetLang === 'te' ? 'te-IN' : 'en-IN'
 
   if (targetLang === 'te') {
     const hasNativeTeVoice =
@@ -446,18 +510,17 @@ export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) 
       (voiceToUse.lang.toLowerCase().startsWith('te') || voiceToUse.name.toLowerCase().includes('telugu'))
 
     if (hasNativeTeVoice) {
-      textToSpeak = sanitized
+      textToSpeak = text
       langTag = 'te-IN'
     } else {
-      // Use phonetic transliteration so Indian English female voice speaks every single word
-      textToSpeak = teluguToPhonetic(sanitized)
+      textToSpeak = teluguToPhonetic(text)
       langTag = 'en-IN'
     }
   } else if (targetLang === 'hi') {
-    textToSpeak = sanitized
+    textToSpeak = text
     langTag = 'hi-IN'
   } else {
-    textToSpeak = sanitized
+    textToSpeak = text
     langTag = 'en-IN'
   }
 

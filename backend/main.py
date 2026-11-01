@@ -1,6 +1,7 @@
 """FastAPI app — one process, wires extract -> guard -> explain -> quiz -> certificate."""
 from __future__ import annotations
 
+import hashlib
 import os
 import shutil
 from contextlib import asynccontextmanager
@@ -282,6 +283,44 @@ async def get_answer_audio(session_id: str, field_id: str):
     if sample_audio.exists():
         return FileResponse(sample_audio, media_type="audio/wav")
     raise HTTPException(status_code=404, detail="Audio recording not found")
+
+
+# High-Fidelity Indian Regional Neural Text-To-Speech (Telugu, Hindi, Indian English)
+TTS_CACHE_DIR = Path(__file__).parent / "data" / "tts_cache"
+TTS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+TTS_VOICE_MAP = {
+    "te": "te-IN-ShrutiNeural",            # Local Andhra Pradesh & Telangana Telugu Female
+    "hi": "hi-IN-SwaraNeural",             # Authentic polite Hindi Female
+    "en": "en-IN-NeerjaExpressiveNeural",  # Fluent young Indian English Female
+}
+
+
+@app.get("/api/tts")
+async def tts_synthesize(text: str, lang: str = "te"):
+    """Synthesizes crystal-clear local Indian accents using neural voice models."""
+    cleaned_text = text.strip()
+    if not cleaned_text:
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+
+    target_lang = "te" if lang.startswith("te") else "hi" if lang.startswith("hi") else "en"
+    voice = TTS_VOICE_MAP.get(target_lang, "te-IN-ShrutiNeural")
+
+    # Fast disk cache check
+    cache_key = hashlib.sha256(f"{voice}:{cleaned_text}".encode("utf-8")).hexdigest()
+    cache_path = TTS_CACHE_DIR / f"{cache_key}.mp3"
+
+    if cache_path.exists():
+        return FileResponse(cache_path, media_type="audio/mpeg")
+
+    try:
+        import edge_tts
+
+        communicate = edge_tts.Communicate(cleaned_text, voice, rate="-4%", pitch="+2Hz")
+        await communicate.save(str(cache_path))
+        return FileResponse(cache_path, media_type="audio/mpeg")
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Neural TTS service unavailable: {e}")
 
 
 # Optional Full-Stack Deployment: Serve frontend SPA build if present

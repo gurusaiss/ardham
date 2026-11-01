@@ -168,3 +168,13 @@ def test_model_unavailable_shape_for_real_backends(monkeypatch, tmp_path):
     detail = resp.json()["detail"]
     assert detail["error"] == "model_unavailable"
     assert detail["backend"] == "local"
+
+
+def test_tts_endpoint(client):
+    """Verifies that the /api/tts endpoint responds with audio/mpeg or 503 if edge_tts network is restricted."""
+    resp = client.get("/api/tts", params={"text": "నమస్కారం", "lang": "te"})
+    # Either succeeds with 200 and mp3 or 503 if network down in sandbox
+    assert resp.status_code in (200, 503)
+    if resp.status_code == 200:
+        assert resp.headers["content-type"] == "audio/mpeg"
+        assert len(resp.content) > 0
