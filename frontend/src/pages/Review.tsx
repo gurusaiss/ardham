@@ -185,29 +185,35 @@ export default function Review() {
                 <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
                   {t('money_flow_title', lang)}
                 </div>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="rounded-2xl bg-emerald-50/90 p-4 border border-emerald-200 shadow-sm">
-                    <div className="text-xs font-bold text-emerald-900">{t('net_in_hand', lang)}</div>
-                    <div className="text-lg sm:text-2xl font-black text-emerald-950 mt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-center">
+                  <div className="rounded-2xl bg-emerald-50/90 p-3 sm:p-4 border border-emerald-200 shadow-sm flex sm:flex-col justify-between items-center sm:justify-center">
+                    <div className="text-left sm:text-center">
+                      <div className="text-xs font-bold text-emerald-900">{t('net_in_hand', lang)}</div>
+                      <div className="text-[10px] sm:text-xs text-emerald-800 font-semibold mt-0.5">Disbursed</div>
+                    </div>
+                    <div className="text-lg sm:text-2xl font-black text-emerald-950 font-mono">
                       ₹{fairness.net_in_hand.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-xs text-emerald-800 font-semibold mt-0.5">Disbursed</div>
                   </div>
 
-                  <div className="rounded-2xl bg-amber-50/90 p-4 border border-amber-200 shadow-sm">
-                    <div className="text-xs font-bold text-amber-900">{t('extra_cost', lang)}</div>
-                    <div className="text-lg sm:text-2xl font-black text-amber-950 mt-1">
+                  <div className="rounded-2xl bg-amber-50/90 p-3 sm:p-4 border border-amber-200 shadow-sm flex sm:flex-col justify-between items-center sm:justify-center">
+                    <div className="text-left sm:text-center">
+                      <div className="text-xs font-bold text-amber-900">{t('extra_cost', lang)}</div>
+                      <div className="text-[10px] sm:text-xs text-amber-800 font-semibold mt-0.5">Interest + Fees</div>
+                    </div>
+                    <div className="text-lg sm:text-2xl font-black text-amber-950 font-mono">
                       ₹{fairness.total_extra_cost.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-xs text-amber-800 font-semibold mt-0.5">Interest + Fees</div>
                   </div>
 
-                  <div className="rounded-2xl bg-slate-50/90 p-4 border border-slate-200 shadow-sm">
-                    <div className="text-xs font-bold text-slate-800">{t('total_repayment', lang)}</div>
-                    <div className="text-lg sm:text-2xl font-black text-slate-900 mt-1">
+                  <div className="rounded-2xl bg-slate-50/90 p-3 sm:p-4 border border-slate-200 shadow-sm flex sm:flex-col justify-between items-center sm:justify-center">
+                    <div className="text-left sm:text-center">
+                      <div className="text-xs font-bold text-slate-800">{t('total_repayment', lang)}</div>
+                      <div className="text-[10px] sm:text-xs text-slate-600 font-semibold mt-0.5">Total Repaid</div>
+                    </div>
+                    <div className="text-lg sm:text-2xl font-black text-slate-900 font-mono">
                       ₹{fairness.total_payable.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-xs text-slate-600 font-semibold mt-0.5">Total Repaid</div>
                   </div>
                 </div>
 

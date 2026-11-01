@@ -293,20 +293,20 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
       aria-modal="true"
       className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-[#022c22] via-[#064e3b] to-[#041c15] text-white overflow-hidden animate-fade-in select-none"
     >
-      {/* Top Header: Pure Minimalist Navigation */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-emerald-900/40 bg-black/20 backdrop-blur-md z-30">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400/20 border border-amber-400/50 text-xl font-bold text-amber-300">
+      {/* Top Header: Pure Minimalist Navigation (Mobile-First Single Row) */}
+      <header className="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-4 border-b border-emerald-900/40 bg-black/40 backdrop-blur-md z-30">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl sm:rounded-2xl bg-amber-400/20 border border-amber-400/50 text-base sm:text-xl font-bold text-amber-300">
             🏛️
           </div>
           <div>
-            <h1 className="text-base sm:text-lg font-extrabold text-amber-100 flex items-center gap-2">
-              <span>{lang === 'en' ? 'Ardham AI Loan Advisor' : 'అర్థం AI రుణ సహాయకురాలు'}</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider">
-                Voice Only
+            <h1 className="text-sm sm:text-lg font-extrabold text-amber-100 flex items-center gap-1.5">
+              <span>{lang === 'en' ? 'Ardham AI Advisor' : 'అర్థం AI రుణ సహాయకురాలు'}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.2 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider">
+                Voice
               </span>
             </h1>
-            <p className="text-xs text-emerald-200/70">
+            <p className="hidden xs:block sm:block text-[10px] sm:text-xs text-emerald-200/70 truncate max-w-[200px] sm:max-w-none">
               {lang === 'en'
                 ? 'Autonomous Eyes-Free Experience for Blind & Rural Borrowers'
                 : 'దృష్టి లోపం ఉన్నవారి కోసం స్వయంప్రతిపత్త వాయిస్ వ్యవస్థ'}
@@ -314,7 +314,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="hidden sm:flex items-center gap-2 rounded-xl bg-black/30 border border-emerald-500/30 px-3 py-1.5 text-xs text-emerald-200">
             <span
               className={`flex h-2 w-2 rounded-full ${
@@ -327,7 +327,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           <button
             type="button"
             onClick={handleClose}
-            className="flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/60 hover:bg-emerald-900/80 px-3.5 py-1.5 text-xs font-bold text-emerald-100 transition active:scale-95 shadow-sm"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/70 hover:bg-emerald-900/90 px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-bold text-emerald-100 transition active:scale-95 shadow-sm"
             title="Switch to guided screen mode"
           >
             <span>📱</span>
@@ -337,38 +337,38 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
       </header>
 
       {/* Main Center Stage: 100% Focused on Human AI Avatar with Unobstructed Full Screen View */}
-      <main className="flex-1 relative flex flex-col items-center justify-center p-4 overflow-hidden">
+      <main className="flex-1 relative flex flex-col items-center justify-center p-2 sm:p-4 overflow-hidden">
         {/* Subtle Traditional Gold Kolam / Indian Sacred Geometric Background Watermark */}
         <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-          <div className="w-[680px] h-[680px] rounded-full border-8 border-dashed border-amber-300" />
+          <div className="w-[380px] h-[380px] sm:w-[680px] sm:h-[680px] rounded-full border-4 sm:border-8 border-dashed border-amber-300" />
         </div>
 
-        {/* The Realistic Human AI Avatar Rig (Full Screen, High-Resolution Prominent Stature) */}
-        <div className="relative z-10 flex flex-col items-center justify-center transition-all duration-500">
+        {/* The Realistic Human AI Avatar Rig (Mobile-Responsive Prominence) */}
+        <div className="relative z-10 flex flex-col items-center justify-center transition-all duration-500 my-auto">
           <HumanAvatarRig
             isSpeaking={speaking}
             language={lang}
-            sizeClass="w-80 h-80 sm:w-[480px] sm:h-[480px] md:w-[560px] md:h-[560px] lg:w-[640px] lg:h-[640px] xl:w-[720px] xl:h-[720px]"
+            sizeClass="w-56 h-56 sm:w-80 sm:h-80 md:w-[500px] md:h-[500px] lg:w-[620px] lg:h-[620px] xl:w-[700px] xl:h-[700px]"
           />
 
           {/* Avatar Name & Status Tag */}
-          <div className="mt-2 flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-black/60 border border-amber-400/50 px-5 py-2 shadow-2xl backdrop-blur-md">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-amber-400 font-extrabold text-sm sm:text-base tracking-wide">
+          <div className="mt-1.5 sm:mt-2 flex flex-col items-center">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-black/60 border border-amber-400/50 px-3.5 sm:px-5 py-1.5 sm:py-2 shadow-2xl backdrop-blur-md">
+              <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-amber-400 font-extrabold text-xs sm:text-base tracking-wide">
                 {lang === 'en' ? 'Lakshmi' : lang === 'hi' ? 'लक्ष्मी' : 'లక్ష్మి'}
               </span>
               <span className="text-xs text-emerald-200">•</span>
-              <span className="text-xs text-emerald-100 font-semibold">
+              <span className="text-[11px] sm:text-xs text-emerald-100 font-semibold">
                 {lang === 'en' ? 'AI Loan Officer' : lang === 'hi' ? 'डिजिटल ऋण अधिकारी' : 'డిజిటల్ లోన్ అధికారి'}
               </span>
             </div>
 
             {/* Recognized Voice Transcript Pill */}
             {transcript && (
-              <div className="mt-2.5 flex items-center gap-2 rounded-full bg-amber-400/20 border border-amber-400/50 px-4 py-1.5 text-xs text-amber-200 shadow-xl backdrop-blur-md animate-fade-in">
-                <span className="h-2 w-2 rounded-full bg-amber-300 animate-ping" />
-                <span>
+              <div className="mt-2 flex items-center gap-1.5 sm:gap-2 rounded-full bg-amber-400/20 border border-amber-400/50 px-3 sm:px-4 py-1 text-[11px] sm:text-xs text-amber-200 shadow-xl backdrop-blur-md animate-fade-in max-w-[90vw] truncate">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-300 animate-ping shrink-0" />
+                <span className="truncate">
                   {lang === 'en' ? 'Heard:' : lang === 'hi' ? 'सुना:' : 'విన్నది:'} <strong>"{transcript}"</strong>
                 </span>
               </div>
@@ -376,57 +376,57 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           </div>
         </div>
 
-        {/* Floating Fact Card (Docked to the Right Side — NEVER Obscures Lakshmi's Face or Torso!) */}
+        {/* Floating Fact Card (Docked to Side on Desktop, Non-Obtrusive Bottom Sheet on Mobile) */}
         {activeFloatingCard && (
           <aside
             aria-label="Loan document snapshot"
-            className={`fixed md:absolute right-4 sm:right-8 lg:right-12 bottom-24 sm:bottom-28 md:bottom-auto md:top-1/2 md:-translate-y-1/2 max-w-xs sm:max-w-sm md:max-w-md w-full px-2 z-30 transition-all duration-500 ease-out ${
+            className={`fixed md:absolute left-2 right-2 sm:left-auto sm:right-6 lg:right-12 bottom-16 sm:bottom-20 md:bottom-auto md:top-1/2 md:-translate-y-1/2 max-w-sm sm:max-w-md w-auto sm:w-full px-1 sm:px-2 z-30 transition-all duration-500 ease-out ${
               cardVisible
-                ? 'opacity-100 translate-x-0 scale-100'
-                : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
+                ? 'opacity-100 translate-y-0 md:translate-x-0 scale-100'
+                : 'opacity-0 translate-y-8 md:translate-x-12 scale-95 pointer-events-none'
             }`}
           >
-            <div className="rounded-3xl border-2 border-amber-400/80 bg-slate-950/95 p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl relative">
+            <div className="rounded-2xl sm:rounded-3xl border-2 border-amber-400/80 bg-slate-950/95 p-3.5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)] backdrop-blur-2xl relative">
               {/* Manual Dismiss Button */}
               <button
                 type="button"
                 onClick={() => setCardVisible(false)}
-                className="absolute top-3.5 right-3.5 text-slate-400 hover:text-amber-300 text-xs px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-700 transition"
+                className="absolute top-2.5 sm:top-3.5 right-2.5 sm:right-3.5 text-slate-400 hover:text-amber-300 text-xs px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-700 transition"
                 title={lang === 'en' ? 'Close card' : 'కార్డును మూసివేయండి'}
               >
                 ✕
               </button>
 
-              <div className="flex items-center justify-between border-b border-amber-500/20 pb-3 pr-6">
+              <div className="flex items-center justify-between border-b border-amber-500/20 pb-2 sm:pb-3 pr-6">
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-amber-100">
+                  <h3 className="text-sm sm:text-lg font-black text-amber-100">
                     {activeFloatingCard.title}
                   </h3>
-                  <p className="text-[11px] text-emerald-300 font-medium">
+                  <p className="text-[10px] sm:text-[11px] text-emerald-300 font-medium">
                     {activeFloatingCard.subtitle}
                   </p>
                 </div>
                 {activeFloatingCard.goldStamp && (
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 shadow">
+                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 shadow">
                     {activeFloatingCard.goldStamp}
                   </span>
                 )}
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-3 mt-3.5">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-2.5 sm:mt-3.5">
                 {activeFloatingCard.stats.map((s, idx) => (
                   <div
                     key={idx}
-                    className={`p-2.5 rounded-2xl border ${
+                    className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border ${
                       s.highlight
                         ? 'bg-amber-950/40 border-amber-400/50 text-amber-100'
                         : 'bg-emerald-950/30 border-emerald-800/40 text-emerald-100'
                     }`}
                   >
-                    <div className="text-[10px] font-semibold text-slate-300">{s.label}</div>
+                    <div className="text-[9px] sm:text-[10px] font-semibold text-slate-300 truncate">{s.label}</div>
                     <div
-                      className={`text-base sm:text-lg font-black font-mono mt-0.5 ${
+                      className={`text-sm sm:text-lg font-black font-mono mt-0.5 ${
                         s.highlight ? 'text-amber-300' : 'text-white'
                       }`}
                     >
@@ -441,41 +441,41 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
       </main>
 
       {/* Bottom Hands-Free Voice Control Bar (Backups for click/touch if needed) */}
-      <footer className="px-6 py-3.5 bg-black/40 border-t border-emerald-900/40 flex items-center justify-between gap-3 text-xs font-bold z-30">
+      <footer className="px-3 sm:px-6 py-2.5 sm:py-3.5 bg-black/60 border-t border-emerald-900/40 flex items-center justify-between gap-2 sm:gap-3 text-xs font-bold z-30">
         <button
           type="button"
           onClick={() => advanceStep(-1)}
           disabled={currentStep === 0}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-emerald-950/60 hover:bg-emerald-900/80 disabled:opacity-30 text-emerald-200 transition active:scale-95 border border-emerald-800/40"
+          className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-950/60 hover:bg-emerald-900/80 disabled:opacity-30 text-emerald-200 text-[11px] sm:text-xs transition active:scale-95 border border-emerald-800/40 shrink-0"
         >
           <span>←</span>
           <span>{lang === 'en' ? 'Back' : 'వెనుకకు'}</span>
         </button>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           <button
             type="button"
             onClick={repeatCurrentStep}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-200 transition active:scale-95 border border-emerald-800/40"
+            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-200 text-[11px] sm:text-xs transition active:scale-95 border border-emerald-800/40"
           >
             <span>🔊</span>
-            <span>{lang === 'en' ? 'Listen Again' : 'మళ్ళీ విను'}</span>
+            <span className="hidden xs:inline sm:inline">{lang === 'en' ? 'Replay' : 'మళ్ళీ విను'}</span>
           </button>
 
           {currentStep === 4 ? (
             <button
               type="button"
               onClick={triggerDownload}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black transition active:scale-95 shadow-xl"
+              className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 text-[11px] sm:text-xs font-black transition active:scale-95 shadow-xl"
             >
               <span>📥</span>
-              <span>{lang === 'en' ? 'Download Certificate' : 'రసీదు డౌన్‌లోడ్'}</span>
+              <span>{lang === 'en' ? 'Certificate' : 'రసీదు డౌన్‌లోడ్'}</span>
             </button>
           ) : (
             <button
               type="button"
               onClick={() => advanceStep(1)}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black transition active:scale-95 shadow-xl"
+              className="flex items-center gap-1 sm:gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 text-[11px] sm:text-xs font-black transition active:scale-95 shadow-xl"
             >
               <span>{lang === 'en' ? 'Next' : 'తరువాత'}</span>
               <span>→</span>

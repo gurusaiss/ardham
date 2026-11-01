@@ -93,21 +93,21 @@ export default function StepLayout({
   const isHome = location.pathname === '/'
 
   return (
-    <div className="min-h-screen bg-slate-50/80 sm:bg-gradient-to-br sm:from-slate-100 sm:via-slate-50 sm:to-emerald-50/30 py-3 sm:py-8 px-3 sm:px-6 lg:px-8 flex flex-col justify-between transition-colors">
-      <div className={`mx-auto w-full ${maxWidthClass} rounded-3xl bg-white shadow-xl border border-slate-200/90 p-5 sm:p-8 md:p-10 flex-1 flex flex-col animate-fade-in`}>
+    <div className="min-h-screen bg-slate-50/80 sm:bg-gradient-to-br sm:from-slate-100 sm:via-slate-50 sm:to-emerald-50/30 py-2 px-2 sm:py-6 sm:px-4 lg:px-8 flex flex-col justify-between transition-colors">
+      <div className={`mx-auto w-full ${maxWidthClass} rounded-2xl sm:rounded-3xl bg-white shadow-xl border border-slate-200/90 p-3.5 sm:p-7 md:p-10 flex-1 flex flex-col animate-fade-in`}>
         {/* Top Header Bar */}
-        <div className="mb-5 flex items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
+        <div className="mb-4 sm:mb-5 flex items-center justify-between gap-2 sm:gap-3 text-sm text-slate-500 border-b border-slate-100 pb-3 sm:pb-4">
           {/* Top Left: Brand and Back Button */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {!isHome && (
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-1 text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm transition active:scale-95"
+                className="flex items-center gap-1 text-[11px] sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 sm:px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm transition active:scale-95"
                 title={lang === 'en' ? 'Go to previous step' : lang === 'hi' ? 'पिछले चरण पर जाएं' : 'మునుపటి పేజీకి వెళ్లండి'}
               >
                 <span>←</span>
-                <span>{lang === 'en' ? 'Go Back' : lang === 'hi' ? 'पीछे जाएं' : 'వెనుకకు'}</span>
+                <span className="hidden sm:inline">{lang === 'en' ? 'Go Back' : lang === 'hi' ? 'पीछे जाएं' : 'వెనుకకు'}</span>
               </button>
             )}
 
@@ -120,13 +120,13 @@ export default function StepLayout({
             </Link>
           </div>
 
-          {/* Top Right: Clean Minimal Icon Controls (Audio Speaker, Language, Settings, Profile) */}
-          <div className="flex items-center gap-2 flex-wrap justify-end">
+          {/* Top Right: Clean Minimal Icon Controls (Single-Row, Never Wraps, Mobile-First) */}
+          <div className="flex items-center gap-1 sm:gap-2 flex-nowrap justify-end shrink-0">
             {/* AI Avatar Loan Advisor Pill (Always 1-click accessible on every single tab & task) */}
             <button
               type="button"
               onClick={() => setShowAvatarModal(true)}
-              className="flex h-9 items-center gap-1.5 px-3 rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-100 hover:from-amber-100 hover:to-yellow-200 text-amber-950 text-xs font-black shadow-sm transition active:scale-95"
+              className="flex h-8 sm:h-9 items-center gap-1 sm:gap-1.5 px-2 sm:px-3 rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-100 hover:from-amber-100 hover:to-yellow-200 text-amber-950 text-[11px] sm:text-xs font-black shadow-sm transition active:scale-95"
               title={
                 lang === 'en'
                   ? 'Open AI Avatar Loan Advisor (Lakshmi)'
@@ -135,8 +135,10 @@ export default function StepLayout({
                   : 'AI అవతార్ రుణ సలహాదారుని తెరవండి (లక్ష్మి)'
               }
             >
-              <span className="text-base select-none">👩‍💼</span>
-              <span className="font-extrabold">{lang === 'en' ? 'AI Avatar' : lang === 'hi' ? 'एआई अवतार' : 'AI అవతార్'}</span>
+              <span className="text-sm sm:text-base select-none">👩‍💼</span>
+              <span className="font-extrabold hidden xs:inline sm:inline">
+                {lang === 'en' ? 'Avatar' : lang === 'hi' ? 'अवतार' : 'అవతార్'}
+              </span>
             </button>
 
             {/* 1. Small Audio Speaker Icon Button */}
@@ -146,17 +148,17 @@ export default function StepLayout({
             <button
               type="button"
               onClick={cycleLanguage}
-              className="flex h-9 items-center gap-1.5 px-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-sm transition active:scale-95"
+              className="flex h-8 sm:h-9 items-center gap-1 px-2 sm:px-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-[11px] sm:text-xs shadow-sm transition active:scale-95"
               title={
                 lang === 'te'
-                  ? 'ప్రస్తుత భాష: తెలుగు (క్లిక్ చేసి ఇంగ్లీష్ లేదా హిందీకి మార్చండి)'
+                  ? 'ప్రస్తుత భాష: తెలుగు (మార్చడానికి క్లిక్ చేయండి)'
                   : lang === 'hi'
                   ? 'वर्तमान भाषा: हिंदी (बदलने के लिए क्लिक करें)'
                   : 'Current Language: English (Click to toggle)'
               }
             >
-              <span className="text-base">🌐</span>
-              <span className="uppercase text-[11px] font-extrabold text-emerald-800 tracking-wider">
+              <span className="text-sm sm:text-base">🌐</span>
+              <span className="uppercase text-[10px] sm:text-[11px] font-extrabold text-emerald-800 tracking-wider">
                 {lang}
               </span>
             </button>
@@ -165,21 +167,21 @@ export default function StepLayout({
             <button
               type="button"
               onClick={() => setShowSettingsModal(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-sm transition active:scale-95"
+              className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-sm transition active:scale-95"
               title={lang === 'en' ? 'Platform Settings, Profile & Navigation' : 'ప్లాట్‌ఫామ్ సెట్టింగ్స్'}
               aria-label="Open settings"
             >
-              <span className="text-base select-none">⚙️</span>
+              <span className="text-sm sm:text-base select-none">⚙️</span>
             </button>
 
             {/* 4. Account Profile Button */}
             <Link
               to="/auth"
-              className="flex h-9 items-center gap-1.5 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold shadow-sm transition active:scale-95"
+              className="flex h-8 sm:h-9 items-center gap-1 px-2 sm:px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-[11px] sm:text-xs font-bold shadow-sm transition active:scale-95"
               title="Account Profile / Role"
             >
-              <span className="text-base">👤</span>
-              <span className="hidden sm:inline truncate max-w-[110px]">
+              <span className="text-sm sm:text-base">👤</span>
+              <span className="hidden md:inline truncate max-w-[110px]">
                 {user ? user.name.split(' ')[0] : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}
               </span>
             </Link>

@@ -21,7 +21,9 @@ export default function VoiceAgentWidget({ onOpenAvatar }: Props) {
   const [speaking, setSpeaking] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [lang, setLang] = useState<AppLanguage>(getLanguage())
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false
+  )
 
   useEffect(() => {
     const unsubLang = subscribeLanguage(setLang)

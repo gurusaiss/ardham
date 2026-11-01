@@ -229,28 +229,21 @@ export default function Scan() {
         onChange={handleFileSelect}
       />
 
-      {/* System Barriers, Bounds & Verification Rules */}
-      <div className="mb-4 rounded-2xl border-2 border-emerald-500/30 bg-emerald-950/10 p-3.5 sm:p-4 text-xs space-y-2">
+      {/* System Barriers, Bounds & Verification Rules (Mobile-Clean) */}
+      <div className="mb-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/5 p-3 sm:p-4 text-xs space-y-1.5">
         <div className="flex items-center gap-2 font-bold text-emerald-900 text-xs sm:text-sm">
-          <span>🛡️ {lang === 'en' ? 'System Barriers & Verification Bounds:' : lang === 'hi' ? 'सिस्टम सुरक्षा एवं सीमाएं:' : 'సిస్టమ్ భద్రతా నిబంధనలు & పరిమితులు:'}</span>
-          <span className="ml-auto text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-            Strict Loan Filter Active
+          <span>🛡️ {lang === 'en' ? 'Verified Loan Documents Only' : lang === 'hi' ? 'केवल वैध ऋण दस्तावेज़' : 'కేవలం లోన్ పత్రాలు మాత్రమే'}</span>
+          <span className="ml-auto text-[9px] sm:text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+            Filter Active
           </span>
         </div>
-        <ul className="text-slate-600 text-xs space-y-1 list-disc list-inside">
-          <li>
-            <strong>{lang === 'en' ? 'Only Genuine Loan Documents Accepted:' : lang === 'hi' ? 'केवल वैध ऋण दस्तावेज़ मान्य:' : 'కేవలం నిజమైన లోన్ పత్రాలు మాత్రమే అనుమతి:'}</strong>{' '}
-            {lang === 'en'
-              ? 'Key Fact Statements, MFI passbooks, sanction letters, and EMI tables. Non-loan files (selfies, receipts, food, pets) are automatically rejected.'
-              : lang === 'hi'
-              ? 'ऋण अनुबंध, पासबुक, स्वीकृति पत्र और किस्त तालिकाएं। गैर-ऋण फाइलें (फोटो, रसीदें) स्वतः अस्वीकार होंगी।'
-              : 'రుణ ఒప్పందాలు, మైక్రోఫైనాన్స్ పాస్‌బుక్‌లు, మంజూరు పత్రాలు మరియు వాయిదాల చార్టులు. ఇతర ఫైళ్లు (సెల్ఫీలు, రసీదులు) తిరస్కరించబడతాయి.'}
-          </li>
-          <li>
-            <strong>{lang === 'en' ? 'File Bounds:' : lang === 'hi' ? 'फ़ाइल सीमाएं:' : 'ఫైల్ పరిమితులు:'}</strong>{' '}
-            PNG, JPG, WEBP, or PDF • Max 15MB per page • Up to 15 pages per agreement.
-          </li>
-        </ul>
+        <p className="text-slate-600 text-[11px] sm:text-xs leading-relaxed">
+          {lang === 'en'
+            ? 'Key Fact Statements, MFI passbooks & sanction letters (PNG, JPG, WEBP, PDF up to 15MB). Non-loan files are automatically rejected.'
+            : lang === 'hi'
+            ? 'ऋण अनुबंध, पासबुक और स्वीकृति पत्र (PNG, JPG, WEBP, PDF - 15MB तक)। गैर-ऋण फाइलें स्वतः अस्वीकृत होंगी।'
+            : 'రుణ ఒప్పందాలు, పాస్‌బుక్‌లు & మంజూరు పత్రాలు (PNG, JPG, WEBP, PDF - 15MB లోపు). ఇతర ఫైళ్లు తిరస్కరించబడతాయి.'}
+        </p>
       </div>
 
       {/* Dedicated Document Barrier & Fallback Card */}
