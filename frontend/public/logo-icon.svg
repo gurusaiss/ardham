@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <!-- Deep Emerald Green Royal Gradient -->
+    <linearGradient id="ardhamBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="45%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#022c22"/>
+    </linearGradient>
+
+    <!-- Brilliant Indian Temple Gold Gradient -->
+    <linearGradient id="ardhamGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="25%" stop-color="#fde047"/>
+      <stop offset="55%" stop-color="#f59e0b"/>
+      <stop offset="85%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+
+    <!-- Subtle Golden Halo Gradient -->
+    <radialGradient id="goldHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35"/>
+      <stop offset="70%" stop-color="#065f46" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#065f46" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Drop Shadow for Dimensionality -->
+    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="url(#ardhamBg)"/>
+  
+  <!-- Outer Gold Rim -->
+  <rect x="4" y="4" width="120" height="120" rx="30" stroke="url(#ardhamGold)" stroke-width="2.5" stroke-opacity="0.9"/>
+  
+  <!-- Subtle Inner Border -->
+  <rect x="9" y="9" width="110" height="110" rx="25" stroke="#34d399" stroke-width="1" stroke-opacity="0.25"/>
+
+  <!-- Ambient Golden Center Glow -->
+  <circle cx="64" cy="64" r="48" fill="url(#goldHalo)"/>
+
+  <!-- Concentric Oral Voice Waves (Left: Spoken Truth, Right: Oral Understanding) -->
+  <g stroke="url(#ardhamGold)" stroke-linecap="round" opacity="0.85">
+    <path d="M25 50 C21 59 21 69 25 78" stroke-width="3"/>
+    <path d="M18 43 C12 56 12 72 18 85" stroke-width="2.5" opacity="0.6"/>
+
+    <path d="M103 50 C107 59 107 69 103 78" stroke-width="3"/>
+    <path d="M110 43 C116 56 116 72 110 85" stroke-width="2.5" opacity="0.6"/>
+  </g>
+
+  <!-- Central Emblem: Sacred Telugu 'అ' merged with Shield of Truth -->
+  <g filter="url(#goldGlow)">
+    <text x="64" y="86" 
+          font-family="'Noto Sans Telugu', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" 
+          font-size="64" 
+          font-weight="900" 
+          fill="url(#ardhamGold)" 
+          text-anchor="middle"
+          letter-spacing="-1">అ</text>
+
+    <!-- Auspicious Star of Clarity & Verification at Top -->
+    <circle cx="64" cy="20" r="4" fill="url(#ardhamGold)"/>
+    <path d="M64 12 L64 16 M64 24 L64 28 M56 20 L60 20 M68 20 L72 20" stroke="url(#ardhamGold)" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 100" fill="none">
+  <defs>
+    <!-- Deep Emerald Green Gradient -->
+    <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="50%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#022c22"/>
+    </linearGradient>
+
+    <!-- Indian Temple Gold Gradient -->
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="30%" stop-color="#fde047"/>
+      <stop offset="60%" stop-color="#f59e0b"/>
+      <stop offset="90%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+
+    <radialGradient id="logoHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#065f46" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="logoDropShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Left: Iconic Emblem (80x80) -->
+  <g transform="translate(10, 10)">
+    <!-- Base Squircle -->
+    <rect x="0" y="0" width="80" height="80" rx="20" fill="url(#logoBg)"/>
+    <rect x="0" y="0" width="80" height="80" rx="20" stroke="url(#logoGold)" stroke-width="2" stroke-opacity="0.9"/>
+    <circle cx="40" cy="40" r="32" fill="url(#logoHalo)"/>
+
+    <!-- Voice waves -->
+    <g stroke="url(#logoGold)" stroke-linecap="round" opacity="0.85">
+      <path d="M15 32 C12 37 12 43 15 48" stroke-width="2"/>
+      <path d="M65 32 C68 37 68 43 65 48" stroke-width="2"/>
+    </g>
+
+    <!-- Central 'అ' Glyph -->
+    <g filter="url(#logoDropShadow)">
+      <text x="40" y="55" 
+            font-family="'Noto Sans Telugu', system-ui, sans-serif" 
+            font-size="42" 
+            font-weight="900" 
+            fill="url(#logoGold)" 
+            text-anchor="middle">అ</text>
+
+      <!-- Sparkle Dot -->
+      <circle cx="40" cy="12" r="2.5" fill="url(#logoGold)"/>
+      <path d="M40 7 L40 9 M40 15 L40 17 M35 12 L37 12 M43 12 L45 12" stroke="url(#logoGold)" stroke-width="1.2" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Right: Typography & Brand Narrative -->
+  <g transform="translate(108, 14)">
+    <!-- Main Telugu Wordmark -->
+    <text x="0" y="38" 
+          font-family="'Noto Sans Telugu', system-ui, sans-serif" 
+          font-size="36" 
+          font-weight="900" 
+          fill="#065f46" 
+          letter-spacing="0.5">అర్థం</text>
+
+    <!-- English Wordmark -->
+    <text x="82" y="37" 
+          font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" 
+          font-size="28" 
+          font-weight="800" 
+          fill="#0f172a" 
+          letter-spacing="-0.5">Ardham</text>
+
+    <!-- Verification Badge Pill -->
+    <g transform="translate(232, 17)">
+      <rect x="0" y="0" width="102" height="22" rx="11" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1"/>
+      <text x="51" y="15" 
+            font-family="'Plus Jakarta Sans', sans-serif" 
+            font-size="10" 
+            font-weight="800" 
+            fill="#065f46" 
+            text-anchor="middle" 
+            letter-spacing="0.5">VERIFIED 100%</text>
+    </g>
+
+    <!-- English & Telugu Subtitle Tagline -->
+    <text x="2" y="62" 
+          font-family="'Plus Jakarta Sans', system-ui, sans-serif" 
+          font-size="12" 
+          font-weight="600" 
+          fill="#475569" 
+          letter-spacing="0.2">
+      Loan Comprehension &amp; Oral Verification System
+    </text>
+
+    <text x="2" y="78" 
+          font-family="'Noto Sans Telugu', system-ui, sans-serif" 
+          font-size="11" 
+          font-weight="500" 
+          fill="#94a3b8">
+      గ్రామీణ &amp; దృష్టి లోపం ఉన్న రుణగ్రహీతల కోసం ప్రత్యేక వెరిఫికేషన్
+    </text>
+  </g>
+</svg>

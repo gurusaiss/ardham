@@ -1,5 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import ArdhamLogo from './ArdhamLogo'
 import GlobalAudioBar from './GlobalAudioBar'
 import StepProgress from './StepProgress'
 import VoiceAssistantModal from './VoiceAssistantModal'
@@ -112,13 +113,10 @@ export default function StepLayout({
 
             <Link
               to="/"
-              className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
+              className="flex items-center hover:opacity-95 transition"
               title="Ardham Home"
             >
-              <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">
-                {lang === 'en' ? 'Ardham' : lang === 'hi' ? 'अर्थम' : 'అర్థం'}
-              </span>
-              {lang !== 'en' && <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>}
+              <ArdhamLogo size="sm" />
             </Link>
           </div>
 

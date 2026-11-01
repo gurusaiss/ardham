@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import ArdhamLogo from '../components/ArdhamLogo'
 import GlobalAudioBar from '../components/GlobalAudioBar'
 import VoiceAssistantModal from '../components/VoiceAssistantModal'
 import SettingsModal from '../components/SettingsModal'
@@ -81,16 +82,13 @@ export default function Home() {
       <div className="mx-auto w-full max-w-6xl rounded-3xl bg-white shadow-xl border border-slate-200/90 p-6 sm:p-10 flex-1 flex flex-col justify-between animate-fade-in">
         {/* Top Header Bar */}
         <div className="w-full flex items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
-          {/* Top Left: Brand only */}
+          {/* Top Left: Brand Logo & Emblem */}
           <Link
             to="/"
-            className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
+            className="flex items-center hover:opacity-95 transition"
             title="Ardham Home"
           >
-            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">
-              {lang === 'en' ? 'Ardham' : lang === 'hi' ? 'अर्थम' : 'అర్థం'}
-            </span>
-            {lang !== 'en' && <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>}
+            <ArdhamLogo size="md" />
           </Link>
 
           {/* Top Right: Clean Minimal Icon Controls (Audio Speaker, Language, Settings, Profile) */}

@@ -11,16 +11,17 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Ardham (అర్థం)',
+        name: 'Ardham (అర్థం) — Loan Comprehension Verification',
         short_name: 'Ardham',
-        description: 'Explain a loan before it is signed. Offline, on-device, in Telugu.',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        description: 'Ensure rural & visually impaired borrowers understand before signing. Multilingual, offline, on-device.',
+        theme_color: '#065f46',
+        background_color: '#064e3b',
         display: 'standalone',
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' },
         ],
       },
     }),
