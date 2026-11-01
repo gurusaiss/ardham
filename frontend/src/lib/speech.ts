@@ -22,11 +22,35 @@ type SpeakingListener = (speaking: boolean) => void
 const speakingListeners = new Set<SpeakingListener>()
 let currentSpeakingState = false
 let currentAudioElement: HTMLAudioElement | null = null
+let masterAudioElement: HTMLAudioElement | null = null
 let currentPlayToken = 0
 let avatarModalOpen = false
 
+export type AudioChannel = 'avatar' | 'screen' | 'modal'
+let currentChannel: AudioChannel = 'screen'
+
+function getMasterAudio(): HTMLAudioElement | null {
+  if (typeof window === 'undefined') return null
+  if (!masterAudioElement) {
+    masterAudioElement = new Audio()
+  }
+  return masterAudioElement
+}
+
+export function setActiveChannel(channel: AudioChannel) {
+  if (currentChannel !== channel) {
+    stopSpeaking()
+    currentChannel = channel
+  }
+}
+
+export function getActiveChannel(): AudioChannel {
+  return currentChannel
+}
+
 export function setAvatarModalActive(isOpen: boolean) {
   avatarModalOpen = isOpen
+  setActiveChannel(isOpen ? 'avatar' : 'screen')
   // Immediately halt any speaking when avatar mode opens or closes
   stopSpeaking()
 }
@@ -55,6 +79,7 @@ export function subscribeSpeaking(fn: SpeakingListener): () => void {
 }
 
 export function isSpeaking(): boolean {
+  if (masterAudioElement && !masterAudioElement.paused && !masterAudioElement.ended) return true
   if (currentAudioElement && !currentAudioElement.paused && !currentAudioElement.ended) return true
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false
   return window.speechSynthesis.speaking
@@ -62,7 +87,21 @@ export function isSpeaking(): boolean {
 
 export function stopSpeaking() {
   currentPlayToken++
-  if (currentAudioElement) {
+  if (masterAudioElement) {
+    try {
+      masterAudioElement.onplay = null
+      masterAudioElement.onended = null
+      masterAudioElement.onerror = null
+      masterAudioElement.onpause = null
+      masterAudioElement.pause()
+      masterAudioElement.currentTime = 0
+      masterAudioElement.removeAttribute('src')
+      masterAudioElement.load()
+    } catch {
+      // ignore
+    }
+  }
+  if (currentAudioElement && currentAudioElement !== masterAudioElement) {
     try {
       currentAudioElement.onplay = null
       currentAudioElement.onended = null
@@ -80,6 +119,10 @@ export function stopSpeaking() {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
       window.speechSynthesis.cancel()
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume()
+        window.speechSynthesis.cancel()
+      }
     } catch {
       // ignore
     }
@@ -494,7 +537,23 @@ export function getYoungFemaleVoice(
  *    - English: en-IN-NeerjaExpressiveNeural (Warm, expressive young Indian English)
  * 2. Seamlessly falls back to local Web Speech API when offline.
  */
-export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) {
+export function speakText(
+  text: string,
+  lang?: AppLanguage,
+  onEnd?: () => void,
+  channel?: AudioChannel
+) {
+  const targetChannel = channel || (avatarModalOpen ? 'avatar' : 'screen')
+
+  // Prevent cross-talk: Screen cannot speak when Avatar is active, and vice-versa
+  if (avatarModalOpen && targetChannel === 'screen') {
+    return
+  }
+  if (!avatarModalOpen && targetChannel === 'avatar') {
+    return
+  }
+
+  // Forcefully stop any old ongoing voice immediately before playing the new one
   stopSpeaking()
   if (!text || !text.trim()) return
 
@@ -502,17 +561,28 @@ export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) 
   const targetLang = lang || getLanguage()
   const sanitized = targetLang === 'te' ? sanitizeTeluguText(text) : text
 
+  const audio = getMasterAudio()
+  if (!audio) {
+    speakWithWebSpeech(sanitized, targetLang, onEnd, token)
+    return
+  }
+  currentAudioElement = audio
+
   // Try high-fidelity backend Neural TTS first
   try {
     const encoded = encodeURIComponent(sanitized.slice(0, 800))
     const ttsUrl = `/api/tts?text=${encoded}&lang=${targetLang}`
-    const audio = new Audio(ttsUrl)
-    currentAudioElement = audio
+    audio.src = ttsUrl
 
     let playbackStarted = false
 
     audio.onplay = () => {
-      if (token !== currentPlayToken) return
+      if (token !== currentPlayToken) {
+        try {
+          audio.pause()
+        } catch {}
+        return
+      }
       playbackStarted = true
       notifySpeaking(true)
     }
@@ -520,20 +590,17 @@ export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) 
     audio.onended = () => {
       if (token !== currentPlayToken) return
       notifySpeaking(false)
-      currentAudioElement = null
       onEnd?.()
     }
 
     audio.onerror = () => {
       if (token !== currentPlayToken) return
-      currentAudioElement = null
       speakWithWebSpeech(sanitized, targetLang, onEnd, token)
     }
 
     audio.play().catch(() => {
       if (token !== currentPlayToken) return
       if (!playbackStarted) {
-        currentAudioElement = null
         speakWithWebSpeech(sanitized, targetLang, onEnd, token)
       }
     })

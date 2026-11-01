@@ -149,7 +149,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           ? 'नमस्ते! मैं लक्ष्मी हूँ, आपकी एआई ऋण सलाहकार। मैंने आपका दस्तावेज़ देख लिया है। आपकी ऋण राशि ₹30,000 है और ब्याज दर 18.5% है। आगे बढ़ने के लिए "Next" बोलें।'
           : 'నమస్కారం! నేను లక్ష్మిని, మీ AI రుణ సలహాదారుని. నేను మీ లోన్ కార్డును తనిఖీ చేశాను. మీకు మంజూరైన లోన్ మొత్తం ముప్పై వేల రూపాయలు, వడ్డీ రేటు 18.5 శాతం. తర్వాతి వివరాలు వినడానికి "Next" అని చెప్పండి.'
 
-      speakText(msg, lang)
+      speakText(msg, lang, undefined, 'avatar')
 
       showTemporaryCard({
         id: 'step1_card',
@@ -336,56 +336,68 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
         </div>
       </header>
 
-      {/* Main Center Stage: 100% Focused on Human AI Avatar in Center */}
-      <main className="flex-1 relative flex flex-col items-center justify-center p-4">
+      {/* Main Center Stage: 100% Focused on Human AI Avatar with Unobstructed Full Screen View */}
+      <main className="flex-1 relative flex flex-col items-center justify-center p-4 overflow-hidden">
         {/* Subtle Traditional Gold Kolam / Indian Sacred Geometric Background Watermark */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-          <div className="w-[600px] h-[600px] rounded-full border-8 border-dashed border-amber-300" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+          <div className="w-[680px] h-[680px] rounded-full border-8 border-dashed border-amber-300" />
         </div>
 
-        {/* The Realistic Human AI Avatar Rig (Strict Center Placement) */}
-        <div className="relative z-10 flex flex-col items-center justify-center">
+        {/* The Realistic Human AI Avatar Rig (Full Screen, High-Resolution Prominent Stature) */}
+        <div className="relative z-10 flex flex-col items-center justify-center transition-all duration-500">
           <HumanAvatarRig
             isSpeaking={speaking}
             language={lang}
-            sizeClass="w-72 h-72 sm:w-96 sm:h-96 md:w-[440px] md:h-[440px]"
+            sizeClass="w-80 h-80 sm:w-[480px] sm:h-[480px] md:w-[560px] md:h-[560px] lg:w-[640px] lg:h-[640px] xl:w-[720px] xl:h-[720px]"
           />
 
           {/* Avatar Name & Status Tag */}
           <div className="mt-2 flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-black/40 border border-amber-400/40 px-4 py-1.5 shadow-xl">
-              <span className="text-amber-400 font-extrabold text-sm sm:text-base">
-                {lang === 'en' ? 'Lakshmi' : 'లక్ష్మి'}
+            <div className="inline-flex items-center gap-2 rounded-full bg-black/60 border border-amber-400/50 px-5 py-2 shadow-2xl backdrop-blur-md">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-amber-400 font-extrabold text-sm sm:text-base tracking-wide">
+                {lang === 'en' ? 'Lakshmi' : lang === 'hi' ? 'लक्ष्मी' : 'లక్ష్మి'}
               </span>
               <span className="text-xs text-emerald-200">•</span>
-              <span className="text-xs text-emerald-100 font-medium">
-                {lang === 'en' ? 'AI Loan Officer' : 'డిజిటల్ లోన్ అధికారి'}
+              <span className="text-xs text-emerald-100 font-semibold">
+                {lang === 'en' ? 'AI Loan Officer' : lang === 'hi' ? 'डिजिटल ऋण अधिकारी' : 'డిజిటల్ లోన్ అధికారి'}
               </span>
             </div>
 
             {/* Recognized Voice Transcript Pill */}
             {transcript && (
-              <div className="mt-3 flex items-center gap-2 rounded-full bg-amber-400/20 border border-amber-400/50 px-3.5 py-1 text-xs text-amber-200 shadow-lg animate-fade-in">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-300 animate-ping" />
+              <div className="mt-2.5 flex items-center gap-2 rounded-full bg-amber-400/20 border border-amber-400/50 px-4 py-1.5 text-xs text-amber-200 shadow-xl backdrop-blur-md animate-fade-in">
+                <span className="h-2 w-2 rounded-full bg-amber-300 animate-ping" />
                 <span>
-                  {lang === 'en' ? 'Heard:' : 'విన్నది:'} <strong>"{transcript}"</strong>
+                  {lang === 'en' ? 'Heard:' : lang === 'hi' ? 'सुना:' : 'విన్నది:'} <strong>"{transcript}"</strong>
                 </span>
               </div>
             )}
           </div>
         </div>
 
-        {/* 5-Second Temporary Floating Card (Floats Up from Bottom, Stays 5s, Fades Out) */}
+        {/* Floating Fact Card (Docked to the Right Side — NEVER Obscures Lakshmi's Face or Torso!) */}
         {activeFloatingCard && (
-          <div
-            className={`absolute bottom-20 sm:bottom-24 max-w-md w-full px-4 z-20 transition-all duration-700 ease-out ${
+          <aside
+            aria-label="Loan document snapshot"
+            className={`fixed md:absolute right-4 sm:right-8 lg:right-12 bottom-24 sm:bottom-28 md:bottom-auto md:top-1/2 md:-translate-y-1/2 max-w-xs sm:max-w-sm md:max-w-md w-full px-2 z-30 transition-all duration-500 ease-out ${
               cardVisible
-                ? 'opacity-100 translate-y-0 scale-100'
-                : 'opacity-0 -translate-y-8 scale-95 pointer-events-none'
+                ? 'opacity-100 translate-x-0 scale-100'
+                : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
             }`}
           >
-            <div className="rounded-3xl border-2 border-amber-400/70 bg-slate-950/95 p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl">
-              <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
+            <div className="rounded-3xl border-2 border-amber-400/80 bg-slate-950/95 p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl relative">
+              {/* Manual Dismiss Button */}
+              <button
+                type="button"
+                onClick={() => setCardVisible(false)}
+                className="absolute top-3.5 right-3.5 text-slate-400 hover:text-amber-300 text-xs px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-700 transition"
+                title={lang === 'en' ? 'Close card' : 'కార్డును మూసివేయండి'}
+              >
+                ✕
+              </button>
+
+              <div className="flex items-center justify-between border-b border-amber-500/20 pb-3 pr-6">
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-amber-100">
                     {activeFloatingCard.title}
@@ -424,7 +436,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
                 ))}
               </div>
             </div>
-          </div>
+          </aside>
         )}
       </main>
 

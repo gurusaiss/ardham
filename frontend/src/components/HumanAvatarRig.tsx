@@ -6,34 +6,41 @@ interface Props {
   sizeClass?: string
 }
 
-export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w-96 sm:h-96 md:w-[420px] md:h-[420px]' }: Props) {
+export default function HumanAvatarRig({
+  isSpeaking,
+  sizeClass = 'w-80 h-80 sm:w-[480px] sm:h-[480px] md:w-[560px] md:h-[560px] lg:w-[640px] lg:h-[640px]',
+}: Props) {
   // Eye blink state (0 = closed, 1 = open)
   const [eyeOpen, setEyeOpen] = useState(1)
+  // Eye pupil saccades (subtle looking around)
+  const [gazeX, setGazeX] = useState(0)
+  const [gazeY, setGazeY] = useState(0)
   // Mouth openness (0 = closed smile, 1 = open wide)
   const [mouthOpen, setMouthOpen] = useState(0)
   // Mouth horizontal stretch (0.8 = rounded O, 1.2 = wide E)
   const [mouthWidth, setMouthWidth] = useState(1.0)
   // Head subtle tilt degrees
   const [headTilt, setHeadTilt] = useState(0)
+  // Torso subtle breathing expansion
+  const [breathPhase, setBreathPhase] = useState(0)
 
   const animFrameRef = useRef<number | null>(null)
   const speechTimeRef = useRef(0)
+  const breathTimeRef = useRef(0)
 
-  // 1. Natural procedural human blink cycle (every 3.2s with random double blinks)
+  // 1. Natural procedural human blink cycle (every 2.5 - 4.5s with occasional double blinks)
   useEffect(() => {
     let blinkTimer: any = null
     function scheduleBlink() {
-      const delay = 2500 + Math.random() * 2000
+      const delay = 2200 + Math.random() * 2500
       blinkTimer = setTimeout(() => {
-        // Close eyes
         setEyeOpen(0.05)
         setTimeout(() => {
           setEyeOpen(1)
-          // 25% chance of a quick natural double blink
-          if (Math.random() < 0.25) {
+          if (Math.random() < 0.28) {
             setTimeout(() => {
               setEyeOpen(0.05)
-              setTimeout(() => setEyeOpen(1), 90)
+              setTimeout(() => setEyeOpen(1), 85)
             }, 120)
           }
           scheduleBlink()
@@ -47,46 +54,65 @@ export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w
     }
   }, [])
 
-  // 2. Real-time procedural lip-sync and expressive head motion (Brahma AI / Ramayana cinematic style)
+  // 2. Natural ocular micro-saccades (subtle eye glance shifts every 2-4 seconds)
+  useEffect(() => {
+    let gazeTimer: any = null
+    function scheduleGaze() {
+      const delay = 2000 + Math.random() * 3000
+      gazeTimer = setTimeout(() => {
+        // Subtle offset: -1.8 to +1.8 pixels
+        setGazeX((Math.random() - 0.5) * 3.2)
+        setGazeY((Math.random() - 0.5) * 1.8)
+        scheduleGaze()
+      }, delay)
+    }
+    scheduleGaze()
+    return () => {
+      if (gazeTimer) clearTimeout(gazeTimer)
+    }
+  }, [])
+
+  // 3. Real-time procedural lip-sync, expressive head tilt & natural chest breathing
   useEffect(() => {
     let active = true
 
-    function animateLipSync() {
+    function animateRig() {
       if (!active) return
+
+      // Continuous peaceful breathing cycle (approx. 4.2 seconds per breath)
+      breathTimeRef.current += 0.025
+      setBreathPhase(Math.sin(breathTimeRef.current))
 
       if (isSpeaking) {
         speechTimeRef.current += 0.08
         const t = speechTimeRef.current
 
         // Multi-frequency harmonic phonetic simulation
-        // Simulates natural Indian syllable transitions: open vowels (A, Aa), rounded (O, U), wide (E, I), closed stops (M, P)
         const openHarmonic =
           Math.sin(t * 8.5) * 0.45 +
           Math.sin(t * 14.2) * 0.35 +
           Math.sin(t * 4.1) * 0.2
 
-        // Normalized mouth aperture (0 to 1)
         const rawOpen = Math.max(0, Math.min(1, 0.45 + openHarmonic * 0.55))
         setMouthOpen(rawOpen)
 
-        // Mouth stretch (rounded O vs wide E)
         const widthHarmonic = 1.0 + Math.sin(t * 6.2) * 0.18
         setMouthWidth(widthHarmonic)
 
-        // Subtle lifelike head sway while articulating
-        const tilt = Math.sin(t * 2.1) * 1.5 + Math.cos(t * 3.4) * 0.8
+        // Subtle lifelike head sway while speaking
+        const tilt = Math.sin(t * 2.1) * 1.6 + Math.cos(t * 3.4) * 0.9
         setHeadTilt(tilt)
       } else {
-        // Return smoothly to closed resting warm smile
+        // Return smoothly to warm resting smile
         setMouthOpen((prev) => Math.max(0, prev - 0.08))
         setMouthWidth((prev) => prev + (1.0 - prev) * 0.1)
         setHeadTilt((prev) => prev * 0.9)
       }
 
-      animFrameRef.current = requestAnimationFrame(animateLipSync)
+      animFrameRef.current = requestAnimationFrame(animateRig)
     }
 
-    animFrameRef.current = requestAnimationFrame(animateLipSync)
+    animFrameRef.current = requestAnimationFrame(animateRig)
 
     return () => {
       active = false
@@ -99,6 +125,7 @@ export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w
   const mouthW = 28 * mouthWidth
   const mouthH = 3 + mouthOpen * 22
   const lipDrop = mouthOpen * 14
+  const browLift = isSpeaking ? -2.5 : 0
 
   return (
     <div className={`relative flex items-center justify-center select-none ${sizeClass}`}>
@@ -106,7 +133,7 @@ export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w
       <div
         className={`absolute inset-0 rounded-full transition-all duration-700 pointer-events-none ${
           isSpeaking
-            ? 'bg-amber-400/20 blur-3xl scale-110'
+            ? 'bg-amber-400/25 blur-3xl scale-110'
             : 'bg-emerald-500/10 blur-2xl scale-95'
         }`}
       />
@@ -120,7 +147,10 @@ export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w
       <svg
         viewBox="0 0 400 480"
         className="w-full h-full drop-shadow-2xl transition-transform duration-300"
-        style={{ transform: `rotate(${headTilt}deg)` }}
+        style={{
+          transform: `rotate(${headTilt}deg) scale(${1 + breathPhase * 0.006})`,
+          transformOrigin: '50% 85%',
+        }}
       >
         <defs>
           {/* Indian Wheatish-Golden Skin Gradient */}
@@ -261,10 +291,10 @@ export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w
         <circle cx="200" cy="188" r="4.5" fill="#991b1b" />
         <circle cx="200" cy="188" r="1.5" fill="#fbbf24" />
 
-        {/* 8. Eyebrows (Natural curved feminine arches) */}
+        {/* 8. Eyebrows (Natural curved feminine arches, lifting with speech expressiveness) */}
         {/* Left Eyebrow */}
         <path
-          d="M 132 208 Q 158 196 182 206"
+          d={`M 132 ${208 + browLift} Q 158 ${196 + browLift} 182 ${206 + browLift}`}
           fill="none"
           stroke="#1c130e"
           strokeWidth="4"
@@ -272,14 +302,14 @@ export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w
         />
         {/* Right Eyebrow */}
         <path
-          d="M 218 206 Q 242 196 268 208"
+          d={`M 218 ${206 + browLift} Q 242 ${196 + browLift} 268 ${208 + browLift}`}
           fill="none"
           stroke="#1c130e"
           strokeWidth="4"
           strokeLinecap="round"
         />
 
-        {/* 9. Expressive Human Eyes (with real-time natural blink) */}
+        {/* 9. Expressive Human Eyes (with real-time natural blink and pupil saccades) */}
         {/* Left Eye */}
         <g transform="translate(156, 228)">
           {/* Sclera (Eye White) */}
@@ -289,13 +319,13 @@ export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w
             stroke="#c48f6c"
             strokeWidth="0.8"
           />
-          {/* Iris */}
-          <circle cx="0" cy="0" r="9.5" fill="url(#irisGrad)" />
+          {/* Iris with ocular micro-movement */}
+          <circle cx={gazeX} cy={gazeY} r="9.5" fill="url(#irisGrad)" />
           {/* Pupil */}
-          <circle cx="0" cy="0" r="4.5" fill="#000000" />
+          <circle cx={gazeX} cy={gazeY} r="4.5" fill="#000000" />
           {/* Catchlight (Life Reflection) */}
-          <circle cx="-2.5" cy="-2.5" r="2.2" fill="#ffffff" opacity="0.9" />
-          <circle cx="2.5" cy="2.5" r="1.1" fill="#ffffff" opacity="0.6" />
+          <circle cx={gazeX - 2.5} cy={gazeY - 2.5} r="2.2" fill="#ffffff" opacity="0.9" />
+          <circle cx={gazeX + 2.5} cy={gazeY + 2.5} r="1.1" fill="#ffffff" opacity="0.6" />
 
           {/* Upper Eyelid / Lash that closes on blink */}
           <path
@@ -324,12 +354,12 @@ export default function HumanAvatarRig({ isSpeaking, sizeClass = 'w-72 h-72 sm:w
             strokeWidth="0.8"
           />
           {/* Iris */}
-          <circle cx="0" cy="0" r="9.5" fill="url(#irisGrad)" />
+          <circle cx={gazeX} cy={gazeY} r="9.5" fill="url(#irisGrad)" />
           {/* Pupil */}
-          <circle cx="0" cy="0" r="4.5" fill="#000000" />
+          <circle cx={gazeX} cy={gazeY} r="4.5" fill="#000000" />
           {/* Catchlight */}
-          <circle cx="-2.5" cy="-2.5" r="2.2" fill="#ffffff" opacity="0.9" />
-          <circle cx="2.5" cy="2.5" r="1.1" fill="#ffffff" opacity="0.6" />
+          <circle cx={gazeX - 2.5} cy={gazeY - 2.5} r="2.2" fill="#ffffff" opacity="0.9" />
+          <circle cx={gazeX + 2.5} cy={gazeY + 2.5} r="1.1" fill="#ffffff" opacity="0.6" />
 
           {/* Upper Eyelid / Lash */}
           <path

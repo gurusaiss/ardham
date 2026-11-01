@@ -93,6 +93,23 @@ export default function Home() {
 
           {/* Top Right: Clean Minimal Icon Controls (Audio Speaker, Language, Settings, Profile) */}
           <div className="flex items-center gap-2 flex-wrap justify-end">
+            {/* AI Avatar Quick Pill Button */}
+            <button
+              type="button"
+              onClick={() => setShowAvatarModal(true)}
+              className="flex h-9 items-center gap-1.5 px-3 rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-100 hover:from-amber-100 hover:to-yellow-200 text-amber-950 text-xs font-black shadow-sm transition active:scale-95"
+              title={
+                lang === 'en'
+                  ? 'Open AI Avatar Loan Advisor (Lakshmi)'
+                  : lang === 'hi'
+                  ? 'एआई अवतार ऋण सलाहकार खोलें (लक्ष्मी)'
+                  : 'AI అవతార్ రుణ సలహాదారుని తెరవండి (లక్ష్మి)'
+              }
+            >
+              <span className="text-base select-none">👩‍💼</span>
+              <span className="font-extrabold">{lang === 'en' ? 'AI Avatar' : lang === 'hi' ? 'एआई अवतार' : 'AI అవతార్'}</span>
+            </button>
+
             {/* 1. Small Audio Speaker Icon Button */}
             <GlobalAudioBar />
 
