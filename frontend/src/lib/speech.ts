@@ -15,7 +15,6 @@ export type AppLanguage = 'te' | 'en' | 'hi'
 const LANG_KEY = 'ardham_app_language'
 const VOICE_PREF_KEY = 'ardham_voice_assistant'
 const MODAL_ANSWERED_KEY = 'ardham_voice_modal_answered'
-const SPEED_KEY = 'ardham_speech_speed'
 
 type SpeakingListener = (speaking: boolean) => void
 const speakingListeners = new Set<SpeakingListener>()
@@ -81,14 +80,11 @@ export function setLanguage(lang: AppLanguage) {
 }
 
 export function getSpeechRate(): number {
-  if (typeof window === 'undefined') return 0.95
-  const r = parseFloat(localStorage.getItem(SPEED_KEY) || '0.95')
-  return isNaN(r) ? 0.95 : r
+  return 1.0
 }
 
-export function setSpeechRate(rate: number) {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(SPEED_KEY, String(rate))
+export function setSpeechRate(_rate: number) {
+  // Speed permanently locked to standard natural 1.0x
 }
 
 export function isVoiceAssistantEnabled(): boolean {

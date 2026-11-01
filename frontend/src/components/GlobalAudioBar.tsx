@@ -4,8 +4,6 @@ import {
   subscribeSpeaking,
   isVoiceAssistantEnabled,
   setVoiceAssistantEnabled,
-  getSpeechRate,
-  setSpeechRate,
   getLanguage,
   subscribeLanguage,
   type AppLanguage,
@@ -18,7 +16,6 @@ interface Props {
 export default function GlobalAudioBar({ onOpenSettings }: Props) {
   const [speaking, setSpeaking] = useState(false)
   const [enabled, setEnabled] = useState(isVoiceAssistantEnabled())
-  const [rate, setRate] = useState(getSpeechRate())
   const [lang, setLang] = useState<AppLanguage>(getLanguage())
 
   useEffect(() => {
@@ -38,23 +35,6 @@ export default function GlobalAudioBar({ onOpenSettings }: Props) {
       stopSpeaking()
     }
   }
-
-  function cycleSpeed() {
-    let next = 1.0
-    if (rate <= 0.85) next = 1.0
-    else if (rate >= 1.15) next = 0.8
-    else next = 1.2
-    setRate(next)
-    setSpeechRate(next)
-  }
-
-  const speedPrefix = lang === 'te' ? 'వేగం' : lang === 'hi' ? 'गति' : 'Speed'
-  const speedLabel = rate <= 0.85 ? `🐢 ${speedPrefix}: 0.8x` : rate >= 1.15 ? `🚀 ${speedPrefix}: 1.2x` : `⚡ ${speedPrefix}: 1.0x`
-  const speedTooltip = lang === 'te' 
-    ? 'వాయిస్ చదివే వేగం మార్చండి: 0.8x (నెమ్మదిగా), 1.0x (సాధారణం), 1.2x (వేగంగా)' 
-    : lang === 'hi'
-    ? 'आवाज़ की गति बदलें: 0.8x (धीमी), 1.0x (सामान्य), 1.2x (तेज़)'
-    : 'Change voice reading speed: 0.8x (Slow for elderly), 1.0x (Normal), 1.2x (Fast)'
 
   return (
     <div className="flex items-center gap-2">
@@ -85,19 +65,21 @@ export default function GlobalAudioBar({ onOpenSettings }: Props) {
           }`}
           title={lang === 'te' ? 'వాయిస్ అసిస్టెంట్ ఆన్ లేదా ఆఫ్ చేయండి' : 'Toggle Voice Assistant ON/OFF'}
         >
-          <span>{enabled ? (lang === 'en' ? '🎙️ Voice ON' : lang === 'hi' ? '🎙️ वॉइस ON' : '🎙️ వాయిస్ ON') : (lang === 'en' ? '🔇 Silent' : lang === 'hi' ? '🔇 मूक' : '🔇 సైలెంట్')}</span>
+          <span>
+            {enabled
+              ? lang === 'en'
+                ? '🎙️ Voice ON'
+                : lang === 'hi'
+                ? '🎙️ वॉइस ON'
+                : '🎙️ వాయిస్ ON'
+              : lang === 'en'
+              ? '🔇 Silent'
+              : lang === 'hi'
+              ? '🔇 मूक'
+              : '🔇 సైలెంట్'}
+          </span>
         </button>
       )}
-
-      {/* Clear Speech Speed Button with understandable label */}
-      <button
-        type="button"
-        onClick={cycleSpeed}
-        className="rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 active:scale-95 transition shadow-sm"
-        title={speedTooltip}
-      >
-        {speedLabel}
-      </button>
 
       {onOpenSettings && (
         <button
