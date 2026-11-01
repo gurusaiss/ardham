@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import StepLayout from '../components/StepLayout'
 import QRCodeSvg from '../components/QRCodeSvg'
-import { getCertificate, getCertificateHtmlUrl, type Certificate as CertType } from '../lib/api'
+import { getCertificate, getCertificateHtmlUrl, getAnswerAudioUrl, type Certificate as CertType } from '../lib/api'
 import { getCurrentUser } from '../lib/auth'
 
 export default function Certificate() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const [cert, setCert] = useState<CertType | null>(null)
+  const [playingAudio, setPlayingAudio] = useState<string | null>(null)
   const user = getCurrentUser()
 
   useEffect(() => {
@@ -16,6 +17,39 @@ export default function Certificate() {
   }, [sessionId])
 
   const verifyUrl = typeof window !== 'undefined' ? window.location.href : `https://ardham.app/certificate/${sessionId}`
+
+  function handleWhatsAppShare() {
+    if (!cert) return
+    const loanAmt = cert.terms.loan_amount?.value || ''
+    const emi = cert.terms.instalment_amount?.value || ''
+    const total = cert.terms.total_payable?.value || ''
+    const msg = 
+      `*🏛️ అర్థం - లోన్ అవగాహన & KFS రసీదు*\n` +
+      `రుణ రకం: ${cert.loan_type}\n` +
+      `లోన్ మొత్తం: ₹${loanAmt}\n` +
+      `వాయిదా: ₹${emi}\n` +
+      `మొత్తం చెల్లింపు: ₹${total}\n` +
+      `అవగాహన స్కోర్: ${cert.score}% ✓ PASS\n` +
+      `ధృవీకరించిన అధికారి: ${user?.name || 'Ramesh Kumar'}\n\n` +
+      `📜 లైవ్ డిజిటల్ సర్టిఫికెట్ & ఆడిట్ సీల్:\n${verifyUrl}\n\n` +
+      `🔒 SHA-256 హాష్: ${cert.sha256.substring(0, 16)}...`
+
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank')
+  }
+
+  function playAudioSnippet(fieldId: string) {
+    if (!sessionId) return
+    if (playingAudio === fieldId) {
+      setPlayingAudio(null)
+      return
+    }
+    const audioUrl = getAnswerAudioUrl(sessionId, fieldId)
+    const audio = new Audio(audioUrl)
+    setPlayingAudio(fieldId)
+    audio.play().catch(() => setPlayingAudio(null))
+    audio.onended = () => setPlayingAudio(null)
+    audio.onerror = () => setPlayingAudio(null)
+  }
 
   return (
     <StepLayout title="Comprehension Certificate" teluguTitle="రుణ అవగాహన ధృవీకరణ పత్రం">
@@ -63,20 +97,50 @@ export default function Certificate() {
               <span className="font-medium text-slate-700">{new Date(cert.created_at).toLocaleString('en-IN')}</span>
             </div>
 
+            {/* Elderly & Benami Proxy Coercion Shield Box */}
+            <div className="mt-3 rounded-xl border border-emerald-300 bg-emerald-50/60 p-3 text-xs text-emerald-950">
+              <div className="font-bold flex items-center gap-1.5 text-emerald-900">
+                <span>🛡️ వృద్ధుల రక్షణ & బినామీ లోన్ రక్షణ ధృవీకరణ:</span>
+              </div>
+              <ul className="mt-1 space-y-0.5 text-[11px] text-emerald-800">
+                <li>• ✓ ప్రత్యక్ష మౌఖిక సమ్మతి (Direct Spoken Oral Consent Verified)</li>
+                <li>• ✓ ఎలాంటి ఒత్తిడి లేదా మోసం లేకుండా స్వచ్ఛందంగా తీసుకున్న రుణం</li>
+                <li>• ✓ కుటుంబ సభ్యుల కోసం డిజిటల్ KFS కాపీ సిద్ధం చేయబడింది</li>
+              </ul>
+            </div>
+
             {/* Questions Checked List */}
             <div className="mt-4">
               <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                ధృవీకరించబడిన అంశాలు (Verified Questions: {cert.results.length})
+                ధృవీకరించబడిన అంశాలు & మౌఖిక సాక్ష్యం (Oral Evidence: {cert.results.length})
               </div>
               <div className="divide-y divide-slate-100 rounded-xl border border-slate-100 bg-slate-50/70 text-xs">
                 {cert.results.map((r, i) => (
                   <div key={i} className="flex items-center justify-between p-2.5">
-                    <span className="font-semibold text-slate-800 capitalize">
-                      {r.field_id.replace(/_/g, ' ')}
-                    </span>
-                    <span className={r.correct ? 'font-bold text-emerald-700' : 'font-bold text-amber-700'}>
-                      {r.correct ? '✓ అర్థం చేసుకున్నారు (Passed)' : '↻ మళ్లీ వివరించబడింది'}
-                    </span>
+                    <div>
+                      <span className="font-semibold text-slate-800 capitalize">
+                        {r.field_id.replace(/_/g, ' ')}
+                      </span>
+                      <p className="text-[10px] text-slate-400">"{r.heard || 'Oral Telugu answer'}"</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => playAudioSnippet(r.field_id)}
+                        className={`rounded-lg px-2 py-1 text-[10px] font-bold border transition ${
+                          playingAudio === r.field_id
+                            ? 'bg-red-600 text-white border-red-600 animate-pulse'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                        title="రుణగ్రహీత స్వరం వినండి"
+                      >
+                        {playingAudio === r.field_id ? '⏹️ ఆపు' : '🔊 స్వరం వినండి'}
+                      </button>
+
+                      <span className={r.correct ? 'font-bold text-emerald-700' : 'font-bold text-amber-700'}>
+                        {r.correct ? '✓ PASS' : '↻ RE-EXPLAIN'}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -100,24 +164,30 @@ export default function Certificate() {
               </span>
               {cert.sha256}
             </div>
-
-            <p className="mt-3 text-[11px] text-slate-400 leading-relaxed text-center">
-              This tamper-proof cryptographic audit seal proves compliance with RBI Digital Lending Guidelines (2022) and Microfinance Fair Practices Code.
-            </p>
           </div>
 
-          <div className="flex gap-2">
+          {/* Action Sharing Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button
+              onClick={handleWhatsAppShare}
+              className="rounded-2xl bg-emerald-600 py-3.5 text-center text-xs sm:text-sm font-bold text-white shadow hover:bg-emerald-700 active:scale-95 transition flex items-center justify-center gap-1.5"
+            >
+              <span>📲 వాట్సాప్‌లో పంపండి</span>
+              <span className="text-[11px] font-normal">(WhatsApp)</span>
+            </button>
+
             <button
               onClick={() => window.print()}
-              className="flex-1 rounded-2xl border-2 border-slate-200 bg-white py-3.5 text-center text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50 active:scale-95 transition"
+              className="rounded-2xl border-2 border-slate-200 bg-white py-3.5 text-center text-xs sm:text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50 active:scale-95 transition"
             >
               🖨️ Print / Save PDF
             </button>
+
             <a
               href={getCertificateHtmlUrl(cert.session_id)}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 rounded-2xl border-2 border-slate-200 bg-white py-3.5 text-center text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50 active:scale-95 transition"
+              className="rounded-2xl border-2 border-slate-200 bg-white py-3.5 text-center text-xs sm:text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50 active:scale-95 transition flex items-center justify-center"
             >
               📄 Printable HTML
             </a>

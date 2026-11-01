@@ -244,3 +244,7 @@ export async function getSampleCardFile(loanType: string): Promise<File> {
 export function getCertificateHtmlUrl(sessionId: string): string {
   return `${API_BASE}/sessions/${sessionId}/certificate.html`
 }
+
+export function getAnswerAudioUrl(sessionId: string, fieldId: string): string {
+  return `${API_BASE}/sessions/${sessionId}/audio/${fieldId}`
+}

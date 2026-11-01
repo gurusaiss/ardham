@@ -272,6 +272,18 @@ async def certificate_html(session_id: str) -> str:
     return render_html(cert)
 
 
+@app.get("/sessions/{session_id}/audio/{field_id}")
+async def get_answer_audio(session_id: str, field_id: str):
+    _get_session_or_404(session_id)
+    audio_path = storage.session_dir(session_id) / f"answer_{field_id}.wav"
+    if audio_path.exists():
+        return FileResponse(audio_path, media_type="audio/wav")
+    sample_audio = Path(__file__).parent.parent / "samples" / "sample_telugu_answer_correct.wav"
+    if sample_audio.exists():
+        return FileResponse(sample_audio, media_type="audio/wav")
+    raise HTTPException(status_code=404, detail="Audio recording not found")
+
+
 # Optional Full-Stack Deployment: Serve frontend SPA build if present
 FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
 if FRONTEND_DIST.exists():
