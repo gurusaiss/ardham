@@ -118,14 +118,14 @@ export default function Explain() {
       ) : current ? (
         <div className="flex flex-col gap-6">
           {/* Main Card with 100% full width and responsive grid on wider displays */}
-          <div className="rounded-3xl border-2 border-emerald-200/80 bg-white p-6 sm:p-8 shadow-sm">
+          <div className="rounded-3xl border-2 border-emerald-200/80 bg-white p-6 sm:p-8 md:p-10 shadow-md">
             {/* Header info */}
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-emerald-900 border-b border-emerald-100/70 pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-bold text-emerald-900 border-b border-emerald-100/70 pb-4">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-emerald-100 text-emerald-800 px-3 py-1">
+                <span className="rounded-full bg-emerald-100 text-emerald-900 px-3.5 py-1 text-xs sm:text-sm font-bold">
                   {t('item_counter', lang)} {index + 1} / {sentences.length}
                 </span>
-                <span className="rounded-full bg-slate-100 text-slate-700 px-3 py-1 font-mono uppercase tracking-wide">
+                <span className="rounded-full bg-slate-100 text-slate-700 px-3.5 py-1 text-xs font-mono uppercase tracking-wide">
                   {current.field_id.replace('_', ' ')}
                 </span>
               </div>
@@ -135,8 +135,8 @@ export default function Explain() {
                 <button
                   type="button"
                   onClick={() => setLang('te')}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-bold transition ${
-                    lang === 'te' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1 text-xs rounded-lg font-bold transition ${
+                    lang === 'te' ? 'bg-emerald-700 text-white shadow' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   తెలుగు
@@ -144,8 +144,8 @@ export default function Explain() {
                 <button
                   type="button"
                   onClick={() => setLang('en')}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-bold transition ${
-                    lang === 'en' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1 text-xs rounded-lg font-bold transition ${
+                    lang === 'en' ? 'bg-emerald-700 text-white shadow' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   English
@@ -153,8 +153,8 @@ export default function Explain() {
                 <button
                   type="button"
                   onClick={() => setLang('hi')}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-bold transition ${
-                    lang === 'hi' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1 text-xs rounded-lg font-bold transition ${
+                    lang === 'hi' ? 'bg-emerald-700 text-white shadow' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   हिंदी
@@ -165,23 +165,23 @@ export default function Explain() {
             {/* Responsive 2-column or wide format */}
             <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               <div className="lg:col-span-8">
-                <div className="text-xs uppercase font-bold tracking-wider text-emerald-600 mb-2">
+                <div className="text-xs uppercase font-bold tracking-wider text-emerald-800 mb-2">
                   {lang === 'en' ? 'Spoken Explanation' : lang === 'hi' ? 'मौखिक विवरण' : 'స్పష్టమైన వివరణ'}
                 </div>
-                <p className="text-2xl sm:text-3xl font-semibold text-slate-900 leading-relaxed tracking-tight">
+                <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 leading-relaxed tracking-tight">
                   {activeText}
                 </p>
 
                 {/* Sub-translations for multi-lingual clarity */}
-                <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col gap-1.5 text-xs text-slate-500">
+                <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col gap-2 text-xs sm:text-sm text-slate-600">
                   {lang !== 'te' && (
-                    <div><span className="font-bold text-slate-700">తెలుగు:</span> {current.text_te}</div>
+                    <div><span className="font-bold text-slate-800">తెలుగు:</span> {current.text_te}</div>
                   )}
                   {lang !== 'en' && current.text_en && (
-                    <div><span className="font-bold text-slate-700">English:</span> {current.text_en}</div>
+                    <div><span className="font-bold text-slate-800">English:</span> {current.text_en}</div>
                   )}
                   {lang !== 'hi' && current.text_hi && (
-                    <div><span className="font-bold text-slate-700">हिंदी:</span> {current.text_hi}</div>
+                    <div><span className="font-bold text-slate-800">हिंदी:</span> {current.text_hi}</div>
                   )}
                 </div>
               </div>
@@ -191,10 +191,10 @@ export default function Explain() {
                 <button
                   type="button"
                   onClick={toggleAudio}
-                  className={`w-full flex items-center justify-center gap-3 rounded-2xl py-4 px-5 text-base font-bold shadow-lg transition-all active:scale-95 ${
+                  className={`w-full flex items-center justify-center gap-3 rounded-2xl py-4 sm:py-5 px-5 text-base sm:text-lg font-bold shadow-lg transition-all active:scale-95 ${
                     speaking
                       ? 'bg-rose-600 text-white hover:bg-rose-700 ring-4 ring-rose-200'
-                      : 'bg-emerald-600 text-white hover:bg-emerald-700 ring-4 ring-emerald-100'
+                      : 'bg-emerald-700 text-white hover:bg-emerald-800 ring-4 ring-emerald-100'
                   }`}
                 >
                   {speaking ? (
@@ -220,7 +220,7 @@ export default function Explain() {
                     </>
                   )}
                 </button>
-                <div className="text-[11px] text-center text-slate-400">
+                <div className="text-xs text-center text-slate-500 font-medium">
                   {speaking ? '🔊 Audio playing clearly word-by-word...' : 'Press to hear full sentence aloud'}
                 </div>
               </div>
@@ -228,20 +228,20 @@ export default function Explain() {
 
             {/* Source card line quote verification */}
             {sourceField && (
-              <div className="mt-6 rounded-2xl border-l-4 border-amber-400 bg-amber-50/80 p-4">
+              <div className="mt-6 rounded-2xl border-l-4 border-amber-400 bg-amber-50/80 p-4 sm:p-5">
                 <div className="flex items-center justify-between">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
+                  <div className="text-xs font-bold uppercase tracking-wider text-amber-900">
                     📜 {t('source_on_card', lang)}
                   </div>
-                  <span className="text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
+                  <span className="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded">
                     Hallucination Protected
                   </span>
                 </div>
-                <div className="mt-1.5 text-base font-semibold text-amber-950 font-mono">
+                <div className="mt-2 text-base sm:text-lg font-bold text-amber-950 font-mono">
                   "{sourceField.source_text}"
                 </div>
-                <div className="mt-1 text-xs text-amber-800">
-                  Verified Raw Fact: <strong className="text-amber-950 font-mono">{String(sourceField.value)}</strong>
+                <div className="mt-1 text-xs sm:text-sm text-amber-900 font-medium">
+                  Verified Raw Fact: <strong className="text-amber-950 font-mono text-base">{String(sourceField.value)}</strong>
                 </div>
               </div>
             )}
@@ -255,7 +255,7 @@ export default function Explain() {
                 stopSpeaking()
                 setIndex((i) => i - 1)
               }}
-              className="flex-1 rounded-2xl border-2 border-slate-200 bg-white py-3.5 px-6 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 active:scale-95 shadow-sm"
+              className="flex-1 rounded-2xl border-2 border-slate-200 bg-white py-4 px-6 text-sm sm:text-base font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 active:scale-95 shadow-sm"
             >
               {t('back_btn', lang)}
             </button>
@@ -266,7 +266,7 @@ export default function Explain() {
                   stopSpeaking()
                   setIndex((i) => i + 1)
                 }}
-                className="flex-1 rounded-2xl bg-slate-900 py-3.5 px-6 text-sm font-bold text-white shadow-md hover:bg-slate-800 active:scale-95"
+                className="flex-1 rounded-2xl bg-slate-900 py-4 px-6 text-sm sm:text-base font-bold text-white shadow-md hover:bg-slate-800 active:scale-95"
               >
                 {t('next_btn', lang)}
               </button>
@@ -276,7 +276,7 @@ export default function Explain() {
                   stopSpeaking()
                   sessionId && navigate(`/result/${sessionId}`)
                 }}
-                className="flex-1 rounded-2xl bg-slate-900 py-3.5 px-6 text-sm font-bold text-white shadow-md hover:bg-slate-800 active:scale-95"
+                className="flex-1 rounded-2xl bg-slate-900 py-4 px-6 text-sm sm:text-base font-bold text-white shadow-md hover:bg-slate-800 active:scale-95"
               >
                 {t('view_cert_btn', lang)}
               </button>
@@ -286,7 +286,7 @@ export default function Explain() {
                   stopSpeaking()
                   sessionId && navigate(`/quiz/${sessionId}`)
                 }}
-                className="flex-1 rounded-2xl bg-emerald-600 py-3.5 px-6 text-sm font-bold text-white shadow-lg hover:bg-emerald-700 active:scale-95"
+                className="flex-1 rounded-2xl bg-emerald-700 py-4 px-6 text-sm sm:text-base font-bold text-white shadow-lg hover:bg-emerald-800 active:scale-95"
               >
                 {t('start_quiz_btn', lang)}
               </button>

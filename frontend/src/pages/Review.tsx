@@ -131,10 +131,10 @@ export default function Review() {
             <div className="rounded-3xl border-2 border-emerald-500 bg-white p-6 shadow-md space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                     {t('fairness_score', lang)}
                   </span>
-                  <div className="text-3xl font-black text-slate-900 flex items-center gap-3">
+                  <div className="text-3xl font-black text-slate-900 flex items-center gap-3 mt-1">
                     <span>{fairness.fairness_score}/100</span>
                     <span
                       className={`text-xs font-bold px-3 py-1 rounded-full ${
@@ -165,34 +165,34 @@ export default function Review() {
                   {t('money_flow_title', lang)}
                 </div>
                 <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="rounded-2xl bg-emerald-50/90 p-3.5 border border-emerald-200 shadow-sm">
-                    <div className="text-xs font-semibold text-emerald-800">{t('net_in_hand', lang)}</div>
-                    <div className="text-lg sm:text-xl font-black text-emerald-950 mt-1">
+                  <div className="rounded-2xl bg-emerald-50/90 p-4 border border-emerald-200 shadow-sm">
+                    <div className="text-xs font-bold text-emerald-900">{t('net_in_hand', lang)}</div>
+                    <div className="text-lg sm:text-2xl font-black text-emerald-950 mt-1">
                       ₹{fairness.net_in_hand.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-[10px] text-emerald-700 font-medium">Disbursed</div>
+                    <div className="text-xs text-emerald-800 font-semibold mt-0.5">Disbursed</div>
                   </div>
 
-                  <div className="rounded-2xl bg-amber-50/90 p-3.5 border border-amber-200 shadow-sm">
-                    <div className="text-xs font-semibold text-amber-800">{t('extra_cost', lang)}</div>
-                    <div className="text-lg sm:text-xl font-black text-amber-950 mt-1">
+                  <div className="rounded-2xl bg-amber-50/90 p-4 border border-amber-200 shadow-sm">
+                    <div className="text-xs font-bold text-amber-900">{t('extra_cost', lang)}</div>
+                    <div className="text-lg sm:text-2xl font-black text-amber-950 mt-1">
                       ₹{fairness.total_extra_cost.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-[10px] text-amber-700 font-medium">Interest + Fees</div>
+                    <div className="text-xs text-amber-800 font-semibold mt-0.5">Interest + Fees</div>
                   </div>
 
-                  <div className="rounded-2xl bg-slate-50/90 p-3.5 border border-slate-200 shadow-sm">
-                    <div className="text-xs font-semibold text-slate-700">{t('total_repayment', lang)}</div>
-                    <div className="text-lg sm:text-xl font-black text-slate-900 mt-1">
+                  <div className="rounded-2xl bg-slate-50/90 p-4 border border-slate-200 shadow-sm">
+                    <div className="text-xs font-bold text-slate-800">{t('total_repayment', lang)}</div>
+                    <div className="text-lg sm:text-2xl font-black text-slate-900 mt-1">
                       ₹{fairness.total_payable.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-medium">Total Repaid</div>
+                    <div className="text-xs text-slate-600 font-semibold mt-0.5">Total Repaid</div>
                   </div>
                 </div>
 
                 {/* Proportional visual bar */}
                 <div className="mt-4">
-                  <div className="flex justify-between text-xs font-semibold text-slate-600 mb-1.5">
+                  <div className="flex justify-between text-xs font-bold text-slate-600 mb-1.5">
                     <span>{t('principal_ratio', lang)}: {Math.round((fairness.net_in_hand / (fairness.total_payable || 1)) * 100)}%</span>
                     <span>{t('fees_ratio', lang)}: {Math.round((fairness.total_extra_cost / (fairness.total_payable || 1)) * 100)}%</span>
                   </div>
@@ -216,7 +216,7 @@ export default function Review() {
                     <span>🚨 దాచిన షరతులు & హెచ్చరికలు (Hidden Traps Detected):</span>
                   </div>
                   {fairness.warnings_te.map((w, i) => (
-                    <p key={i} className="text-xs text-amber-950 leading-relaxed font-medium">
+                    <p key={i} className="text-xs text-amber-950 leading-relaxed font-semibold">
                       • {w}
                     </p>
                   ))}
@@ -229,10 +229,10 @@ export default function Review() {
                   <p className="font-bold flex items-center gap-1.5 text-emerald-900 text-sm">
                     <span>💰 వడ్డీ వ్యాపారి కంటే ఎంత ఆదా? (Moneylender Savings):</span>
                   </p>
-                  <p className="mt-1.5 font-semibold text-emerald-800 text-sm">
+                  <p className="mt-1.5 font-bold text-emerald-800 text-sm">
                     {fairness.moneylender_comparison.savings_te}
                   </p>
-                  <p className="text-[11px] text-slate-500 mt-1">
+                  <p className="text-xs text-slate-500 mt-1 font-medium">
                     {fairness.moneylender_comparison.savings_en}
                   </p>
                 </div>
@@ -256,33 +256,33 @@ export default function Review() {
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 సేకరించిన వివరాలు (Extracted Terms)
               </span>
-              <span className="text-xs font-bold text-slate-400">
+              <span className="text-xs font-bold text-slate-500">
                 {Object.keys(terms).length} Fields
               </span>
             </div>
 
             {lowConfidence.length > 0 && (
-              <div className="rounded-2xl bg-amber-50 p-3 text-xs text-amber-800 border border-amber-200">
+              <div className="rounded-2xl bg-amber-50 p-3 text-xs font-semibold text-amber-800 border border-amber-200">
                 ⚠️ {lowConfidence.length} field(s) have lower confidence — please verify against the card.
               </div>
             )}
 
-            {/* Extracted Fields Table */}
+            {/* Extracted Fields Table with clean readable fonts */}
             <ul className="flex flex-col gap-2.5 max-h-[480px] overflow-y-auto pr-1">
               {Object.entries(terms).map(([fieldId, field]) => (
-                <li key={fieldId} className="rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5 shadow-sm hover:border-emerald-200 transition">
+                <li key={fieldId} className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 shadow-sm hover:border-emerald-200 transition">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold capitalize text-slate-600">
                       {fieldId.replace(/_/g, ' ')}
                     </span>
                     {field.confidence < 0.7 && (
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                      <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">
                         Check
                       </span>
                     )}
                   </div>
-                  <div className="text-lg font-black text-slate-900 mt-1">{String(field.value)}</div>
-                  <div className="mt-1 text-[11px] text-slate-400 font-mono truncate">"{field.source_text}"</div>
+                  <div className="text-lg sm:text-xl font-black text-slate-900 mt-1">{String(field.value)}</div>
+                  <div className="mt-1 text-xs text-slate-500 font-mono truncate">"{field.source_text}"</div>
                 </li>
               ))}
             </ul>
@@ -296,7 +296,7 @@ export default function Review() {
             <button
               disabled={confirming || Object.keys(terms).length === 0}
               onClick={onConfirm}
-              className="mt-2 w-full rounded-2xl bg-emerald-600 py-4 px-6 text-base font-bold text-white shadow-lg hover:bg-emerald-700 disabled:opacity-50 active:scale-[0.98] transition flex items-center justify-center gap-2"
+              className="mt-2 w-full rounded-2xl bg-emerald-700 py-4 px-6 text-base font-bold text-white shadow-lg hover:bg-emerald-800 disabled:opacity-50 active:scale-[0.98] transition flex items-center justify-center gap-2"
             >
               <span>{confirming ? 'Confirming...' : t('confirm_terms_btn', lang)}</span>
             </button>

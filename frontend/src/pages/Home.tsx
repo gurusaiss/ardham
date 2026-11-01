@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import OfflineIndicator from '../components/OfflineIndicator'
 import GlobalAudioBar from '../components/GlobalAudioBar'
 import VoiceAssistantModal from '../components/VoiceAssistantModal'
 import {
@@ -32,7 +31,7 @@ export default function Home() {
   useEffect(() => {
     if (isVoiceAssistantEnabled()) {
       if (lang === 'en') {
-        speakText('Welcome to Ardham. An edge AI assistant for loan comprehension verification.', 'en')
+        speakText('Welcome to Ardham. An assistant for loan comprehension verification.', 'en')
       } else if (lang === 'hi') {
         speakText('अर्थम में आपका स्वागत है। ऋण समझ सत्यापन के लिए नया सत्र शुरू करें।', 'hi')
       } else {
@@ -53,27 +52,27 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 sm:bg-gradient-to-br sm:from-slate-100 sm:via-slate-50 sm:to-emerald-50/40 py-3 sm:py-8 px-2 sm:px-6 lg:px-8 flex flex-col justify-between">
-      <div className="mx-auto w-full max-w-6xl rounded-3xl bg-white shadow-xl border border-slate-200/80 p-5 sm:p-8 md:p-10 flex-1 flex flex-col justify-between animate-fade-in">
-        {/* Top User Bar */}
-        <div className="w-full flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 border-b border-slate-100 pb-4">
+    <div className="min-h-screen bg-slate-50/80 sm:bg-gradient-to-br sm:from-slate-100 sm:via-slate-50 sm:to-emerald-50/30 py-4 sm:py-8 px-3 sm:px-6 lg:px-8 flex flex-col justify-between">
+      <div className="mx-auto w-full max-w-6xl rounded-3xl bg-white shadow-xl border border-slate-200/90 p-6 sm:p-10 flex-1 flex flex-col justify-between animate-fade-in">
+        {/* Top Header Bar */}
+        <div className="w-full flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
           <div className="flex items-center gap-3">
             <Link
               to="/auth"
-              className="flex items-center gap-1.5 font-bold text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition"
+              className="flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-1.5 rounded-xl transition text-xs sm:text-sm"
             >
               <span>👤</span>
-              <span>{user ? `${user.name} (${user.role === 'officer' ? 'Officer' : 'Borrower'})` : '🔑 Sign In / Demo Login'}</span>
+              <span>{user ? `${user.name} (${user.role === 'officer' ? 'Officer' : 'Borrower'})` : (lang === 'en' ? '🔑 Sign In / Demo Account' : lang === 'hi' ? '🔑 साइन इन / डेमो' : '🔑 సైన్ ఇన్ / డెమో ఖాతా')}</span>
             </Link>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             {/* Real-time Language Selector Pills */}
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs font-bold">
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
               <button
                 type="button"
                 onClick={() => switchLang('te')}
-                className={`px-3 py-1 rounded-lg transition-all ${
+                className={`px-3 py-1.5 rounded-lg transition-all ${
                   lang === 'te'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
@@ -85,7 +84,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => switchLang('en')}
-                className={`px-3 py-1 rounded-lg transition-all ${
+                className={`px-3 py-1.5 rounded-lg transition-all ${
                   lang === 'en'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
@@ -97,7 +96,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => switchLang('hi')}
-                className={`px-3 py-1 rounded-lg transition-all ${
+                className={`px-3 py-1.5 rounded-lg transition-all ${
                   lang === 'hi'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
@@ -109,88 +108,89 @@ export default function Home() {
             </div>
 
             <GlobalAudioBar onOpenSettings={() => setShowVoiceModal(true)} />
-            <OfflineIndicator />
           </div>
         </div>
 
-        {/* Hero Section: Responsive Full Width */}
+        {/* Hero Section: Centered, clean, prominent typography */}
         <div className="my-8 text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-xs font-extrabold text-emerald-800 mb-4 shadow-sm">
-            <span>✨ Powered by Gemma 4 Edge AI</span>
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-bold text-emerald-800 mb-5 shadow-sm">
+            <span>🏛️ RBI Key Fact Statement (KFS) Audit Verified</span>
             <span>•</span>
-            <span>100% Offline Capable</span>
-            <span>•</span>
-            <span>Zero Hallucination Guard</span>
+            <span>Zero Hallucination Protected</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 leading-tight">
-            అర్థం <span className="text-3xl sm:text-4xl font-medium text-emerald-700 font-sans">Ardham</span>
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 leading-tight">
+            అర్థం <span className="text-3xl sm:text-5xl font-medium text-emerald-800 font-sans">Ardham</span>
           </h1>
 
-          <p className="mt-4 text-lg sm:text-xl font-bold text-slate-800 leading-snug">
+          <p className="mt-4 text-lg sm:text-2xl font-bold text-slate-800 leading-snug">
             {t('tagline', lang)}
           </p>
-          <p className="mt-2 text-sm text-slate-500">
-            Offline Loan Comprehension & Regulatory Key Fact Statement (KFS) Verification
+          <p className="mt-2 text-sm sm:text-base text-slate-500 max-w-2xl mx-auto">
+            {lang === 'en'
+              ? 'Makes sure rural & visually impaired borrowers understand all loan commitments before signing.'
+              : lang === 'hi'
+              ? 'सुनिश्चित करता है कि हस्ताक्षर करने से पहले ग्रामीण और दृष्टिबाधित उधारकर्ता सभी शर्तों को स्पष्ट रूप से समझें।'
+              : 'రుణ ఒప్పందంపై సంతకం లేదా వేలిముద్ర వేయడానికి ముందే ప్రతి నిబంధనను స్వచ్ఛమైన మాటల్లో వివరించే వ్యవస్థ.'}
           </p>
         </div>
 
-        {/* Loan Categories Grid: 3 columns on tablet/desktop, 1 column on phone */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
+        {/* Loan Categories Grid: 3 columns with legible fonts */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 my-6">
           <Link
             to="/scan/microfinance-group-loan"
-            className="rounded-3xl border-2 border-emerald-500/80 bg-emerald-50/40 p-5 text-left hover:bg-emerald-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
+            className="rounded-3xl border-2 border-emerald-500/80 bg-emerald-50/40 p-6 text-left hover:bg-emerald-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
           >
             <div>
-              <span className="text-3xl">👩‍🌾</span>
-              <p className="font-extrabold text-lg text-emerald-950 mt-2">Microfinance (JLG)</p>
-              <p className="text-xs text-emerald-800 font-medium leading-relaxed mt-1">
+              <span className="text-4xl">👩‍🌾</span>
+              <p className="font-extrabold text-xl text-emerald-950 mt-3">Microfinance (JLG)</p>
+              <p className="text-sm text-emerald-900 font-semibold leading-relaxed mt-1">
                 స్వయం సహాయక సంఘాలు • Weekly reducing installments • Group liability
               </p>
             </div>
-            <span className="text-xs font-bold text-emerald-700 mt-4 inline-flex items-center gap-1">
+            <span className="text-sm font-bold text-emerald-800 mt-5 inline-flex items-center gap-1">
               {t('quick_demo_card', lang)} →
             </span>
           </Link>
 
           <Link
             to="/scan/gold-loan"
-            className="rounded-3xl border-2 border-amber-300 bg-amber-50/40 p-5 text-left hover:bg-amber-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
+            className="rounded-3xl border-2 border-amber-300 bg-amber-50/40 p-6 text-left hover:bg-amber-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
           >
             <div>
-              <span className="text-3xl">💍</span>
-              <p className="font-extrabold text-lg text-amber-950 mt-2">Gold Loan</p>
-              <p className="text-xs text-amber-800 font-medium leading-relaxed mt-1">
+              <span className="text-4xl">💍</span>
+              <p className="font-extrabold text-xl text-amber-950 mt-3">Gold Loan</p>
+              <p className="text-sm text-amber-900 font-semibold leading-relaxed mt-1">
                 బంగారు ఆభరణాల తాకట్టు • Bullet interest repayment • Auction risk warning
               </p>
             </div>
-            <span className="text-xs font-bold text-amber-800 mt-4 inline-flex items-center gap-1">
+            <span className="text-sm font-bold text-amber-900 mt-5 inline-flex items-center gap-1">
               ⚡ Quick Scan →
             </span>
           </Link>
 
           <Link
             to="/scan/individual-personal-loan"
-            className="rounded-3xl border-2 border-blue-300 bg-blue-50/40 p-5 text-left hover:bg-blue-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
+            className="rounded-3xl border-2 border-blue-300 bg-blue-50/40 p-6 text-left hover:bg-blue-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
           >
             <div>
-              <span className="text-3xl">💼</span>
-              <p className="font-extrabold text-lg text-blue-950 mt-2">Personal Loan</p>
-              <p className="text-xs text-blue-800 font-medium leading-relaxed mt-1">
+              <span className="text-4xl">💼</span>
+              <p className="font-extrabold text-xl text-blue-950 mt-3">Personal Loan</p>
+              <p className="text-sm text-blue-900 font-semibold leading-relaxed mt-1">
                 వ్యక్తిగత వినియోగదారుల రుణం • Monthly EMI • Upfront fee audit
               </p>
             </div>
-            <span className="text-xs font-bold text-blue-700 mt-4 inline-flex items-center gap-1">
+            <span className="text-sm font-bold text-blue-800 mt-5 inline-flex items-center gap-1">
               ⚡ Quick Scan →
             </span>
           </Link>
         </div>
 
-        {/* Action CTAs: Full-width responsive */}
+        {/* Action CTAs: High legibility */}
         <div className="mt-4 flex flex-col sm:flex-row gap-3">
           <Link
             to="/choose-loan"
-            className="flex-1 rounded-2xl bg-emerald-600 py-4 px-6 text-center text-base font-bold text-white shadow-lg hover:bg-emerald-700 active:scale-[0.98] transition"
+            className="flex-1 rounded-2xl bg-emerald-700 py-4 px-6 text-center text-base sm:text-lg font-bold text-white shadow-lg hover:bg-emerald-800 active:scale-[0.98] transition"
           >
             {t('start_new_session', lang)} →
           </Link>
@@ -198,29 +198,29 @@ export default function Home() {
           <button
             type="button"
             onClick={resetAndOpenModal}
-            className="rounded-2xl border-2 border-slate-200 bg-white py-4 px-6 text-center text-sm font-bold text-slate-700 hover:bg-slate-50 active:scale-95 transition shadow-sm"
+            className="rounded-2xl border-2 border-slate-200 bg-white py-4 px-6 text-center text-sm sm:text-base font-bold text-slate-700 hover:bg-slate-50 active:scale-95 transition shadow-sm"
           >
             🌐 {t('voice_assistant', lang)} & {t('change_language', lang)}
           </button>
         </div>
 
         {/* Regulatory & Safety Footer Card */}
-        <div className="mt-6 rounded-3xl bg-slate-50 p-5 text-left border border-slate-200 text-xs text-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="mt-8 rounded-3xl bg-slate-50 p-6 text-left border border-slate-200 text-sm text-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <p className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+            <p className="font-extrabold text-slate-900 text-base flex items-center gap-2">
               <span>{t('rbi_kfs_compliance_title', lang)}</span>
             </p>
-            <p className="text-xs text-slate-600 leading-relaxed max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
               {t('rbi_kfs_compliance_desc', lang)}
             </p>
           </div>
-          <div className="shrink-0 text-[11px] font-mono text-emerald-800 bg-emerald-100/80 px-3 py-1.5 rounded-xl font-bold">
+          <div className="shrink-0 text-xs font-mono text-emerald-800 bg-emerald-100/80 px-3.5 py-2 rounded-xl font-bold">
             RBI/2023-24/139 Compliant
           </div>
         </div>
 
-        <p className="mt-4 text-[11px] text-slate-400 text-center">
-          Ardham operates on-device to protect rural borrower privacy. All test datasets are fictional.
+        <p className="mt-5 text-xs text-slate-500 text-center">
+          Ardham protects rural borrowers and visually impaired citizens through transparent oral comprehension verification.
         </p>
       </div>
 
