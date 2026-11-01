@@ -7,6 +7,7 @@ import {
   subscribeLanguage,
   type AppLanguage,
   subscribeSpeaking,
+  setAvatarModalActive,
 } from '../lib/speech'
 import {
   subscribeVoiceCommands,
@@ -40,6 +41,13 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
   const [cardVisible, setCardVisible] = useState(false)
   const cardTimerRef = useRef<any>(null)
 
+  function handleClose() {
+    setAvatarModalActive(false)
+    stopSpeaking()
+    if (cardTimerRef.current) clearTimeout(cardTimerRef.current)
+    onClose()
+  }
+
   // Sync language and speaking state
   useEffect(() => {
     const unsubLang = subscribeLanguage(setLang)
@@ -53,9 +61,16 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
   // Start continuous voice commander when avatar is open
   useEffect(() => {
     if (isOpen) {
+      setAvatarModalActive(true)
       startVoiceCommander()
       runStep(0)
     } else {
+      setAvatarModalActive(false)
+      stopSpeaking()
+      if (cardTimerRef.current) clearTimeout(cardTimerRef.current)
+    }
+    return () => {
+      setAvatarModalActive(false)
       stopSpeaking()
       if (cardTimerRef.current) clearTimeout(cardTimerRef.current)
     }
@@ -80,7 +95,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
       } else if (action === 'share') {
         triggerShare()
       } else if (action === 'screen') {
-        onClose()
+        handleClose()
       } else if (currentStep === 3) {
         // In quiz step, check if borrower answered with voice
         handleSpokenAnswer(rawText)
@@ -129,40 +144,40 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
       // Step 1: Scan & Approved Principal
       const msg =
         lang === 'en'
-          ? 'Hello! I am Lakshmi, your AI loan advisor. I have scanned your loan document. Your principal loan amount is ₹30,000, with an 18.5% interest rate. Say "Next" to inspect the upfront fees.'
+          ? 'Hello! I am Lakshmi, your AI loan advisor. I have checked your loan document. Your loan amount is ₹30,000, with an 18.5% interest rate. Say "Next" to inspect the upfront fees.'
           : lang === 'hi'
-          ? 'नमस्ते! मैं लक्ष्मी हूँ, आपकी एआई ऋण सलाहकार। मैंने आपका दस्तावेज़ स्कैन कर लिया है। आपकी ऋण राशि ₹30,000 है और ब्याज दर 18.5% है। आगे बढ़ने के लिए "Next" बोलें।'
-          : 'నమస్కారం! నేను లక్ష్మిని, మీ AI రుణ సలహాదారుని. నేను మీ లోన్ కార్డును స్కాన్ చేశాను. మీకు మంజూరైన లోన్ మొత్తం ముప్పై వేల రూపాయలు, వడ్డీ రేటు 18.5 శాతం. తర్వాతి వివరాలు వినడానికి "Next" అని చెప్పండి.'
+          ? 'नमस्ते! मैं लक्ष्मी हूँ, आपकी एआई ऋण सलाहकार। मैंने आपका दस्तावेज़ देख लिया है। आपकी ऋण राशि ₹30,000 है और ब्याज दर 18.5% है। आगे बढ़ने के लिए "Next" बोलें।'
+          : 'నమస్కారం! నేను లక్ష్మిని, మీ AI రుణ సలహాదారుని. నేను మీ లోన్ కార్డును తనిఖీ చేశాను. మీకు మంజూరైన లోన్ మొత్తం ముప్పై వేల రూపాయలు, వడ్డీ రేటు 18.5 శాతం. తర్వాతి వివరాలు వినడానికి "Next" అని చెప్పండి.'
 
       speakText(msg, lang)
 
       showTemporaryCard({
         id: 'step1_card',
-        title: lang === 'en' ? 'Loan Card Scanned' : lang === 'hi' ? 'ऋण दस्तावेज़ स्कैन' : 'లోన్ కార్డు స్కాన్ ధృవీకరణ',
-        subtitle: '100% Gemma 4 Vision Extract',
+        title: lang === 'en' ? 'Loan Card Verified' : lang === 'hi' ? 'ऋण दस्तावेज़ सत्यापन' : 'లోన్ కార్డు స్కాన్ ధృవీకరణ',
+        subtitle: '100% Genuine Card Details',
         pillText: 'Verified Agreement',
         stats: [
-          { label: lang === 'en' ? 'Principal Loan' : 'అసలు అప్పు మొత్తం', value: '₹30,000', highlight: true },
+          { label: lang === 'en' ? 'Loan Amount' : 'అసలు అప్పు మొత్తం', value: '₹30,000', highlight: true },
           { label: lang === 'en' ? 'Annual Interest' : 'వార్షిక వడ్డీ రేటు', value: '18.5%' },
           { label: lang === 'en' ? 'Weekly Installment' : 'వారపు వాయిదా', value: '₹690' },
           { label: lang === 'en' ? 'Total Weeks' : 'వాయిదాల సంఖ్య', value: '50' },
         ],
-        goldStamp: 'RBI/2023-24/139',
+        goldStamp: 'Official Card',
       })
     } else if (stepIdx === 1) {
       // Step 2: Predatory Audit & Upfront Deductions
       const msg =
         lang === 'en'
-          ? 'Step 2: Fairness Audit. The bank will deduct ₹2,200 upfront for processing and insurance. You will receive ₹27,800 net cash in your bank account. You save ₹14,200 compared to private moneylenders. Say "Next" to continue.'
+          ? 'Step 2: Fair loan check. The bank will deduct ₹2,200 upfront for processing and insurance. You will receive ₹27,800 net cash in your bank account. You save ₹14,200 compared to private moneylenders. Say "Next" to continue.'
           : lang === 'hi'
           ? 'चरण 2: निष्पक्षता विश्लेषण। बैंक ₹2,200 अग्रिम शुल्क काटेगा। आपके बैंक खाते में शुद्ध ₹27,800 आएंगे। साहूकार की तुलना में आप ₹14,200 बचा रहे हैं। आगे बढ़ने के लिए "Next" बोलें।'
-          : 'రెండవ దశ: దాచిన ఛార్జీల ఆడిట్. ప్రాసెసింగ్ ఫీజు మరియు బీమా కోసం 2,200 రూపాయలు ముందుగానే మినహాయిస్తారు. మీ చేతికి నికరంగా 27,800 రూపాయలు అందుతాయి. ప్రైవేట్ వడ్డీ వ్యాపారి కంటే మీరు 14,200 రూపాయలు ఆదా చేస్తున్నారు. "Next" అని చెప్పండి.'
+          : 'రెండవ దశ: దాచిన ఛార్జీల తనిఖీ. ప్రాసెసింగ్ ఫీజు మరియు బీమా కోసం 2,200 రూపాయలు ముందుగానే మినహాయిస్తారు. మీ చేతికి నికరంగా 27,800 రూపాయలు అందుతాయి. ప్రైవేట్ వడ్డీ వ్యాపారి కంటే మీరు 14,200 రూపాయలు ఆదా చేస్తున్నారు. "Next" అని చెప్పండి.'
 
       speakText(msg, lang)
 
       showTemporaryCard({
         id: 'step2_card',
-        title: lang === 'en' ? 'Key Fact Statement Audit' : lang === 'hi' ? 'केएफएस निष्पक्षता ऑडिट' : 'RBI నిష్పక్షపాత ఆడిట్',
+        title: lang === 'en' ? 'Fee & Deductions Check' : lang === 'hi' ? 'शुल्क एवं कटौती जांच' : 'ఫీజులు & మినహాయింపుల తనిఖీ',
         subtitle: 'Fair Lending Protection',
         pillText: 'Zero Hidden Fees',
         stats: [
@@ -170,30 +185,30 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           { label: lang === 'en' ? 'Net Cash in Hand' : 'చేతికి అందే నికర నగదు', value: '₹27,800', highlight: true },
           { label: lang === 'en' ? 'Savings vs Moneylender' : 'వడ్డీ వ్యాపారి కంటే ఆదా', value: '+₹14,200', highlight: true },
         ],
-        goldStamp: 'Zero Usury',
+        goldStamp: 'Fair Loan',
       })
     } else if (stepIdx === 2) {
       // Step 3: Crucial Terms (Prepayment & Gold Safety)
       const msg =
         lang === 'en'
-          ? 'Step 3: Crucial commitment. If you repay early, there is zero prepayment penalty. However, late payments carry a 2% monthly penalty. Say "Next" for your oral comprehension test.'
+          ? 'Step 3: Crucial commitment. If you repay early, there is zero extra charge. However, late payments carry a 2% monthly penalty. Say "Next" for your oral comprehension test.'
           : lang === 'hi'
-          ? 'चरण 3: महत्वपूर्ण नियम। समय से पहले ऋण चुकाने पर कोई जुर्माना नहीं है। विलंब पर 2% शुल्क लगेगा। मौखिक प्रश्न के लिए "Next" बोलें।'
-          : 'మూడవ దశ: ముఖ్యమైన నిబంధన. మీరు గడువు కంటే ముందే రుణం చెల్లిస్తే ఎలాంటి పెనాల్టీ ఉండదు. కానీ ఆలస్యమైతే 2 శాతం రుసుము పడుతుంది. నోటి ప్రశ్న కోసం "Next" అని చెప్పండి.'
+          ? 'चरण 3: महत्वपूर्ण नियम। समय से पहले ऋण चुकाने पर कोई अतिरिक्त शुल्क नहीं है। विलंब पर 2% शुल्क लगेगा। मौखिक प्रश्न के लिए "Next" बोलें।'
+          : 'మూడవ దశ: ముఖ్యమైన నిబంధన. మీరు గడువు కంటే ముందే రుణం చెల్లిస్తే ఎలాంటి అదనపు ఛార్జీలు ఉండవు. కానీ ఆలస్యమైతే 2 శాతం రుసుము పడుతుంది. నోటి ప్రశ్న కోసం "Next" అని చెప్పండి.'
 
       speakText(msg, lang)
 
       showTemporaryCard({
         id: 'step3_card',
-        title: lang === 'en' ? 'Legal Repayment Terms' : lang === 'hi' ? 'कानूनी नियम' : 'చట్టపరమైన నిబంధనలు',
-        subtitle: 'Protected by RBI KFS Regulations',
+        title: lang === 'en' ? 'Loan Repayment Rules' : lang === 'hi' ? 'ऋण भुगतान नियम' : 'రుణ చెల్లింపు నిబంధనలు',
+        subtitle: 'Protected by Official Bank Rules',
         pillText: 'Fair Terms',
         stats: [
-          { label: lang === 'en' ? 'Prepayment Penalty' : 'ముందస్తు రుసుము', value: '₹0 (0%)', highlight: true },
+          { label: lang === 'en' ? 'Early Repayment Fee' : 'ముందే కడితే అదనపు ఛార్జీలు', value: '₹0 (0%)', highlight: true },
           { label: lang === 'en' ? 'Overdue Penalty' : 'ఆలస్య రుసుము', value: '2% per month' },
           { label: lang === 'en' ? 'Gold Collateral' : 'బంగారు భద్రత', value: 'Safe in Vault' },
         ],
-        goldStamp: 'Zero Foreclosure',
+        goldStamp: 'No Extra Fee',
       })
     } else if (stepIdx === 3) {
       // Step 4: Spoken Comprehension Question
@@ -215,13 +230,13 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           { label: lang === 'en' ? 'Question' : 'ప్రశ్న', value: lang === 'en' ? 'Weekly repayment?' : 'వారపు వాయిదా ఎంత?' },
           { label: lang === 'en' ? 'Expected' : 'ఖచ్చితమైన విలువ', value: '₹690', highlight: true },
         ],
-        goldStamp: 'Oral KFS',
+        goldStamp: 'Voice Verified',
       })
     } else if (stepIdx === 4) {
       // Step 5: Sealed Digital Certificate
       const msg =
         lang === 'en'
-          ? 'Congratulations! Your comprehension score is 100%. Your tamper-proof digital certificate is sealed with SHA-256. Say "Download" to save your certificate, or "Share" for WhatsApp.'
+          ? 'Congratulations! Your comprehension score is 100%. Your official digital certificate is ready. Say "Download" to save your certificate, or "Share" for WhatsApp.'
           : lang === 'hi'
           ? 'बधाई हो! आपका समझ स्कोर 100% है। आपका डिजिटल प्रमाणपत्र तैयार है। इसे सेव करने के लिए "Download" बोलें या "Share" बोलें।'
           : 'అభినందనలు! మీ అవగాహన స్కోర్ 100 శాతం. మీ అధికారిక డిజిటల్ సీల్ రసీదు సిద్ధమైంది. రసీదు సేవ్ చేయడానికి "Download" లేదా వాట్సాప్ కోసం "Share" అని చెప్పండి.'
@@ -230,15 +245,15 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
 
       showTemporaryCard({
         id: 'step5_card',
-        title: lang === 'en' ? 'Digital Certificate Sealed' : lang === 'hi' ? 'डिजिटल ऑडिट प्रमाणपत्र' : 'డిజిటల్ సీల్ ధృవీకరణ పత్రం',
-        subtitle: 'Cryptographically Verified by Gemma 4',
+        title: lang === 'en' ? 'Official Digital Certificate' : lang === 'hi' ? 'आधिकारिक डिजिटल प्रमाणपत्र' : 'డిజిటల్ సీల్ ధృవీకరణ పత్రం',
+        subtitle: 'Verified by Gemma 4',
         pillText: '100% PASSED',
         stats: [
           { label: lang === 'en' ? 'Score' : 'స్కోర్', value: '100% ✓ Pass', highlight: true },
-          { label: lang === 'en' ? 'Audit Hash' : 'ఆడిట్ సీల్', value: 'SHA256: 8f9b...1a' },
-          { label: lang === 'en' ? 'Compliance' : 'నిబంధనలు', value: 'RBI KFS Verified' },
+          { label: lang === 'en' ? 'Verification Seal' : 'ఆడిట్ సీల్', value: 'SHA256: 8f9b...1a' },
+          { label: lang === 'en' ? 'Compliance' : 'నిబంధనలు', value: 'Official Bank Verified' },
         ],
-        goldStamp: 'Tamper-Proof',
+        goldStamp: 'Securely Sealed',
       })
     }
   }
@@ -311,7 +326,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/60 hover:bg-emerald-900/80 px-3.5 py-1.5 text-xs font-bold text-emerald-100 transition active:scale-95 shadow-sm"
             title="Switch to guided screen mode"
           >

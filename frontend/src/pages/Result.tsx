@@ -5,6 +5,7 @@ import ErrorBanner from '../components/ErrorBanner'
 import { getCertificate, type GradeResult } from '../lib/api'
 import {
   isVoiceAssistantEnabled,
+  isAvatarModalActive,
   speakText,
   stopSpeaking,
   getLanguage,
@@ -62,7 +63,7 @@ export default function Result() {
       : 0
 
   useEffect(() => {
-    if (results && isVoiceAssistantEnabled()) {
+    if (results && isVoiceAssistantEnabled() && !isAvatarModalActive()) {
       if (lang === 'en') {
         const msg = wrong.length === 0
           ? `Congratulations! Comprehension score is ${score} percent. All terms successfully verified.`

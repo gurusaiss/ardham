@@ -5,6 +5,7 @@ import ErrorBanner from '../components/ErrorBanner'
 import { extractTerms, getSampleCardFile } from '../lib/api'
 import {
   isVoiceAssistantEnabled,
+  isAvatarModalActive,
   speakText,
   stopSpeaking,
   getLanguage,
@@ -29,7 +30,7 @@ export default function Scan() {
   }, [])
 
   useEffect(() => {
-    if (isVoiceAssistantEnabled()) {
+    if (isVoiceAssistantEnabled() && !isAvatarModalActive()) {
       if (lang === 'en') {
         speakText('Please photograph or upload your loan card. You can add 1 to 10+ pages.', 'en')
       } else if (lang === 'hi') {
@@ -108,9 +109,9 @@ export default function Scan() {
     <StepLayout
       title={t('scan_title', lang)}
       subtitle={{
-        en: 'Scan loan agreement or Key Fact Statement (1 to 10+ pages)',
-        te: 'రుణ పత్రాలు లేదా KFS స్కాన్ చేయండి (1 నుండి 10+ పేజీలు)',
-        hi: 'ऋण दस्तावेज़ या केएफएस स्कैन करें (1 से 10+ पृष्ठ)',
+        en: 'Scan loan agreement or bank card (1 to 10+ pages)',
+        te: 'రుణ పత్రాలు లేదా బ్యాంక్ కార్డును స్కాన్ చేయండి (1 నుండి 10+ పేజీలు)',
+        hi: 'ऋण दस्तावेज़ या बैंक कार्ड स्कैन करें (1 से 10+ पृष्ठ)',
       }}
       maxWidthClass="max-w-5xl"
     >
@@ -207,24 +208,24 @@ export default function Scan() {
         </button>
       </div>
 
-      {/* RBI Regulatory & Multi-page Explainer */}
+      {/* Official Guidelines & Multi-page Explainer */}
       <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 text-xs sm:text-sm text-slate-600 space-y-2.5">
         <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-          <span>🏛️ RBI Key Fact Statement (KFS) Rule:</span>
+          <span>🏛️ {lang === 'en' ? 'Official Loan Transparency Rules:' : lang === 'hi' ? 'आधिकारिक ऋण नियम:' : 'అధికారిక రుణ పారదర్శక నిబంధనలు:'}</span>
         </div>
         <p className="leading-relaxed">
           {lang === 'en'
-            ? 'Under RBI Circular RBI/2023-24/139, lenders must provide a 1-page Key Fact Statement (KFS) on Page 1 or 2 summarizing all APR, fees, and net disbursal.'
+            ? 'Official guidelines mandate that lenders disclose all upfront charges, real yearly cost, and the exact money you receive in hand before you sign.'
             : lang === 'hi'
-            ? 'आरबीआई परिपत्र RBI/2023-24/139 के तहत, ऋणदाताओं को सभी ब्याज दरों, शुल्कों और निवल संवितरण का सारांश देते हुए 1 पृष्ठ का केएफएस प्रदान करना अनिवार्य है।'
-            : 'ఆర్బీఐ సర్క్యులర్ RBI/2023-24/139 ప్రకారం, బ్యాంకులు తప్పనిసరిగా మొదటి పేజీలోనే 1-పేజీ KFS స్టేట్‌మెంట్‌ను అందించాలి.'}
+            ? 'आधिकारिक नियम यह अनिवार्य करते हैं कि ऋणदाता हस्ताक्षर से पहले सभी अग्रिम शुल्क, वास्तविक लागत और हाथ में मिलने वाली राशि स्पष्ट करें।'
+            : 'బ్యాంకులు లేదా సంస్థలు రుణం ఇచ్చే ముందు అసలు అప్పు, అన్ని ముందస్తు ఛార్జీలు మరియు చేతికి వచ్చే నికర నగదును స్పష్టంగా తెలపాలి.'}
         </p>
         <p className="leading-relaxed text-slate-500 text-xs">
           {lang === 'en'
-            ? '• If you have the KFS summary page, scanning just that 1 page is enough! • If the lender gave a 10+ page agreement without a KFS, snap all pages. Ardham scans across all pages to hunt down hidden charges.'
+            ? '• If you have a summary sheet or passbook card, scanning just that 1 page is enough! • If you received a full multi-page agreement, snap all pages. Ardham scans across every page to find any hidden fees.'
             : lang === 'hi'
-            ? '• यदि आपके पास केएफएस पृष्ठ है, तो केवल वह 1 पृष्ठ स्कैन करना पर्याप्त है। • यदि 10+ पृष्ठों का अनुबंध है, तो सभी पृष्ठ स्कैन करें।'
-            : '• మీ వద్ద KFS సారాంశ పేజీ ఉంటే, కేవలం ఆ 1 పేజీని స్కాన్ చేస్తే సరిపోతుంది! • 10+ పేజీల ఒప్పందం ఉంటే అన్ని పేజీలను ఫోటో తీయండి.'}
+            ? '• यदि आपके पास सारांश पृष्ठ या पासबुक कार्ड है, तो केवल 1 पृष्ठ स्कैन करें। • यदि लंबा अनुबंध है, तो सभी पृष्ठों की फोटो लें।'
+            : '• మీ వద్ద సారాంశ పేజీ లేదా పాస్‌బుక్ కార్డు ఉంటే, ఆ 1 పేజీని స్కాన్ చేస్తే సరిపోతుంది! • పూర్తి ఒప్పందం ఉంటే అన్ని పేజీలను ఫోటో తీయండి.'}
         </p>
       </div>
 

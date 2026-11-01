@@ -33,14 +33,14 @@ export const TRANSLATIONS = {
     hi: '⚡ 1-क्लिक डेमो: माइक्रोफाइनेंस ऋण स्कैन',
   },
   rbi_kfs_compliance_title: {
-    te: '🏛️ RBI KFS & డిజిటల్ సమ్మతి ధృవీకరణ',
-    en: '🏛️ RBI Key Fact Statement (KFS) Compliance',
-    hi: '🏛️ आरबीआई केएफएस अनुपालन सत्यापन',
+    te: '🏛️ అధికారిక బ్యాంక్ నిబంధనల రసీదు',
+    en: '🏛️ Official Bank Rules & Safety Check',
+    hi: '🏛️ आधिकारिक बैंक नियम एवं सुरक्षा सत्यापन',
   },
   rbi_kfs_compliance_desc: {
-    te: 'ఆర్బీఐ డిజిటల్ లెండింగ్ నిబంధనల ప్రకారం సంతకం లేదా వేలిముద్ర వేయడానికి ముందే రుణగ్రహీతకు పూర్తి అవగాహన ఉండాలి.',
-    en: 'Complies with RBI Digital Lending Guidelines & Microfinance Fair Practices Code: verified oral comprehension before signing.',
-    hi: 'आरबीआई डिजिटल लेंडिंग नियमों के अनुसार हस्ताक्षर से पहले मौखिक समझ सुनिश्चित की जाती है।',
+    te: 'బ్యాంక్ నిబంధనల ప్రకారం సంతకం లేదా వేలిముద్ర వేయడానికి ముందే ప్రతి రుసుము మరియు వాయిదాను నోటితో అర్థం చేసుకోవాలి.',
+    en: 'Official rules ensure borrowers clearly understand every fee, installment, and loan term before signing or thumbprinting.',
+    hi: 'हस्ताक्षर या अंगूठा लगाने से पहले सभी शुल्कों और किस्तों की स्पष्ट समझ सुनिश्चित की जाती है।',
   },
 
   // Steps
@@ -51,12 +51,12 @@ export const TRANSLATIONS = {
   step_cert: { te: 'ధృవీకరణ', en: 'Certificate', hi: 'प्रमाणपत्र' },
 
   // Loan Categories
-  cat_microfinance: { te: 'మైక్రోఫైనాన్స్ గ్రూప్ రుణం', en: 'Microfinance Group Loan (JLG)', hi: 'माइक्रोफाइनेंस समूह ऋण (JLG)' },
-  cat_gold: { te: 'బంగారు ఆభరణాల తాకట్టు రుణం', en: 'Gold Loan (Jewellery Collateral)', hi: 'स्वर्ण ऋण (गोल्ड लोन)' },
+  cat_microfinance: { te: 'స్వయం సహాయక సంఘాల గ్రూప్ రుణం', en: 'Self Help Group Loan (SHG)', hi: 'स्वयं सहायता समूह ऋण (SHG)' },
+  cat_gold: { te: 'బంగారు ఆభరణాల తాకట్టు రుణం', en: 'Gold Jewellery Loan', hi: 'स्वर्ण आभूषण ऋण (गोल्ड लोन)' },
   cat_personal: { te: 'వ్యక్తిగత వినియోగదారుల రుణం', en: 'Individual Personal Loan', hi: 'व्यक्तिगत ऋण (पर्सनल लोन)' },
 
   // Scan Screen
-  scan_title: { te: 'రుణ పత్రాన్ని స్కాన్ చేయండి', en: 'Scan Loan Document / KFS', hi: 'ऋण दस्तावेज़ / केएफएस स्कैन करें' },
+  scan_title: { te: 'రుణ పత్రాన్ని స్కాన్ చేయండి', en: 'Scan Loan Document or Card', hi: 'ऋण दस्तावेज़ या कार्ड स्कैन करें' },
   take_photo_btn: { te: '📷 ఫోటో తీయండి / పేజీలను అప్‌లోడ్ చేయండి', en: '📷 Take Photos / Upload Pages', hi: '📷 फोटो लें / दस्तावेज़ अपलोड करें' },
   use_sample_btn: { te: '⚡ శాంపిల్ కార్డుతో తక్షణ డెమో', en: '⚡ Quick Demo: Use Sample Card', hi: '⚡ त्वरित डेमो: नमूना कार्ड का उपयोग करें' },
   pages_selected: { te: 'పేజీలు ఎంచుకోబడ్డాయి', en: 'Pages Selected', hi: 'पृष्ठ चुने गए' },
@@ -64,13 +64,13 @@ export const TRANSLATIONS = {
   analyze_all_btn: { te: '🔍 జెమ్మా 4 తో అన్ని పేజీలను విశ్లేషించండి', en: '🔍 Analyze All Pages with Gemma 4', hi: '🔍 जेम्मा 4 से सभी पृष्ठों का विश्लेषण करें' },
 
   // Review & Fairness Screen
-  review_title: { te: 'రుణ వివరాలు & మోసపూరిత వడ్డీ విశ్లేషణ', en: 'Loan Review & Fairness Analysis', hi: 'ऋण समीक्षा एवं निष्पक्षता विश्लेषण' },
-  fairness_score: { te: 'న్యాయమైన రుణ రేటింగ్', en: 'Fair Lending Score', hi: 'निष्पक्ष ऋण स्कोर' },
-  money_flow_title: { te: 'డబ్బు ప్రయాణం (Visual Money Flow)', en: 'Money Flow Breakdown', hi: 'पैसे का प्रवाह (मनी फ्लो)' },
-  net_in_hand: { te: 'చేతికి వచ్చేది', en: 'Net in Hand', hi: 'हाथ में मिलने वाली राशि' },
+  review_title: { te: 'రుణ వివరాలు & న్యాయమైన తనిఖీ', en: 'Loan Review & Fairness Check', hi: 'ऋण समीक्षा एवं निष्पक्षता जांच' },
+  fairness_score: { te: 'రుణ భద్రతా స్కోర్', en: 'Loan Safety Score', hi: 'ऋण सुरक्षा स्कोर' },
+  money_flow_title: { te: 'డబ్బు ప్రయాణం (Money Flow)', en: 'Money Flow Breakdown', hi: 'पैसे का प्रवाह (मनी फ्लो)' },
+  net_in_hand: { te: 'చేతికి వచ్చే నికర నగదు', en: 'Cash in Hand', hi: 'हाथ में मिलने वाली राशि' },
   extra_cost: { te: 'అదనపు ఖర్చు (వడ్డీ + ఫీజులు)', en: 'Extra Cost (Interest + Fees)', hi: 'अतिरिक्त लागत (ब्याज + शुल्क)' },
   total_repayment: { te: 'మొత్తం చెల్లింపు', en: 'Total Repayment', hi: 'कुल पुनर्भुगतान' },
-  principal_ratio: { te: 'అసలు', en: 'Principal', hi: 'मूलधन' },
+  principal_ratio: { te: 'అసలు అప్పు', en: 'Loan Amount', hi: 'मूल राशि' },
   fees_ratio: { te: 'వడ్డీ & ఫీజులు', en: 'Interest & Fees', hi: 'ब्याज और शुल्क' },
   listen_analysis_btn: { te: '🔊 విశ్లేషణ వినండి', en: '🔊 Listen to Analysis', hi: '🔊 विश्लेषण सुनें' },
   confirm_terms_btn: { te: 'వివరాలు సరిగ్గా ఉన్నాయి — కొనసాగించండి →', en: 'Looks Correct — Continue →', hi: 'विवरण सही हैं — आगे बढ़ें →' },

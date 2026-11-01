@@ -15,9 +15,10 @@ interface Props {
   isOpen: boolean
   onClose: () => void
   onOpenVideoGuide?: () => void
+  onOpenAvatar?: () => void
 }
 
-export default function SettingsModal({ isOpen, onClose, onOpenVideoGuide }: Props) {
+export default function SettingsModal({ isOpen, onClose, onOpenVideoGuide, onOpenAvatar }: Props) {
   const navigate = useNavigate()
   const [lang, setLangState] = useState<AppLanguage>(getLanguage())
   const [voiceEnabled, setVoiceEnabled] = useState(isVoiceAssistantEnabled())
@@ -259,7 +260,41 @@ export default function SettingsModal({ isOpen, onClose, onOpenVideoGuide }: Pro
           </div>
         </div>
 
-        {/* 4. AI Video Walkthrough Feature */}
+        {/* 4. Experience AI Avatar (Direct Test from Settings) */}
+        {onOpenAvatar && (
+          <div className="rounded-2xl border-2 border-amber-500/70 bg-gradient-to-r from-amber-50 via-yellow-50 to-emerald-50 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-start gap-3">
+              <span className="text-3xl p-1 bg-amber-100/80 rounded-2xl">👩‍💼</span>
+              <div>
+                <p className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                  <span>{lang === 'en' ? 'Experience Lakshmi AI Avatar' : lang === 'hi' ? 'लक्ष्मी AI अवतार का अनुभव लें' : 'లక్ష్మి AI అవతార్ ప్రత్యక్ష అనుభవం'}</span>
+                  <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full">
+                    {lang === 'en' ? 'Pure Voice' : 'వాయిస్ మాత్రమే'}
+                  </span>
+                </p>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  {lang === 'en'
+                    ? '100% eyes-free hands-free spoken experience with live lip-sync avatar and 5-second fact cards.'
+                    : lang === 'hi'
+                    ? 'बिना स्क्रीन देखे केवल आवाज और वास्तविक लिप-सिंक अवतार के साथ 100% हैंड्स-फ्री अनुभव।'
+                    : 'స్క్రీన్ చూడకుండా కేవలం స్వచ్ఛమైన వాయిస్ మరియు రియల్ లిప్-సింక్ అవతార్‌తో మాట్లాడి ఉపయోగించే అనుభవం.'}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                onClose()
+                onOpenAvatar()
+              }}
+              className="shrink-0 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 px-4 py-2.5 text-xs font-black text-slate-950 shadow-md active:scale-95 transition"
+            >
+              👩‍💼 {lang === 'en' ? 'Launch Avatar' : lang === 'hi' ? 'अवतार शुरू करें' : 'అవతార్ తెరవండి'}
+            </button>
+          </div>
+        )}
+
+        {/* 5. AI Video Walkthrough Feature */}
         {onOpenVideoGuide && (
           <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50/70 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
             <div>

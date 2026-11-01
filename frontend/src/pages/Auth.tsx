@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StepLayout from '../components/StepLayout'
 import { signIn, signUp, signInDemo, getCurrentUser } from '../lib/auth'
-import { isVoiceAssistantEnabled, speakText, stopSpeaking, getLanguage, subscribeLanguage, type AppLanguage } from '../lib/speech'
+import { isVoiceAssistantEnabled, isAvatarModalActive, speakText, stopSpeaking, getLanguage, subscribeLanguage, type AppLanguage } from '../lib/speech'
 
 export default function Auth() {
   const navigate = useNavigate()
@@ -19,7 +19,7 @@ export default function Auth() {
   }, [])
 
   useEffect(() => {
-    if (isVoiceAssistantEnabled()) {
+    if (isVoiceAssistantEnabled() && !isAvatarModalActive()) {
       if (lang === 'en') {
         speakText('User account and login page. Sign in or use one-click demo login.', 'en')
       } else if (lang === 'hi') {

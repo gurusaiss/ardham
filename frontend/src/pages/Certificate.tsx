@@ -47,18 +47,18 @@ export default function Certificate() {
     let msg = ''
     if (lang === 'en') {
       msg =
-        `*🏛️ ARDHAM - Loan Comprehension & KFS Verification Receipt*\n` +
+        `*🏛️ ARDHAM - Loan Comprehension & Verification Receipt*\n` +
         `Loan Product: ${cert.loan_type}\n` +
         `Loan Amount: ₹${loanAmt}\n` +
         `Installment EMI: ₹${emi}\n` +
         `Total Repayable: ₹${total}\n` +
         `Comprehension Score: ${cert.score}% ✓ PASS\n` +
         `Verifying Officer: ${user?.name || 'Ramesh Kumar'}\n\n` +
-        `📜 Live Digital Certificate & Audit Seal:\n${verifyUrl}\n\n` +
-        `🔒 SHA-256 Hash: ${cert.sha256.substring(0, 16)}...`
+        `📜 Live Digital Certificate:\n${verifyUrl}\n\n` +
+        `🔒 Verification Seal: ${cert.sha256.substring(0, 16)}...`
     } else if (lang === 'hi') {
       msg =
-        `*🏛️ अर्थम - ऋण समझ एवं केएफएस सत्यापन रसीद*\n` +
+        `*🏛️ अर्थम - ऋण समझ एवं सत्यापन रसीद*\n` +
         `ऋण उत्पाद: ${cert.loan_type}\n` +
         `ऋण राशि: ₹${loanAmt}\n` +
         `किस्त राशि: ₹${emi}\n` +
@@ -66,18 +66,18 @@ export default function Certificate() {
         `समझ स्कोर: ${cert.score}% ✓ PASS\n` +
         `सत्यापित अधिकारी: ${user?.name || 'रमेश कुमार'}\n\n` +
         `📜 लाइव डिजिटल प्रमाणपत्र:\n${verifyUrl}\n\n` +
-        `🔒 SHA-256 हैश: ${cert.sha256.substring(0, 16)}...`
+        `🔒 डिजिटल सील: ${cert.sha256.substring(0, 16)}...`
     } else {
       msg = 
-        `*🏛️ అర్థం - లోన్ అవగాహన & KFS రసీదు*\n` +
+        `*🏛️ అర్థం - లోన్ అవగాహన & అధికారిక రసీదు*\n` +
         `రుణ రకం: ${cert.loan_type}\n` +
         `లోన్ మొత్తం: ₹${loanAmt}\n` +
         `వాయిదా: ₹${emi}\n` +
         `మొత్తం చెల్లింపు: ₹${total}\n` +
         `అవగాహన స్కోర్: ${cert.score}% ✓ PASS\n` +
         `ధృవీకరించిన అధికారి: ${user?.name || 'Ramesh Kumar'}\n\n` +
-        `📜 లైవ్ డిజిటల్ సర్టిఫికెట్ & ఆడిట్ సీల్:\n${verifyUrl}\n\n` +
-        `🔒 SHA-256 హాష్: ${cert.sha256.substring(0, 16)}...`
+        `📜 లైవ్ డిజిటల్ సర్టిఫికెట్:\n${verifyUrl}\n\n` +
+        `🔒 అధికారిక సీల్: ${cert.sha256.substring(0, 16)}...`
     }
 
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank')
@@ -101,9 +101,9 @@ export default function Certificate() {
     <StepLayout
       title={t('cert_title', lang)}
       subtitle={{
-        en: 'Digital Key Fact Statement (KFS) Regulatory Audit Certificate',
-        te: 'డిజిటల్ రసీదు & RBI KFS ఆడిట్ సర్టిఫికెట్',
-        hi: 'डिजिटल केएफएस नियामक ऑडिट प्रमाणपत्र',
+        en: 'Official Digital Loan Verification Certificate',
+        te: 'అధికారిక డిజిటల్ లోన్ ధృవీకరణ పత్రం',
+        hi: 'आधिकारिक डिजिटल ऋण सत्यापन प्रमाणपत्र',
       }}
       maxWidthClass="max-w-6xl"
     >
@@ -119,9 +119,11 @@ export default function Certificate() {
                     🏛️
                   </span>
                   <div>
-                    <h3 className="text-base font-extrabold text-slate-900 leading-tight">RBI KFS Audit Seal</h3>
+                    <h3 className="text-base font-extrabold text-slate-900 leading-tight">
+                      {lang === 'en' ? 'Official Bank Verification Seal' : lang === 'hi' ? 'आधिकारिक बैंक सत्यापन सील' : 'అధికారిక బ్యాంక్ ధృవీకరణ ముద్ర'}
+                    </h3>
                     <p className="text-xs text-emerald-800 font-bold uppercase tracking-wider">
-                      Digital Lending Guidelines Verified
+                      {lang === 'en' ? '100% Rules & Fairness Verified' : lang === 'hi' ? '100% नियम एवं निष्पक्षता सत्यापित' : '100% నిబంధనలు & న్యాయమైన రుణం ధృవీకరించబడింది'}
                     </p>
                   </div>
                 </div>
@@ -172,29 +174,37 @@ export default function Certificate() {
               {/* Key Loan Metrics Table */}
               <div className="space-y-2">
                 <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Key Disclosed Financial Terms (KFS Summary)
+                  {lang === 'en' ? 'Key Loan Details' : lang === 'hi' ? 'मुख्य ऋण विवरण' : 'ముఖ్యమైన రుణ వివరాలు'}
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                   <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                    <span className="text-xs text-slate-500 font-bold uppercase">Loan Amount</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase">
+                      {lang === 'en' ? 'Loan Amount' : 'అసలు అప్పు'}
+                    </span>
                     <p className="text-lg font-black text-slate-900 mt-0.5">
                       ₹{String(cert.terms.loan_amount?.value || '—')}
                     </p>
                   </div>
                   <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                    <span className="text-xs text-slate-500 font-bold uppercase">Instalment</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase">
+                      {lang === 'en' ? 'Instalment' : 'వాయిదా'}
+                    </span>
                     <p className="text-lg font-black text-slate-900 mt-0.5">
                       ₹{String(cert.terms.instalment_amount?.value || '—')}
                     </p>
                   </div>
                   <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                    <span className="text-xs text-slate-500 font-bold uppercase">Annual Interest</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase">
+                      {lang === 'en' ? 'Interest Rate' : 'వడ్డీ రేటు'}
+                    </span>
                     <p className="text-lg font-black text-slate-900 mt-0.5">
                       {String(cert.terms.interest_rate?.value || '—')}%
                     </p>
                   </div>
                   <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                    <span className="text-xs text-slate-500 font-bold uppercase">Total Payable</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase">
+                      {lang === 'en' ? 'Total Payable' : 'మొత్తం చెల్లింపు'}
+                    </span>
                     <p className="text-lg font-black text-slate-900 mt-0.5">
                       ₹{String(cert.terms.total_payable?.value || '—')}
                     </p>
@@ -209,13 +219,13 @@ export default function Certificate() {
                 </div>
                 <div className="space-y-1 text-center sm:text-left">
                   <p className="text-xs sm:text-sm font-bold text-slate-800">
-                    🔒 Tamper-Proof SHA-256 Audit Seal
+                    🔒 {lang === 'en' ? 'Official Digital Verification Seal' : lang === 'hi' ? 'आधिकारिक डिजिटल सत्यापन सील' : 'అధికారిక డిజిటల్ సీల్'}
                   </p>
                   <p className="font-mono text-xs text-slate-600 break-all select-all">
                     {cert.sha256}
                   </p>
                   <p className="text-xs text-emerald-800 font-semibold">
-                    ✓ Cryptographically sealed on edge device via verified pipeline
+                    ✓ {lang === 'en' ? 'Securely verified and saved on your device' : lang === 'hi' ? 'सुरक्षित रूप से सत्यापित और आपके डिवाइस पर सहेजा गया' : 'మీ మొబైల్‌లో సురక్షితంగా ధృవీకరించబడి సేవ్ చేయబడింది'}
                   </p>
                 </div>
               </div>

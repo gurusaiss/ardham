@@ -192,11 +192,11 @@ export default function StepLayout({
         {/* Footer */}
         <footer className="mt-8 border-t border-slate-100 pt-4 text-xs font-medium text-slate-500 text-center flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span>🏛️ RBI Key Fact Statement (KFS) & Fair Lending Verification</span>
+            <span>🏛️ {lang === 'en' ? 'Official Bank Rules & Fair Lending Verification' : lang === 'hi' ? 'आधिकारिक बैंक नियम एवं निष्पक्ष ऋण सत्यापन' : 'అధికారిక బ్యాంక్ నిబంధనలు & న్యాయమైన రుణ ధృవీకరణ'}</span>
           </div>
           <div className="text-xs text-slate-400">
             {lang === 'en'
-              ? 'Multi-dialect Oral Verification Engine'
+              ? 'Voice Verification & Safety Engine'
               : lang === 'hi'
               ? 'मौखिक समझ एवं निष्पक्ष ऋण सत्यापन'
               : 'గ్రామీణ రుణ అవగాహన & సమ్మతి ధృవీకరణ వేదిక'}
@@ -218,6 +218,10 @@ export default function StepLayout({
         onOpenVideoGuide={() => {
           setShowSettingsModal(false)
           setShowVideoModal(true)
+        }}
+        onOpenAvatar={() => {
+          setShowSettingsModal(false)
+          setShowAvatarModal(true)
         }}
       />
 

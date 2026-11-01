@@ -210,8 +210,8 @@ export default function Explain() {
                   <div className="text-xs font-bold uppercase tracking-wider text-amber-900">
                     📜 {t('source_on_card', lang)}
                   </div>
-                  <span className="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded">
-                    Hallucination Protected
+                  <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded">
+                    {lang === 'en' ? '100% Genuine Card Value' : lang === 'hi' ? '100% सटीक विवरण' : 'కార్డులో ఉన్న నిజమైన విలువ'}
                   </span>
                 </div>
                 <div className="mt-2 text-base sm:text-lg font-bold text-amber-950 font-mono">

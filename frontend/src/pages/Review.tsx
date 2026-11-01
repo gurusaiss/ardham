@@ -6,6 +6,7 @@ import LoanSimulator from '../components/LoanSimulator'
 import { confirmTerms, getAnalysis, type FairnessAnalysis, type LoanTerms } from '../lib/api'
 import {
   isVoiceAssistantEnabled,
+  isAvatarModalActive,
   speakText,
   stopSpeaking,
   getLanguage,
@@ -43,7 +44,7 @@ export default function Review() {
   }, [sessionId, fairness])
 
   useEffect(() => {
-    if (fairness && isVoiceAssistantEnabled()) {
+    if (fairness && isVoiceAssistantEnabled() && !isAvatarModalActive()) {
       if (lang === 'en') {
         const topWarn = fairness.warnings_en[0] ? ' Please review predatory alerts.' : ''
         speakText(

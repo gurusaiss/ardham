@@ -44,13 +44,13 @@ const VIDEO_STEPS: VideoStep[] = [
   },
   {
     id: 'step2_audit',
-    title: '2. Fairness & Predatory Trap Audit (APR & Deductions)',
-    title_te: '2. మోసపూరిత వడ్డీ & దాచిన ఛార్జీల విశ్లేషణ',
-    title_hi: '2. निष्पक्षता एवं छिपे हुए शुल्क विश्लेषण',
-    desc: 'Calculates true effective APR and detects hidden processing fees, comparing savings against 36% informal private moneylenders.',
+    title: '2. Fair Loan Check & Fee Analysis',
+    title_te: '2. న్యాయమైన రుణం & దాచిన ఛార్జీల తనిఖీ',
+    title_hi: '2. निष्पक्ष ऋण एवं छिपे हुए शुल्क जांच',
+    desc: 'Detects upfront fee deductions and calculates your substantial savings compared to private moneylenders.',
     desc_te: 'నికరంగా చేతికి అందే నగదును లెక్కించి, ప్రైవేట్ వడ్డీ వ్యాపారి కంటే ఎంత ఆదా అవుతుందో లెక్కిస్తుంది.',
-    desc_hi: 'वास्तविक प्रभावी ब्याज दर और अग्रिम कटौतियों की गणना करके अनौपचारिक साहूकारों से तुलना करता है।',
-    speech: 'Step 2: Predatory Trap Audit. Identifies upfront fee deductions and warns borrowers about high penalty risks.',
+    desc_hi: 'अग्रिम शुल्कों की पहचान करके निजी साहूकारों की तुलना में बचत की गणना करता है।',
+    speech: 'Step 2: Fair Loan Check. Identifies upfront fee deductions and calculates your net cash in hand.',
     speech_te: 'రెండవ దశ: దాచిన ఛార్జీలను గుర్తించి రుణగ్రహీతకు నికరంగా అందే నగదును లెక్కిస్తుంది.',
     speech_hi: 'दूसरा चरण: अग्रिम शुल्कों की पहचान करके वास्तविक ऋण लागत का विश्लेषण करता है।',
     icon: '⚖️',
@@ -58,13 +58,13 @@ const VIDEO_STEPS: VideoStep[] = [
   },
   {
     id: 'step3_explain',
-    title: '3. Multilingual Spoken Telugu/Hindi Explanation',
+    title: '3. Multilingual Spoken Mother Tongue Explanation',
     title_te: '3. స్వచ్ఛమైన తెలుగులో ప్రతి పదం మరియు నంబర్ వివరణ',
     title_hi: '3. मातृभाषा में प्रत्येक शब्द और संख्या का स्पष्ट उच्चारण',
-    desc: 'Quotes exact printed lines so Gemma never hallucinates numbers, speaking every word aloud for visually impaired and rural borrowers.',
+    desc: 'Reads every single word and installment amount plainly in your mother tongue quoting genuine card facts.',
     desc_te: 'కార్డుపై ఉన్న నంబర్లను మాత్రమే ఉపయోగించి, స్వచ్ఛమైన తెలుగు మాటల్లో ప్రతి నిబంధనను స్పష్టంగా చదివి వినిపిస్తుంది.',
-    desc_hi: 'बिना किसी गलत संख्या के, केवल कार्ड पर छपे तथ्यों को स्पष्ट आवाज़ में पढ़कर सुनाता है।',
-    speech: 'Step 3: Pure Multilingual Speech. Gemma 4 explains each term plainly in the borrower native language quoting exact printed facts.',
+    desc_hi: 'कार्ड पर छपे तथ्यों को स्पष्ट आवाज़ में पढ़कर सुनाता है।',
+    speech: 'Step 3: Pure Multilingual Speech. Explains each loan term plainly in the borrower native language.',
     speech_te: 'మూడవ దశ: లోన్ నిబంధనలను స్పష్టమైన మాటల్లో ప్రతి ఒక్క పదాన్ని నోటితో చదివి వినిపిస్తుంది.',
     speech_hi: 'तीसरा चरण: उधारकर्ता की मातृभाषा में सभी वित्तीय शर्तों को बोलकर समझाया जाता है।',
     icon: '🔊',
@@ -72,15 +72,15 @@ const VIDEO_STEPS: VideoStep[] = [
   },
   {
     id: 'step4_cert',
-    title: '4. Voice Comprehension Verification & SHA-256 Seal',
+    title: '4. Voice Comprehension Verification & Digital Receipt',
     title_te: '4. నోటి సమాధానం ధృవీకరణ & డిజిటల్ సీల్ రసీదు',
     title_hi: '4. मौखिक समझ सत्यापन एवं डिजिटल प्रमाणपत्र',
-    desc: 'Listens to borrower spoken answer, verifies accuracy with zero-hallucination guard, and issues a tamper-proof SHA-256 certificate.',
+    desc: 'Listens to borrower spoken answer, verifies accuracy, and issues an official verified digital receipt.',
     desc_te: 'రుణగ్రహీత నోటి సమాధానాన్ని రికార్డ్ చేసి, ధృవీకరించి, వాట్సాప్ మరియు ప్రింటబుల్ సర్టిఫికెట్ జారీ చేస్తుంది.',
-    desc_hi: 'उधारकर्ता के बोले गए उत्तर को सत्यापित करके छेड़छाड़-मुक्त क्यूआर कोड प्रमाणपत्र तैयार करता है।',
-    speech: 'Step 4: Voice Verification. Gemma evaluates spoken answers and seals a tamper-proof digital certificate for RBI KFS compliance.',
+    desc_hi: 'उधारकर्ता के बोले गए उत्तर को सत्यापित करके डिजिटल रसीद तैयार करता है।',
+    speech: 'Step 4: Voice Verification. Evaluates spoken answers and generates an official verified digital receipt.',
     speech_te: 'నాల్గవ దశ: రుణగ్రహీత అవగాహనను పరీక్షించి లైవ్ క్యూఆర్ కోడ్ సర్టిఫికెట్ జారీ చేస్తుంది.',
-    speech_hi: 'चौथा चरण: समझ का मूल्यांकन करके डिजिटल ऑडिट प्रमाणपत्र जारी किया जाता है।',
+    speech_hi: 'चौथा चरण: समझ का मूल्यांकन करके डिजिटल रसीद जारी की जाती है।',
     icon: '🏛️',
     previewType: 'cert',
   },
@@ -201,10 +201,10 @@ export default function VideoGuideModal({ isOpen, onClose, initialSection }: Pro
 
               <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  LOAN CARD / KFS DOCUMENT
+                  LOAN CARD / BANK PASSBOOK
                 </span>
                 <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                  OCR 98.4%
+                  VERIFIED 100%
                 </span>
               </div>
 
@@ -225,7 +225,7 @@ export default function VideoGuideModal({ isOpen, onClose, initialSection }: Pro
               </div>
 
               <div className="mt-3 text-[10px] text-center font-mono text-emerald-600 font-bold">
-                [Gemma 4 Vision: Zero hallucination boundary locked]
+                [100% Genuine Card Details Verified]
               </div>
             </div>
           )}
@@ -257,7 +257,7 @@ export default function VideoGuideModal({ isOpen, onClose, initialSection }: Pro
               </div>
 
               <div className="rounded-xl bg-emerald-950/60 border border-emerald-700/60 p-2.5 text-xs text-emerald-300">
-                💰 You save ₹3,970 compared to informal moneylenders (36% APR).
+                💰 You save ₹3,970 compared to informal private moneylenders.
               </div>
             </div>
           )}
@@ -282,7 +282,7 @@ export default function VideoGuideModal({ isOpen, onClose, initialSection }: Pro
               </p>
 
               <div className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-xs font-mono text-emerald-400 border border-slate-700">
-                <span>🔊 Gemma 4 Multilingual Spoken Synthesis</span>
+                <span>🔊 Gemma 4 Spoken Synthesis</span>
               </div>
             </div>
           )}
@@ -290,7 +290,7 @@ export default function VideoGuideModal({ isOpen, onClose, initialSection }: Pro
           {activeStep.previewType === 'cert' && (
             <div className="w-full max-w-md rounded-2xl bg-white text-slate-900 p-5 shadow-2xl border-2 border-emerald-500 space-y-3 animate-fade-in text-center">
               <div className="flex items-center justify-between border-b pb-2">
-                <span className="text-xs font-bold text-emerald-800">🏛️ RBI KFS AUDIT SEAL</span>
+                <span className="text-xs font-bold text-emerald-800">🏛️ OFFICIAL VERIFIED RECEIPT</span>
                 <span className="rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-0.5 text-xs font-extrabold">
                   100% PASS
                 </span>
@@ -301,7 +301,7 @@ export default function VideoGuideModal({ isOpen, onClose, initialSection }: Pro
               </div>
 
               <div className="rounded-xl bg-slate-50 p-2 text-xs font-mono text-slate-600 break-all">
-                SHA-256: e8b940a7f19d2... (Cryptographically Sealed)
+                Verification Seal: e8b940a7f19d2... (Securely Verified)
               </div>
 
               <div className="flex justify-center gap-2 text-xs font-bold text-emerald-700">

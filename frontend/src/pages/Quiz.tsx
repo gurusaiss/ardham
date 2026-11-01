@@ -8,6 +8,7 @@ import {
   stopSpeaking,
   subscribeSpeaking,
   isVoiceAssistantEnabled,
+  isAvatarModalActive,
   getLanguage,
   subscribeLanguage,
   type AppLanguage,
@@ -108,7 +109,7 @@ export default function Quiz() {
 
   // Speak question automatically when question changes if voice assistant is ON
   useEffect(() => {
-    if (current && isVoiceAssistantEnabled()) {
+    if (current && isVoiceAssistantEnabled() && !isAvatarModalActive()) {
       const text = getQuestionText(current, lang)
       speakText(text, lang)
     }

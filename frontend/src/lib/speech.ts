@@ -22,6 +22,18 @@ type SpeakingListener = (speaking: boolean) => void
 const speakingListeners = new Set<SpeakingListener>()
 let currentSpeakingState = false
 let currentAudioElement: HTMLAudioElement | null = null
+let currentPlayToken = 0
+let avatarModalOpen = false
+
+export function setAvatarModalActive(isOpen: boolean) {
+  avatarModalOpen = isOpen
+  // Immediately halt any speaking when avatar mode opens or closes
+  stopSpeaking()
+}
+
+export function isAvatarModalActive(): boolean {
+  return avatarModalOpen
+}
 
 function notifySpeaking(speaking: boolean) {
   currentSpeakingState = speaking
@@ -49,11 +61,17 @@ export function isSpeaking(): boolean {
 }
 
 export function stopSpeaking() {
+  currentPlayToken++
   if (currentAudioElement) {
     try {
+      currentAudioElement.onplay = null
+      currentAudioElement.onended = null
+      currentAudioElement.onerror = null
+      currentAudioElement.onpause = null
       currentAudioElement.pause()
       currentAudioElement.currentTime = 0
-      currentAudioElement.src = ''
+      currentAudioElement.removeAttribute('src')
+      currentAudioElement.load()
     } catch {
       // ignore
     }
@@ -478,7 +496,9 @@ export function getYoungFemaleVoice(
  */
 export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) {
   stopSpeaking()
+  if (!text || !text.trim()) return
 
+  const token = ++currentPlayToken
   const targetLang = lang || getLanguage()
   const sanitized = targetLang === 'te' ? sanitizeTeluguText(text) : text
 
@@ -492,43 +512,53 @@ export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) 
     let playbackStarted = false
 
     audio.onplay = () => {
+      if (token !== currentPlayToken) return
       playbackStarted = true
       notifySpeaking(true)
     }
 
     audio.onended = () => {
+      if (token !== currentPlayToken) return
       notifySpeaking(false)
       currentAudioElement = null
       onEnd?.()
     }
 
     audio.onerror = () => {
+      if (token !== currentPlayToken) return
       currentAudioElement = null
-      speakWithWebSpeech(sanitized, targetLang, onEnd)
+      speakWithWebSpeech(sanitized, targetLang, onEnd, token)
     }
 
     audio.play().catch(() => {
+      if (token !== currentPlayToken) return
       if (!playbackStarted) {
         currentAudioElement = null
-        speakWithWebSpeech(sanitized, targetLang, onEnd)
+        speakWithWebSpeech(sanitized, targetLang, onEnd, token)
       }
     })
     return
   } catch {
-    speakWithWebSpeech(sanitized, targetLang, onEnd)
+    if (token !== currentPlayToken) return
+    speakWithWebSpeech(sanitized, targetLang, onEnd, token)
   }
 }
 
 /**
  * On-device Web Speech API fallback.
  */
-export function speakWithWebSpeech(text: string, targetLang: AppLanguage, onEnd?: () => void) {
+export function speakWithWebSpeech(text: string, targetLang: AppLanguage, onEnd?: () => void, token?: number) {
+  if (token && token !== currentPlayToken) return
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-    onEnd?.()
+    if (!token || token === currentPlayToken) onEnd?.()
     return
   }
 
-  stopSpeaking()
+  // If called directly without a token, cancel previous and generate new token
+  const activeToken = token ?? ++currentPlayToken
+  if (!token) {
+    stopSpeaking()
+  }
 
   const voices = window.speechSynthesis.getVoices()
   const voiceToUse = getYoungFemaleVoice(voices, targetLang)
@@ -564,12 +594,22 @@ export function speakWithWebSpeech(text: string, targetLang: AppLanguage, onEnd?
     utterance.voice = voiceToUse
   }
 
-  utterance.onstart = () => notifySpeaking(true)
+  utterance.onstart = () => {
+    if (activeToken !== currentPlayToken) {
+      try {
+        window.speechSynthesis.cancel()
+      } catch {}
+      return
+    }
+    notifySpeaking(true)
+  }
   utterance.onend = () => {
+    if (activeToken !== currentPlayToken) return
     notifySpeaking(false)
     onEnd?.()
   }
   utterance.onerror = () => {
+    if (activeToken !== currentPlayToken) return
     notifySpeaking(false)
     onEnd?.()
   }

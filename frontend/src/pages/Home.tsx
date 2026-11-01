@@ -8,6 +8,7 @@ import VoiceAvatarMode from '../components/VoiceAvatarMode'
 import VoiceAgentWidget from '../components/VoiceAgentWidget'
 import {
   isVoiceAssistantEnabled,
+  isAvatarModalActive,
   speakText,
   stopSpeaking,
   resetVoiceModal,
@@ -52,7 +53,7 @@ export default function Home() {
   }, [navigate])
 
   useEffect(() => {
-    if (isVoiceAssistantEnabled()) {
+    if (isVoiceAssistantEnabled() && !isAvatarModalActive() && !showAvatarModal) {
       if (lang === 'en') {
         speakText('Welcome to Ardham. An assistant for loan comprehension verification.', 'en')
       } else if (lang === 'hi') {
@@ -62,7 +63,7 @@ export default function Home() {
       }
     }
     return () => stopSpeaking()
-  }, [lang])
+  }, [lang, showAvatarModal])
 
   function resetAndOpenModal() {
     resetVoiceModal()
@@ -144,9 +145,9 @@ export default function Home() {
         {/* Hero Section */}
         <div className="my-6 text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-bold text-emerald-800 mb-4 shadow-sm">
-            <span>🏛️ RBI Key Fact Statement (KFS) Audit Verified</span>
+            <span>🏛️ {lang === 'en' ? 'Official Bank Rules Verified' : lang === 'hi' ? 'आधिकारिक बैंक नियम सत्यापित' : 'అధికారిక బ్యాంక్ నిబంధనల రసీదు'}</span>
             <span>•</span>
-            <span>Zero Hallucination Protected</span>
+            <span>{lang === 'en' ? '100% Genuine Card Details' : lang === 'hi' ? '100% सटीक दस्तावेज़ विवरण' : 'కార్డులో ఉన్న నిజమైన వివరాలు'}</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 leading-tight">
@@ -170,19 +171,19 @@ export default function Home() {
         <div className="my-5 rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5">
           <div className="space-y-1.5 text-center sm:text-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
-              <span>🎬 Gemma 4 Multimodal Simulation</span>
+              <span>🎬 {lang === 'en' ? 'AI Guide' : 'AI డెమో'}</span>
               <span>•</span>
-              <span>Vision • Voice • KFS Audit</span>
+              <span>{lang === 'en' ? 'Photo Scan • Voice Readout • Safety Check' : 'ఫోటో స్కాన్ • వాయిస్ రీడౌట్ • భద్రతా తనిఖీ'}</span>
             </div>
             <h3 className="text-lg sm:text-xl font-extrabold text-white">
               {lang === 'en' ? 'Watch How Ardham Operates in 4 Visual Steps' : lang === 'hi' ? 'देखें कि अर्थम 4 चरणों में कैसे कार्य करता है' : 'అర్థం ఎలా పనిచేస్తుందో 4 దశల్లో లైవ్ డెమో చూడండి'}
             </h3>
             <p className="text-xs sm:text-sm text-emerald-100/80 max-w-xl">
               {lang === 'en'
-                ? 'Camera Vision scanning, hidden fee audit, spoken Telugu/Hindi readout, and cryptographic SHA-256 digital certificate generation.'
+                ? 'Camera photo scanning, upfront fee check, spoken mother tongue explanation, and official verified digital receipt.'
                 : lang === 'hi'
-                ? 'कैमरा विज़न स्कैन, छिपे हुए शुल्कों का विश्लेषण, मातृभाषा ऑडियो स्पष्टीकरण और डिजिटल ऑडिट प्रमाणपत्र।'
-                : 'కెమెరా విజన్ స్కాన్, దాచిన ఛార్జీల విశ్లేషణ, స్వచ్ఛమైన వాయిస్ రీడౌట్ మరియు లైవ్ డిజిటల్ సీల్ సర్టిఫికెట్.'}
+                ? 'कैमरा फोटो स्कैन, अग्रिम शुल्कों की जांच, मातृभाषा में मौखिक व्याख्या और आधिकारिक डिजिटल रसीद।'
+                : 'కెమెరా ఫోటో స్కాన్, ముందస్తు ఫీజుల తనిఖీ, మాతృభాషలో స్పష్టమైన వివరణ మరియు అధికారిక డిజిటల్ రసీదు.'}
             </p>
           </div>
           <button
@@ -204,14 +205,14 @@ export default function Home() {
             <div>
               <span className="text-4xl">👩‍🌾</span>
               <p className="font-extrabold text-xl text-emerald-950 mt-3">
-                {lang === 'en' ? 'Microfinance (JLG)' : lang === 'hi' ? 'माइक्रोफाइनेंस (JLG)' : 'మైక్రోఫైనాన్స్ గ్రూప్ రుణం'}
+                {lang === 'en' ? 'Self Help Group Loan (SHG)' : lang === 'hi' ? 'स्वयं सहायता समूह ऋण (SHG)' : 'స్వయం సహాయక సంఘాల గ్రూప్ రుణం'}
               </p>
               <p className="text-sm text-emerald-900 font-semibold leading-relaxed mt-1">
                 {lang === 'en'
-                  ? 'Self Help Group loan • Weekly reducing installments • Group liability'
+                  ? 'Self Help Group loan • Easy weekly installments • Group support'
                   : lang === 'hi'
-                  ? 'स्वयं सहायता समूह ऋण • साप्ताहिक घटती किस्तें • समूह देयता'
-                  : 'స్వయం సహాయక సంఘాలు • వారపు వాయిదాలు • గ్రూప్ బాధ్యత'}
+                  ? 'स्वयं सहायता समूह ऋण • आसान साप्ताहिक किस्तें • समूह सहयोग'
+                  : 'స్వయం సహాయక సంఘాలు • సులభ వారపు వాయిదాలు • గ్రూప్ మద్దతు'}
               </p>
             </div>
             <span className="text-sm font-bold text-emerald-800 mt-5 inline-flex items-center gap-1">
@@ -319,6 +320,10 @@ export default function Home() {
         onOpenVideoGuide={() => {
           setShowSettingsModal(false)
           setShowVideoModal(true)
+        }}
+        onOpenAvatar={() => {
+          setShowSettingsModal(false)
+          setShowAvatarModal(true)
         }}
       />
 
