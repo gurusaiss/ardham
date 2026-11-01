@@ -31,6 +31,69 @@ interface FloatingCardData {
   goldStamp?: string
 }
 
+const STEP_METADATA = [
+  {
+    step: 1,
+    title_en: 'Loan Card Verification',
+    title_te: 'లోన్ కార్డు స్కాన్ & ధృవీకరణ',
+    title_hi: 'ऋण दस्तावेज़ सत्यापन',
+    desc_en: 'Checking your approved loan amount, interest rate, and weekly installments.',
+    desc_te: 'మంజూరైన అసలు అప్పు, వార్షిక వడ్డీ రేటు మరియు వారపు వాయిదాలను పరిశీలిస్తున్నాం.',
+    desc_hi: 'आपकी स्वीकृत ऋण राशि, ब्याज दर और साप्ताहिक किस्तों की जांच की जा रही है।',
+    cue_en: 'Say "Next" or tap to inspect upfront fees',
+    cue_te: '"Next" అని చెప్పండి లేదా బటన్ నొక్కండి',
+    cue_hi: '"Next" बोलें या आगे बढ़ें',
+  },
+  {
+    step: 2,
+    title_en: 'Fair Lending & Fee Audit',
+    title_te: 'దాచిన ఫీజులు & మినహాయింపుల తనిఖీ',
+    title_hi: 'शुल्क एवं कटौती जांच',
+    desc_en: 'Auditing upfront processing fees, insurance cuts, and net cash disbursed in hand.',
+    desc_te: 'ప్రాసెసింగ్ రుసుము, బీమా మినహాయింపులు మరియు చేతికి అందే నికర నగదు తనిఖీ.',
+    desc_hi: 'अग्रिम कटौती और हाथ में मिलने वाली वास्तविक राशि की जांच।',
+    cue_en: 'Say "Next" to check prepayment rules',
+    cue_te: '"Next" అని చెప్పండి',
+    cue_hi: '"Next" बोलें',
+  },
+  {
+    step: 3,
+    title_en: 'Repayment & Prepayment Rules',
+    title_te: 'ముందస్తు చెల్లింపు & జరిమానా నిబంధనలు',
+    title_hi: 'भुगतान एवं पूर्व-भुगतान नियम',
+    desc_en: 'Ensuring zero early foreclosure penalties and checking default interest terms.',
+    desc_te: 'గడువు కంటే ముందే చెల్లిస్తే అదనపు ఫీజులు లేవని మరియు ఆలస్య రుసుములను ధృవీకరిస్తున్నాం.',
+    desc_hi: 'समय पूर्व भुगतान और विलंब शुल्क नियमों की जांच।',
+    cue_en: 'Say "Next" for your oral comprehension test',
+    cue_te: 'నోటి ప్రశ్న కోసం "Next" చెప్పండి',
+    cue_hi: 'प्रश्नोत्तरी के लिए "Next" बोलें',
+  },
+  {
+    step: 4,
+    title_en: 'Voice Comprehension Quiz',
+    title_te: 'నోటి మాటల అవగాహన ప్రశ్న',
+    title_hi: 'मौखिक समझ सत्यापन',
+    desc_en: 'Answer verbally into the mic to prove real understanding before any commitment.',
+    desc_te: 'రుణ ఒప్పందంపై సంతకం లేదా వేలిముద్ర వేసే ముందు వివరాలు అర్థమయ్యాయని చెప్పండి.',
+    desc_hi: 'हस्ताक्षर से पहले मौखिक रूप से उत्तर देकर अपनी समझ सत्यापित करें।',
+    cue_en: 'Speak your answer: "690 rupees" or say "Pass"',
+    cue_te: 'సమాధానం నోటితో చెప్పండి: "690 రూపాయలు"',
+    cue_hi: 'अपना उत्तर बोलें: "690 रुपये"',
+  },
+  {
+    step: 5,
+    title_en: 'Cryptographic Verification Receipt',
+    title_te: 'అధికారిక డిజిటల్ ధృవీకరణ రసీదు',
+    title_hi: 'डिजिटल सत्यापन प्रमाणपत्र',
+    desc_en: 'Tamper-proof comprehension certificate stamped with an SHA-256 seal and QR code.',
+    desc_te: 'SHA-256 అధికారిక సీల్ మరియు వివాద పరిష్కార క్యూఆర్ కోడ్‌తో కూడిన రసీదు సిద్ధమైంది.',
+    desc_hi: 'SHA-256 डिजिटल मुहर और क्यूआर कोड के साथ आधिकारिक रसीद तैयार है।',
+    cue_en: 'Say "Download" or tap the button to save',
+    cue_te: '"Download" అని చెప్పండి',
+    cue_hi: '"Download" बोलें',
+  },
+]
+
 export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
   const [lang, setLang] = useState<AppLanguage>(getLanguage())
   const [speaking, setSpeaking] = useState(false)
@@ -336,37 +399,79 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
         </div>
       </header>
 
-      {/* Main Center Stage: 100% Focused on Human AI Avatar with Unobstructed Full Screen View */}
-      <main className="flex-1 relative flex flex-col items-center justify-center p-2 sm:p-4 overflow-hidden">
+      {/* Main Stage: Balanced 3-Column Layout (Left: Step & Voice Guidance | Center: Photorealistic Lakshmi | Right: Verified Facts Card) */}
+      <main className="flex-1 relative flex flex-col md:flex-row items-center justify-between px-4 sm:px-8 lg:px-12 py-3 overflow-y-auto md:overflow-hidden gap-4 lg:gap-8 max-w-7xl mx-auto w-full">
         {/* Subtle Traditional Gold Kolam / Indian Sacred Geometric Background Watermark */}
         <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
           <div className="w-[380px] h-[380px] sm:w-[680px] sm:h-[680px] rounded-full border-4 sm:border-8 border-dashed border-amber-300" />
         </div>
 
-        {/* The Realistic Human AI Avatar Rig (Mobile-Responsive Prominence) */}
-        <div className="relative z-10 flex flex-col items-center justify-center transition-all duration-500 my-auto">
+        {/* LEFT ZONE: Step Context, Live Audio Topic & Voice Commands */}
+        <section aria-label="Step Context" className="w-full md:w-80 lg:w-96 flex flex-col justify-center gap-3 z-20 order-2 md:order-1">
+          {(() => {
+            const meta = STEP_METADATA[currentStep] || STEP_METADATA[0]
+            const title = lang === 'en' ? meta.title_en : lang === 'hi' ? meta.title_hi : meta.title_te
+            const desc = lang === 'en' ? meta.desc_en : lang === 'hi' ? meta.desc_hi : meta.desc_te
+            const cue = lang === 'en' ? meta.cue_en : lang === 'hi' ? meta.cue_hi : meta.cue_te
+            return (
+              <div className="rounded-2xl border border-emerald-500/30 bg-slate-950/80 p-4 sm:p-5 backdrop-blur-xl shadow-xl">
+                {/* Step badge */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-[10px] sm:text-xs font-black text-amber-300 uppercase tracking-wider">
+                    <span>{lang === 'en' ? `Step ${meta.step} of 5` : `దశ ${meta.step} / 5`}</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-300/80 font-mono">
+                    Gemma 4 SLM
+                  </span>
+                </div>
+
+                {/* Localized Step Title */}
+                <h2 className="text-base sm:text-lg lg:text-xl font-black text-amber-100 leading-snug">
+                  {title}
+                </h2>
+
+                {/* Localized Live Audio Narration Explanation */}
+                <p className="mt-2 text-xs sm:text-sm text-emerald-100/90 leading-relaxed font-normal">
+                  {desc}
+                </p>
+
+                {/* Hands-free Voice Hint Box */}
+                <div className="mt-3.5 flex items-center gap-2 rounded-xl bg-amber-400/10 border border-amber-400/30 px-3 py-2 text-[11px] sm:text-xs text-amber-200">
+                  <span className="text-base shrink-0 animate-bounce">🎙️</span>
+                  <div className="leading-tight">
+                    <span className="font-bold text-amber-300">{lang === 'en' ? 'Voice Cue: ' : 'వాయిస్ సూచన: '}</span>
+                    <span>{cue}</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+        </section>
+
+        {/* CENTER ZONE: Photorealistic Human AI Avatar Rig */}
+        <section aria-label="Lakshmi AI Avatar" className="flex-1 flex flex-col items-center justify-center relative z-10 order-1 md:order-2 my-auto">
           <HumanAvatarRig
             isSpeaking={speaking}
             language={lang}
-            sizeClass="w-56 h-56 sm:w-80 sm:h-80 md:w-[500px] md:h-[500px] lg:w-[620px] lg:h-[620px] xl:w-[700px] xl:h-[700px]"
+            sizeClass="w-52 h-52 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px] xl:w-[460px] xl:h-[460px]"
           />
 
-          {/* Avatar Name & Status Tag */}
-          <div className="mt-1.5 sm:mt-2 flex flex-col items-center">
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-black/60 border border-amber-400/50 px-3.5 sm:px-5 py-1.5 sm:py-2 shadow-2xl backdrop-blur-md">
-              <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-amber-400 font-extrabold text-xs sm:text-base tracking-wide">
+          {/* Avatar Identity & Live Status Tag */}
+          <div className="mt-2 flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 rounded-full bg-black/70 border border-amber-400/50 px-4 sm:px-5 py-1.5 shadow-2xl backdrop-blur-md">
+              <span className={`h-2 w-2 rounded-full ${speaking ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`} />
+              <span className="text-amber-400 font-extrabold text-xs sm:text-sm tracking-wide">
                 {lang === 'en' ? 'Lakshmi' : lang === 'hi' ? 'लक्ष्मी' : 'లక్ష్మి'}
               </span>
               <span className="text-xs text-emerald-200">•</span>
               <span className="text-[11px] sm:text-xs text-emerald-100 font-semibold">
-                {lang === 'en' ? 'AI Loan Officer' : lang === 'hi' ? 'डिजिटल ऋण अधिकारी' : 'డిజిటల్ లోన్ అధికారి'}
+                {lang === 'en' ? 'Digital Loan Officer' : lang === 'hi' ? 'डिजिटल ऋण अधिकारी' : 'డిజిటల్ లోన్ అధికారి'}
               </span>
             </div>
 
             {/* Recognized Voice Transcript Pill */}
             {transcript && (
-              <div className="mt-2 flex items-center gap-1.5 sm:gap-2 rounded-full bg-amber-400/20 border border-amber-400/50 px-3 sm:px-4 py-1 text-[11px] sm:text-xs text-amber-200 shadow-xl backdrop-blur-md animate-fade-in max-w-[90vw] truncate">
+              <div className="mt-2 flex items-center gap-2 rounded-full bg-amber-400/20 border border-amber-400/50 px-3.5 py-1 text-xs text-amber-200 shadow-xl backdrop-blur-md animate-fade-in max-w-[90vw] truncate">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-300 animate-ping shrink-0" />
                 <span className="truncate">
                   {lang === 'en' ? 'Heard:' : lang === 'hi' ? 'सुना:' : 'విన్నది:'} <strong>"{transcript}"</strong>
@@ -374,32 +479,21 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
               </div>
             )}
           </div>
-        </div>
+        </section>
 
-        {/* Floating Fact Card (Docked to Side on Desktop, Non-Obtrusive Bottom Sheet on Mobile) */}
-        {activeFloatingCard && (
-          <aside
-            aria-label="Loan document snapshot"
-            className={`fixed md:absolute left-2 right-2 sm:left-auto sm:right-6 lg:right-12 bottom-16 sm:bottom-20 md:bottom-auto md:top-1/2 md:-translate-y-1/2 max-w-sm sm:max-w-md w-auto sm:w-full px-1 sm:px-2 z-30 transition-all duration-500 ease-out ${
-              cardVisible
-                ? 'opacity-100 translate-y-0 md:translate-x-0 scale-100'
-                : 'opacity-0 translate-y-8 md:translate-x-12 scale-95 pointer-events-none'
-            }`}
-          >
-            <div className="rounded-2xl sm:rounded-3xl border-2 border-amber-400/80 bg-slate-950/95 p-3.5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)] backdrop-blur-2xl relative">
-              {/* Manual Dismiss Button */}
-              <button
-                type="button"
-                onClick={() => setCardVisible(false)}
-                className="absolute top-2.5 sm:top-3.5 right-2.5 sm:right-3.5 text-slate-400 hover:text-amber-300 text-xs px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-700 transition"
-                title={lang === 'en' ? 'Close card' : 'కార్డును మూసివేయండి'}
-              >
-                ✕
-              </button>
-
-              <div className="flex items-center justify-between border-b border-amber-500/20 pb-2 sm:pb-3 pr-6">
+        {/* RIGHT ZONE: Verified Document Facts Card */}
+        <section aria-label="Loan document snapshot" className="w-full md:w-80 lg:w-96 flex flex-col justify-center z-20 order-3">
+          {activeFloatingCard ? (
+            <div
+              className={`rounded-2xl sm:rounded-3xl border-2 border-amber-400/80 bg-slate-950/95 p-3.5 sm:p-5 shadow-[0_20px_50px_rgba(0,0,0,0.9)] backdrop-blur-2xl relative transition-all duration-500 ease-out ${
+                cardVisible
+                  ? 'opacity-100 translate-y-0 scale-100'
+                  : 'opacity-40 translate-y-2 scale-98'
+              }`}
+            >
+              <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
                 <div>
-                  <h3 className="text-sm sm:text-lg font-black text-amber-100">
+                  <h3 className="text-sm sm:text-base font-black text-amber-100">
                     {activeFloatingCard.title}
                   </h3>
                   <p className="text-[10px] sm:text-[11px] text-emerald-300 font-medium">
@@ -407,18 +501,18 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
                   </p>
                 </div>
                 {activeFloatingCard.goldStamp && (
-                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 shadow">
+                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 shadow shrink-0">
                     {activeFloatingCard.goldStamp}
                   </span>
                 )}
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-2.5 sm:mt-3.5">
+              <div className="grid grid-cols-2 gap-2 sm:gap-2.5 mt-3">
                 {activeFloatingCard.stats.map((s, idx) => (
                   <div
                     key={idx}
-                    className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border ${
+                    className={`p-2 sm:p-2.5 rounded-xl border ${
                       s.highlight
                         ? 'bg-amber-950/40 border-amber-400/50 text-amber-100'
                         : 'bg-emerald-950/30 border-emerald-800/40 text-emerald-100'
@@ -426,7 +520,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
                   >
                     <div className="text-[9px] sm:text-[10px] font-semibold text-slate-300 truncate">{s.label}</div>
                     <div
-                      className={`text-sm sm:text-lg font-black font-mono mt-0.5 ${
+                      className={`text-sm sm:text-base font-black font-mono mt-0.5 ${
                         s.highlight ? 'text-amber-300' : 'text-white'
                       }`}
                     >
@@ -436,8 +530,21 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
                 ))}
               </div>
             </div>
-          </aside>
-        )}
+          ) : (
+            /* Ambient Placeholder Card when no temporary card is actively floating */
+            <div className="rounded-2xl border border-emerald-500/20 bg-slate-950/60 p-4 backdrop-blur-md text-center">
+              <div className="text-2xl mb-1">🛡️</div>
+              <div className="text-xs font-bold text-amber-200">
+                {lang === 'en' ? 'Gemma 4 Pure Math Guard' : 'గెమ్మా 4 గణిత ధృవీకరణ'}
+              </div>
+              <div className="text-[11px] text-emerald-300/70 mt-1">
+                {lang === 'en'
+                  ? 'All facts cross-checked against RBI & KFS standards with zero hallucination.'
+                  : 'ఆర్బీఐ నిబంధనల ప్రకారం అన్ని వివరాలు ఖచ్చితంగా లెక్కించబడ్డాయి.'}
+              </div>
+            </div>
+          )}
+        </section>
       </main>
 
       {/* Bottom Hands-Free Voice Control Bar (Backups for click/touch if needed) */}
