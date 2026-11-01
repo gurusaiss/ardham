@@ -26,6 +26,10 @@ Ardham is submitted to and satisfies the full criteria of the following official
 
 ## 🌟 Key Features
 
+<p align="center">
+  <img src="docs/images/ardham-key-features.png" alt="Ardham Key Architecture & Features" width="100%" />
+</p>
+
 1. **Autonomous Lakshmi AI Avatar**:
    - High-fidelity, real-time procedural lip-sync avatar with warm Indian heritage aesthetics (saree with zari border, nathni, jhumkas, bindi).
    - 100% eyes-free, hands-free voice navigation designed specifically for visually impaired and illiterate borrowers.

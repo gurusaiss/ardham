@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 340" width="980" height="340">
+  <defs>
+    <radialGradient id="cardGlowStandalone" cx="50%" cy="0%" r="80%">
+      <stop offset="0%" stop-color="#064e3b" stop-opacity="0.5" />
+      <stop offset="50%" stop-color="#022c22" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#020617" stop-opacity="0.98" />
+    </radialGradient>
+
+    <linearGradient id="borderGradStandalone" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+
+    <filter id="shadowStandalone" x="-5%" y="-5%" width="110%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000000" flood-opacity="0.8" />
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#10b981" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <style>
+    .title-font { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 800; }
+    .body-font { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 500; }
+  </style>
+
+  <!-- Main Card Container -->
+  <g filter="url(#shadowStandalone)">
+    <rect x="15" y="15" width="950" height="310" rx="24" fill="url(#cardGlowStandalone)" stroke="url(#borderGradStandalone)" stroke-width="2.5" />
+
+    <!-- 2x2 Grid Dividers -->
+    <line x1="490" y1="30" x2="490" y2="310" stroke="#10b981" stroke-opacity="0.18" stroke-width="1.5" />
+    <line x1="35" y1="170" x2="945" y2="170" stroke="#10b981" stroke-opacity="0.18" stroke-width="1.5" />
+
+    <!-- Item 1: Top Left - 100% Offline-Ready -->
+    <g transform="translate(45, 50)">
+      <rect x="0" y="0" width="56" height="56" rx="16" fill="#047857" fill-opacity="0.3" stroke="#34d399" stroke-width="1.5" />
+      <text x="28" y="37" text-anchor="middle" font-size="28">📱</text>
+      <g transform="translate(74, 18)">
+        <text x="0" y="0" fill="#ffffff" class="title-font" font-size="20">100% Offline-Ready</text>
+        <text x="0" y="24" fill="#94a3b8" class="body-font" font-size="14.5">runs on-device with Wi-Fi switched OFF</text>
+      </g>
+    </g>
+
+    <!-- Item 2: Top Right - Google Gemma 4 -->
+    <g transform="translate(525, 50)">
+      <rect x="0" y="0" width="56" height="56" rx="16" fill="#047857" fill-opacity="0.3" stroke="#34d399" stroke-width="1.5" />
+      <text x="28" y="37" text-anchor="middle" font-size="28">🤖</text>
+      <g transform="translate(74, 18)">
+        <text x="0" y="0" fill="#ffffff" class="title-font" font-size="20">Google Gemma 4</text>
+        <text x="0" y="24" fill="#94a3b8" class="body-font" font-size="14.5">Apache 2.0 open-weight multimodal SLM</text>
+      </g>
+    </g>
+
+    <!-- Item 3: Bottom Left - Lakshmi AI Avatar -->
+    <g transform="translate(45, 205)">
+      <rect x="0" y="0" width="56" height="56" rx="16" fill="#047857" fill-opacity="0.3" stroke="#34d399" stroke-width="1.5" />
+      <text x="28" y="37" text-anchor="middle" font-size="28">👩‍💼</text>
+      <g transform="translate(74, 18)">
+        <text x="0" y="0" fill="#ffffff" class="title-font" font-size="20">Lakshmi AI Avatar</text>
+        <text x="0" y="24" fill="#94a3b8" class="body-font" font-size="14.5">real-time procedural voice lip-sync</text>
+      </g>
+    </g>
+
+    <!-- Item 4: Bottom Right - Tamper-Proof Seal -->
+    <g transform="translate(525, 205)">
+      <rect x="0" y="0" width="56" height="56" rx="16" fill="#047857" fill-opacity="0.3" stroke="#34d399" stroke-width="1.5" />
+      <text x="28" y="37" text-anchor="middle" font-size="28">🔒</text>
+      <g transform="translate(74, 18)">
+        <text x="0" y="0" fill="#ffffff" class="title-font" font-size="20">Tamper-Proof Seal</text>
+        <text x="0" y="24" fill="#94a3b8" class="body-font" font-size="14.5">SHA-256 hash plus scannable QR receipt</text>
+      </g>
+    </g>
+  </g>
+</svg>
