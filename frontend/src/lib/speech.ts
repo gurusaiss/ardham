@@ -2,7 +2,10 @@
  * Multi-Language & Pure Speech Synthesis Controller
  * 
  * - Supports Telugu (default), English, and Hindi.
- * - Ensures pure Telugu vocabulary without Hindi loan words when Telugu is active.
+ * - Native Telugu voice support with intelligent Phonetic Fallback:
+ *   When no native Telugu TTS voice is installed on OS (common on Windows),
+ *   intelligently converts Telugu text to clean phonetic syllables so Indian English (en-IN)
+ *   TTS speaks EVERY SINGLE WORD AND NUMBER aloud, instead of dropping characters!
  * - Global Stop Audio control across the entire application.
  * - Remembers Language & Voice Assistant preferences in localStorage.
  */
@@ -99,6 +102,159 @@ export function sanitizeTeluguText(text: string): string {
 }
 
 /**
+ * Dictionary of common Telugu words to phonetic English representations.
+ * Ensures natural and intelligible spoken output when TTS has no native Telugu font reader.
+ */
+const TELUGU_WORD_MAP: Record<string, string> = {
+  'మీకు': 'Meeku',
+  'మీరు': 'Meeru',
+  'మీ': 'Mee',
+  'మంజూరైన': 'manjooraina',
+  'లోన్': 'loan',
+  'రుణం': 'runam',
+  'అప్పు': 'appu',
+  'మొత్తం': 'motham',
+  'విలువ': 'viluva',
+  'రూపాయలు': 'rupaayalu',
+  'రూపాయల': 'rupaayala',
+  'రూపాయిలు': 'rupaayilu',
+  'ప్రతి': 'prathi',
+  'వారం': 'vaaram',
+  'వాయిదాకి': 'vaayidaaki',
+  'వాయిదా': 'vaayidaa',
+  'వాయిదాలలో': 'vaayidaalalo',
+  'వాయిదాలు': 'vaayidaalu',
+  'చెల్లించాలి': 'chellinchaali',
+  'చెల్లించవలెను': 'chellinchavalenu',
+  'కట్టాలి': 'kattali',
+  'కడతారు': 'kadataaru',
+  'వార్షిక': 'vaarshika',
+  'వడ్డీ': 'vaddi',
+  'రేటు': 'rate',
+  'శాతం': 'percent',
+  'ప్రాసెసింగ్': 'processing',
+  'రుసుము': 'rusumu',
+  'రుసుముగా': 'rusumugaa',
+  'మినహాయిస్తారు': 'minahaayisthaaru',
+  'మినహాయించబడును': 'minahaayinchabadunu',
+  'బీమా': 'beema',
+  'ప్రీమియం': 'premium',
+  'కొరకు': 'koraku',
+  'కలిపి': 'kalipi',
+  'మీద': 'meeda',
+  'మరియు': 'mariyu',
+  'ఆలస్యమైతే': 'aalasyamaithe',
+  'అపరాధ': 'aparaadha',
+  'జరిమానా': 'jarimaanaa',
+  'పడుతుంది': 'paduthundi',
+  'కాలపరిమితి': 'kaalaparimithi',
+  'నెలలు': 'nelalu',
+  'నెలల': 'nelala',
+  'వారాలు': 'vaaraalu',
+  'వారాల': 'vaarala',
+  'పాటు': 'paatu',
+  'ఎంత': 'entha',
+  'ఎన్ని': 'enni',
+  'ప్రశ్న': 'prashna',
+  'సమాధానం': 'samaadhaanam',
+  'చెప్పండి': 'cheppandi',
+  'అవును': 'avunu',
+  'కాదు': 'kaadu',
+  'తెలీదు': 'teleedu',
+  'బంగారం': 'bangaaram',
+  'తాకట్టు': 'thaakattu',
+  'అమ్మేస్తారు': 'ammeesthaaru',
+  'వేలం': 'veelam',
+  'వేస్తారు': 'veesthaaru',
+  'తీసేసుకుంటారు': 'theeseesukuntaaru',
+  'కట్టకపోతే': 'kattakapoothye',
+  'అర్ధం': 'Ardham',
+  'స్వాగతం': 'swaagatham',
+  'నమస్కారం': 'namaskaaram',
+  'భాషను': 'bhashanu',
+  'ఎంచుకోండి': 'enchukondi',
+  'కావాలా': 'kaavaalaa',
+  'కావాలంటే': 'kaavaalante',
+  'నొక్కండి': 'nokkandi',
+  'లేదా': 'leedhaa',
+  'అని': 'ani',
+  'వద్దు': 'vaddu',
+  'సైలెంట్': 'silent',
+  'మోడ్': 'mode',
+  'ధృవీకరించబడింది': 'dhruveekarinchabadindi',
+  'ధృవీకరించబడ్డాయి': 'dhruveekarinchabaddaayi',
+  'అవగాహన': 'avagaahana',
+  'స్కోర్': 'score',
+  'వివరాలు': 'vivaraalu',
+  'చేతికి': 'cheethiki',
+  'వచ్చేది': 'vachhedhi',
+  'అందే': 'andhee',
+  'నగదు': 'nagadhu',
+  'దాచిన': 'daachina',
+  'షరతులు': 'sharathulu',
+  'హెచ్చరిక': 'hechharika',
+  'హెచ్చరికలు': 'hechharikalu',
+  'అంశాలలో': 'amshaalalo',
+  'స్పష్టత': 'spashtatha',
+  'అవసరం': 'avasaram',
+  'అభినందనలు': 'abhinandanalu',
+  'విజయవంతంగా': 'vijayavanthamgaa',
+}
+
+const VOWELS: Record<string, string> = {
+  'అ': 'a', 'ఆ': 'aa', 'ఇ': 'i', 'ఈ': 'ee', 'ఉ': 'u', 'ఊ': 'oo',
+  'ఋ': 'ru', 'ఎ': 'e', 'ఏ': 'ee', 'ఐ': 'ai', 'ఒ': 'o', 'ఓ': 'oo', 'ఔ': 'au',
+}
+const CONSONANTS: Record<string, string> = {
+  'క': 'k', 'ఖ': 'kh', 'గ': 'g', 'ఘ': 'gh', 'ఙ': 'ng',
+  'చ': 'ch', 'ఛ': 'chh', 'జ': 'j', 'ఝ': 'jh', 'ఞ': 'ny',
+  'ట': 't', 'ఠ': 'th', 'డ': 'd', 'ఢ': 'dh', 'ణ': 'n',
+  'త': 'th', 'థ': 'thh', 'ద': 'd', 'ధ': 'dh', 'న': 'n',
+  'ప': 'p', 'ఫ': 'ph', 'బ': 'b', 'భ': 'bh', 'మ': 'm',
+  'య': 'y', 'ర': 'r', 'ల': 'l', 'వ': 'v', 'శ': 'sh', 'ష': 'sh', 'స': 's', 'హ': 'h', 'ళ': 'l',
+}
+const MATRAS: Record<string, string> = {
+  'ా': 'aa', 'ి': 'i', 'ీ': 'ee', 'ు': 'u', 'ూ': 'oo', 'ృ': 'ru',
+  'ె': 'e', 'ే': 'ee', 'ై': 'ai', 'ొ': 'o', 'ో': 'oo', 'ౌ': 'au',
+  'ం': 'm', 'ః': 'h', '్': '',
+}
+
+export function teluguToPhonetic(text: string): string {
+  let result = text
+  for (const [te, en] of Object.entries(TELUGU_WORD_MAP)) {
+    result = result.split(te).join(en + ' ')
+  }
+
+  let out = ''
+  let i = 0
+  while (i < result.length) {
+    const ch = result[i]
+    if (VOWELS[ch]) {
+      out += VOWELS[ch]
+      i++
+    } else if (CONSONANTS[ch]) {
+      const cons = CONSONANTS[ch]
+      const next = result[i + 1]
+      if (next === '్') {
+        out += cons
+        i += 2
+      } else if (next && MATRAS[next] !== undefined) {
+        out += cons + MATRAS[next]
+        i += 2
+      } else {
+        out += cons + 'a'
+        i++
+      }
+    } else {
+      out += ch
+      i++
+    }
+  }
+
+  return out.replace(/\s+/g, ' ').trim()
+}
+
+/**
  * Universal speaker based on active language or specified text.
  */
 export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) {
@@ -111,36 +267,53 @@ export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) 
 
   const targetLang = lang || getLanguage()
   const sanitized = targetLang === 'te' ? sanitizeTeluguText(text) : text
-  const utterance = new SpeechSynthesisUtterance(sanitized)
-  utterance.rate = 0.95
-  utterance.pitch = 1.0
-
   const voices = window.speechSynthesis.getVoices()
+
+  let voiceToUse: SpeechSynthesisVoice | null = null
+  let textToSpeak = sanitized
+  let langTag = 'te-IN'
 
   if (targetLang === 'te') {
     const teVoice = voices.find(
       (v) => v.lang.toLowerCase().startsWith('te') || v.name.toLowerCase().includes('telugu')
     )
     if (teVoice) {
-      utterance.voice = teVoice
-      utterance.lang = 'te-IN'
+      voiceToUse = teVoice
+      textToSpeak = sanitized
+      langTag = 'te-IN'
     } else {
-      const enIn = voices.find((v) => v.lang.toLowerCase().startsWith('en-in'))
-      if (enIn) utterance.voice = enIn
-      utterance.lang = 'te-IN'
+      // No native Telugu voice installed on OS!
+      // Convert to phonetic syllables so Indian English voice speaks EVERY SINGLE WORD & NUMBER
+      // instead of dropping Telugu characters!
+      const enIn = voices.find(
+        (v) => v.lang.toLowerCase().startsWith('en-in') || v.lang.toLowerCase().startsWith('en')
+      )
+      voiceToUse = enIn || null
+      textToSpeak = teluguToPhonetic(sanitized)
+      langTag = 'en-IN'
     }
   } else if (targetLang === 'hi') {
     const hiVoice = voices.find(
       (v) => v.lang.toLowerCase().startsWith('hi') || v.name.toLowerCase().includes('hindi')
     )
-    if (hiVoice) utterance.voice = hiVoice
-    utterance.lang = 'hi-IN'
+    voiceToUse = hiVoice || null
+    textToSpeak = sanitized
+    langTag = 'hi-IN'
   } else {
     const enVoice = voices.find(
       (v) => v.lang.toLowerCase().startsWith('en-in') || v.lang.toLowerCase().startsWith('en')
     )
-    if (enVoice) utterance.voice = enVoice
-    utterance.lang = 'en-IN'
+    voiceToUse = enVoice || null
+    textToSpeak = sanitized
+    langTag = 'en-IN'
+  }
+
+  const utterance = new SpeechSynthesisUtterance(textToSpeak)
+  utterance.rate = 0.92 // Natural measured speaking speed
+  utterance.pitch = 1.0
+  utterance.lang = langTag
+  if (voiceToUse) {
+    utterance.voice = voiceToUse
   }
 
   utterance.onstart = () => notify(true)
@@ -170,21 +343,8 @@ export function speakLanguagePrompt(onEnd?: () => void) {
   }
   stopSpeaking()
 
-  const u = new SpeechSynthesisUtterance(
-    'నమస్కారం! భాషను ఎంచుకోండి. తెలుగు, English, లేదా हिंदी.'
-  )
-  u.lang = 'te-IN'
-  u.rate = 0.95
-  u.onstart = () => notify(true)
-  u.onend = () => {
-    notify(false)
-    onEnd?.()
-  }
-  u.onerror = () => {
-    notify(false)
-    onEnd?.()
-  }
-  window.speechSynthesis.speak(u)
+  const promptText = 'నమస్కారం! భాషను ఎంచుకోండి. తెలుగు, English, లేదా हिंदी.'
+  speakText(promptText, 'te', onEnd)
 }
 
 /**
