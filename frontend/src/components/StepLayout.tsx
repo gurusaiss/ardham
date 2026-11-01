@@ -1,8 +1,10 @@
 import { useState, useEffect, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import GlobalAudioBar from './GlobalAudioBar'
 import StepProgress from './StepProgress'
 import VoiceAssistantModal from './VoiceAssistantModal'
+import SettingsModal from './SettingsModal'
+import VideoGuideModal from './VideoGuideModal'
 import { stopSpeaking, getLanguage, setLanguage, subscribeLanguage, type AppLanguage } from '../lib/speech'
 import { getCurrentUser, subscribeAuth, type User } from '../lib/auth'
 
@@ -21,7 +23,11 @@ export default function StepLayout({
   children: ReactNode
   maxWidthClass?: string
 }) {
+  const location = useLocation()
+  const navigate = useNavigate()
   const [showVoiceModal, setShowVoiceModal] = useState(false)
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
+  const [showVideoModal, setShowVideoModal] = useState(false)
   const [user, setUser] = useState<User | null>(getCurrentUser())
   const [lang, setLangState] = useState<AppLanguage>(getLanguage())
 
@@ -64,76 +70,116 @@ export default function StepLayout({
     }
   }
 
+  const isHome = location.pathname === '/'
+
   return (
     <div className="min-h-screen bg-slate-50/80 sm:bg-gradient-to-br sm:from-slate-100 sm:via-slate-50 sm:to-emerald-50/30 py-3 sm:py-8 px-3 sm:px-6 lg:px-8 flex flex-col justify-between transition-colors">
       <div className={`mx-auto w-full ${maxWidthClass} rounded-3xl bg-white shadow-xl border border-slate-200/90 p-5 sm:p-8 md:p-10 flex-1 flex flex-col animate-fade-in`}>
         {/* Top Header Bar */}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
-          {/* Top Left: Brand only */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
-            title="Ardham Home"
-          >
-            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">
-              {lang === 'en' ? 'Ardham' : lang === 'hi' ? 'अर्थम' : 'అర్థం'}
-            </span>
-            {lang !== 'en' && <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>}
-          </Link>
+          {/* Top Left: Brand and Back Button */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {!isHome && (
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-1 text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm transition active:scale-95"
+                title={lang === 'en' ? 'Go to previous step' : lang === 'hi' ? 'पिछले चरण पर जाएं' : 'మునుపటి పేజీకి వెళ్లండి'}
+              >
+                <span>←</span>
+                <span>{lang === 'en' ? 'Go Back' : lang === 'hi' ? 'पीछे जाएं' : 'వెనుకకు'}</span>
+              </button>
+            )}
 
-          {/* Top Right: Buttons (Language, Audio, Account Profile) */}
+            <Link
+              to="/"
+              className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
+              title="Ardham Home"
+            >
+              <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">
+                {lang === 'en' ? 'Ardham' : lang === 'hi' ? 'अर्थम' : 'అర్థం'}
+              </span>
+              {lang !== 'en' && <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>}
+            </Link>
+          </div>
+
+          {/* Top Right: Buttons (Video Demo, Language, Audio, Settings, Account Profile) */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
-            {/* 1. Language Buttons */}
+            {/* 1. Watch AI Demo Video Button */}
+            <button
+              type="button"
+              onClick={() => setShowVideoModal(true)}
+              className="flex items-center gap-1.5 text-xs font-bold text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+              title={lang === 'en' ? 'Watch Multimodal Gemma 4 AI Video Guide' : 'AI వీడియో గైడ్ చూడండి'}
+            >
+              <span>🎬</span>
+              <span className="hidden sm:inline">
+                {lang === 'en' ? 'AI Video Demo' : lang === 'hi' ? 'एआई वीडियो डेमो' : 'AI వీడియో డెమో'}
+              </span>
+            </button>
+
+            {/* 2. Compact Language Switcher */}
             <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold shadow-inner">
               <button
                 type="button"
                 onClick={() => switchLang('te')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-2.5 py-1 rounded-lg transition-all ${
                   lang === 'te'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="తెలుగు (Telugu)"
               >
-                🪔 తెలుగు
+                తెలుగు
               </button>
               <button
                 type="button"
                 onClick={() => switchLang('en')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-2.5 py-1 rounded-lg transition-all ${
                   lang === 'en'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="English"
               >
-                🌐 English
+                English
               </button>
               <button
                 type="button"
                 onClick={() => switchLang('hi')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-2.5 py-1 rounded-lg transition-all ${
                   lang === 'hi'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="हिंदी (Hindi)"
               >
-                🇮🇳 हिंदी
+                हिंदी
               </button>
             </div>
 
-            {/* 2. Global Voice ON/Silent and Stop Audio Controls */}
-            <GlobalAudioBar onOpenSettings={() => setShowVoiceModal(true)} />
+            {/* 3. Global Voice Audio Controls */}
+            <GlobalAudioBar onOpenSettings={() => setShowSettingsModal(true)} />
 
-            {/* 3. Account Profile Button (Top Right) */}
+            {/* 4. Settings Button */}
+            <button
+              type="button"
+              onClick={() => setShowSettingsModal(true)}
+              className="flex items-center gap-1 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+              title={lang === 'en' ? 'Platform Settings, Profile & Navigation' : 'ప్లాట్‌ఫామ్ సెట్టింగ్స్'}
+            >
+              <span>⚙️</span>
+              <span className="hidden md:inline">{lang === 'en' ? 'Settings' : 'సెట్టింగ్స్'}</span>
+            </button>
+
+            {/* 5. Account Profile Button */}
             <Link
               to="/auth"
               className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-500 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95"
               title="Account Profile / Role"
             >
               <span>👤</span>
-              <span className="truncate max-w-[140px] sm:max-w-[200px]">
+              <span className="truncate max-w-[120px] sm:max-w-[180px]">
                 {user ? `${user.name} (${user.role === 'officer' ? (lang === 'en' ? 'Officer' : lang === 'hi' ? 'अधिकारी' : 'అధికారి') : (lang === 'en' ? 'Borrower' : lang === 'hi' ? 'उधारकर्ता' : 'రుణగ్రహీత')})` : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}
               </span>
             </Link>
@@ -173,9 +219,26 @@ export default function StepLayout({
         </footer>
       </div>
 
+      {/* Voice Assistant Modal */}
       <VoiceAssistantModal
         isOpen={showVoiceModal}
         onClose={() => setShowVoiceModal(false)}
+      />
+
+      {/* Platform Settings Modal */}
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        onOpenVideoGuide={() => {
+          setShowSettingsModal(false)
+          setShowVideoModal(true)
+        }}
+      />
+
+      {/* Multimodal Video Guide Modal */}
+      <VideoGuideModal
+        isOpen={showVideoModal}
+        onClose={() => setShowVideoModal(false)}
       />
     </div>
   )

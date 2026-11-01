@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import GlobalAudioBar from '../components/GlobalAudioBar'
 import VoiceAssistantModal from '../components/VoiceAssistantModal'
+import SettingsModal from '../components/SettingsModal'
+import VideoGuideModal from '../components/VideoGuideModal'
 import {
   isVoiceAssistantEnabled,
   speakText,
@@ -17,6 +19,8 @@ import { t } from '../lib/translations'
 
 export default function Home() {
   const [showVoiceModal, setShowVoiceModal] = useState(false)
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
+  const [showVideoModal, setShowVideoModal] = useState(false)
   const [user, setUser] = useState<User | null>(getCurrentUser())
   const [lang, setLang] = useState<AppLanguage>(getLanguage())
 
@@ -68,68 +72,92 @@ export default function Home() {
             {lang !== 'en' && <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>}
           </Link>
 
-          {/* Top Right: Buttons (Language, Audio, Account Profile) */}
+          {/* Top Right: Buttons (Video Demo, Language, Audio, Settings, Account Profile) */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
-            {/* 1. Language Buttons */}
+            {/* 1. Watch AI Demo Video Button */}
+            <button
+              type="button"
+              onClick={() => setShowVideoModal(true)}
+              className="flex items-center gap-1.5 text-xs font-bold text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+              title={lang === 'en' ? 'Watch Multimodal Gemma 4 AI Video Guide' : 'AI వీడియో గైడ్ చూడండి'}
+            >
+              <span>🎬</span>
+              <span className="hidden sm:inline">
+                {lang === 'en' ? 'AI Video Demo' : lang === 'hi' ? 'एआई वीडियो डेमो' : 'AI వీడియో డెమో'}
+              </span>
+            </button>
+
+            {/* 2. Compact Language Buttons */}
             <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold shadow-inner">
               <button
                 type="button"
                 onClick={() => switchLang('te')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-2.5 py-1 rounded-lg transition-all ${
                   lang === 'te'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="తెలుగు"
               >
-                🪔 తెలుగు
+                తెలుగు
               </button>
               <button
                 type="button"
                 onClick={() => switchLang('en')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-2.5 py-1 rounded-lg transition-all ${
                   lang === 'en'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="English"
               >
-                🌐 English
+                English
               </button>
               <button
                 type="button"
                 onClick={() => switchLang('hi')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-2.5 py-1 rounded-lg transition-all ${
                   lang === 'hi'
                     ? 'bg-emerald-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="हिंदी"
               >
-                🇮🇳 हिंदी
+                हिंदी
               </button>
             </div>
 
-            {/* 2. Audio Voice Control */}
-            <GlobalAudioBar onOpenSettings={() => setShowVoiceModal(true)} />
+            {/* 3. Audio Voice Control */}
+            <GlobalAudioBar onOpenSettings={() => setShowSettingsModal(true)} />
 
-            {/* 3. Account Profile Button (Top Right) */}
+            {/* 4. Settings Button */}
+            <button
+              type="button"
+              onClick={() => setShowSettingsModal(true)}
+              className="flex items-center gap-1 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+              title={lang === 'en' ? 'Platform Settings & Controls' : 'ప్లాట్‌ఫామ్ సెట్టింగ్స్'}
+            >
+              <span>⚙️</span>
+              <span className="hidden md:inline">{lang === 'en' ? 'Settings' : 'సెట్టింగ్స్'}</span>
+            </button>
+
+            {/* 5. Account Profile Button (Top Right) */}
             <Link
               to="/auth"
               className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-500 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95"
               title="Account Profile / Login"
             >
               <span>👤</span>
-              <span className="truncate max-w-[140px] sm:max-w-[200px]">
-                {user ? `${user.name} (${user.role === 'officer' ? (lang === 'en' ? 'Officer' : lang === 'hi' ? 'अधिकारी' : 'అధికారి') : (lang === 'en' ? 'Borrower' : lang === 'hi' ? 'उधारकर्ता' : 'రుణగ్రహీత')})` : (lang === 'en' ? 'Sign In / Demo' : lang === 'hi' ? 'साइन इन / डेमो' : 'సైన్ ఇన్ / డెమో')}
+              <span className="truncate max-w-[120px] sm:max-w-[180px]">
+                {user ? `${user.name} (${user.role === 'officer' ? (lang === 'en' ? 'Officer' : lang === 'hi' ? 'अधिकारी' : 'అధికారి') : (lang === 'en' ? 'Borrower' : lang === 'hi' ? 'उधारकर्ता' : 'రుణగ్రహీత')})` : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}
               </span>
             </Link>
           </div>
         </div>
 
         {/* Hero Section */}
-        <div className="my-8 text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-bold text-emerald-800 mb-5 shadow-sm">
+        <div className="my-6 text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-bold text-emerald-800 mb-4 shadow-sm">
             <span>🏛️ RBI Key Fact Statement (KFS) Audit Verified</span>
             <span>•</span>
             <span>Zero Hallucination Protected</span>
@@ -140,16 +168,45 @@ export default function Home() {
             {lang !== 'en' && <span className="text-3xl sm:text-5xl font-medium text-emerald-800 font-sans">Ardham</span>}
           </h1>
 
-          <p className="mt-4 text-lg sm:text-2xl font-bold text-slate-800 leading-snug">
+          <p className="mt-3 text-lg sm:text-2xl font-bold text-slate-800 leading-snug">
             {t('tagline', lang)}
           </p>
           <p className="mt-2 text-sm sm:text-base text-slate-500 max-w-2xl mx-auto">
             {lang === 'en'
-              ? 'Makes sure rural & visually impaired borrowers understand all loan commitments before signing.'
+              ? 'Ensures rural & visually impaired borrowers understand all loan commitments before signing.'
               : lang === 'hi'
               ? 'सुनिश्चित करता है कि हस्ताक्षर करने से पहले ग्रामीण और दृष्टिबाधित उधारकर्ता सभी शर्तों को स्पष्ट रूप से समझें।'
               : 'రుణ ఒప్పందంపై సంతకం లేదా వేలిముద్ర వేయడానికి ముందే ప్రతి నిబంధనను స్వచ్ఛమైన మాటల్లో వివరించే వ్యవస్థ.'}
           </p>
+        </div>
+
+        {/* Interactive Gemma 4 Multimodal Video Guide Banner */}
+        <div className="my-5 rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div className="space-y-1.5 text-center sm:text-left">
+            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
+              <span>🎬 Gemma 4 Multimodal Simulation</span>
+              <span>•</span>
+              <span>Vision • Voice • KFS Audit</span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-extrabold text-white">
+              {lang === 'en' ? 'Watch How Ardham Operates in 4 Visual Steps' : lang === 'hi' ? 'देखें कि अर्थम 4 चरणों में कैसे कार्य करता है' : 'అర్థం ఎలా పనిచేస్తుందో 4 దశల్లో లైవ్ డెమో చూడండి'}
+            </h3>
+            <p className="text-xs sm:text-sm text-emerald-100/80 max-w-xl">
+              {lang === 'en'
+                ? 'Camera Vision scanning, hidden fee audit, spoken Telugu/Hindi readout, and cryptographic SHA-256 digital certificate generation.'
+                : lang === 'hi'
+                ? 'कैमरा विज़न स्कैन, छिपे हुए शुल्कों का विश्लेषण, मातृभाषा ऑडियो स्पष्टीकरण और डिजिटल ऑडिट प्रमाणपत्र।'
+                : 'కెమెరా విజన్ స్కాన్, దాచిన ఛార్జీల విశ్లేషణ, స్వచ్ఛమైన వాయిస్ రీడౌట్ మరియు లైవ్ డిజిటల్ సీల్ సర్టిఫికెట్.'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowVideoModal(true)}
+            className="shrink-0 flex items-center gap-2 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black px-5 py-3 text-sm sm:text-base shadow-lg active:scale-95 transition"
+          >
+            <span className="text-lg">▶️</span>
+            <span>{lang === 'en' ? 'Watch AI Demo Guide' : lang === 'hi' ? 'एआई वीडियो डेमो' : 'AI వీడియో గైడ్'}</span>
+          </button>
         </div>
 
         {/* Loan Categories Grid: 100% strictly localized */}
@@ -266,6 +323,22 @@ export default function Home() {
       <VoiceAssistantModal
         isOpen={showVoiceModal ? true : undefined}
         onClose={() => setShowVoiceModal(false)}
+      />
+
+      {/* Platform Settings Modal */}
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        onOpenVideoGuide={() => {
+          setShowSettingsModal(false)
+          setShowVideoModal(true)
+        }}
+      />
+
+      {/* Multimodal Gemma 4 AI Video Guide Modal */}
+      <VideoGuideModal
+        isOpen={showVideoModal}
+        onClose={() => setShowVideoModal(false)}
       />
     </div>
   )

@@ -140,42 +140,11 @@ export default function Explain() {
                   {current.field_id.replace('_', ' ')}
                 </span>
               </div>
-
-              {/* In-card Language Selector */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
-                <button
-                  type="button"
-                  onClick={() => setLang('te')}
-                  className={`px-3 py-1 text-xs rounded-lg font-bold transition ${
-                    lang === 'te' ? 'bg-emerald-700 text-white shadow' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  తెలుగు
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLang('en')}
-                  className={`px-3 py-1 text-xs rounded-lg font-bold transition ${
-                    lang === 'en' ? 'bg-emerald-700 text-white shadow' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  English
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLang('hi')}
-                  className={`px-3 py-1 text-xs rounded-lg font-bold transition ${
-                    lang === 'hi' ? 'bg-emerald-700 text-white shadow' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  हिंदी
-                </button>
-              </div>
             </div>
 
-            {/* Responsive 2-column or wide format */}
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-              <div className="lg:col-span-8">
+            {/* Responsive sentence and compact audio button */}
+            <div className="mt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+              <div className="flex-1">
                 <div className="text-xs uppercase font-bold tracking-wider text-emerald-800 mb-2">
                   {lang === 'en' ? 'Spoken Explanation' : lang === 'hi' ? 'मौखिक विवरण' : 'స్పష్టమైన వివరణ'}
                 </div>
@@ -184,16 +153,17 @@ export default function Explain() {
                 </p>
               </div>
 
-              {/* Audio Listen Button Box */}
-              <div className="lg:col-span-4 flex flex-col gap-3">
+              {/* Compact Audio Button */}
+              <div className="shrink-0 self-start md:self-center">
                 <button
                   type="button"
                   onClick={toggleAudio}
-                  className={`w-full flex items-center justify-center gap-3 rounded-2xl py-4 sm:py-5 px-5 text-base sm:text-lg font-bold shadow-lg transition-all active:scale-95 ${
+                  className={`flex items-center gap-2 rounded-2xl py-3 px-5 text-sm sm:text-base font-bold shadow-md transition-all active:scale-95 ${
                     speaking
                       ? 'bg-rose-600 text-white hover:bg-rose-700 ring-4 ring-rose-200'
                       : 'bg-emerald-700 text-white hover:bg-emerald-800 ring-4 ring-emerald-100'
                   }`}
+                  title={speaking ? 'Stop Audio' : 'Listen'}
                 >
                   {speaking ? (
                     <>
@@ -207,22 +177,11 @@ export default function Explain() {
                     </>
                   ) : (
                     <>
-                      <span className="text-xl">🔊</span>
-                      <span>
-                        {lang === 'en'
-                          ? 'Speak Sentence Aloud'
-                          : lang === 'hi'
-                          ? 'पूरा वाक्य सुनें'
-                          : 'అన్ని పదాలు & నంబర్లు వినండి'}
-                      </span>
+                      <span className="text-lg">🔊</span>
+                      <span>{lang === 'en' ? 'Listen' : lang === 'hi' ? 'सुनें' : 'వినండి'}</span>
                     </>
                   )}
                 </button>
-                <div className="text-xs text-center text-slate-500 font-medium">
-                  {speaking
-                    ? (lang === 'en' ? '🔊 Speaking sentence clearly...' : '🔊 ఆడియో చదువుతోంది...')
-                    : (lang === 'en' ? 'Press to hear full sentence aloud' : 'పూర్తి వాక్యాన్ని వినడానికి నొక్కండి')}
-                </div>
               </div>
             </div>
 
