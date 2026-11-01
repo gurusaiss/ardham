@@ -50,27 +50,20 @@ export default function StepLayout({
       <div className={`mx-auto w-full ${maxWidthClass} rounded-3xl bg-white shadow-xl border border-slate-200/90 p-5 sm:p-8 md:p-10 flex-1 flex flex-col animate-fade-in`}>
         {/* Top Header Bar */}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
-              title="Ardham Home"
-            >
-              <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">అర్థం</span>
-              <span className="text-sm font-bold text-slate-500 hidden sm:inline">Ardham</span>
-            </Link>
-            <span className="text-slate-300">|</span>
-            <Link
-              to="/auth"
-              className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-700 hover:text-emerald-700 bg-slate-100/90 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition"
-            >
-              <span>👤 {user ? `${user.name} (${user.role === 'officer' ? 'Officer' : 'Borrower'})` : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}</span>
-            </Link>
-          </div>
+          {/* Top Left: Brand / Logo only */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
+            title="Ardham Home"
+          >
+            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">అర్థం</span>
+            <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>
+          </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            {/* Real-time Language Switcher Pills */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
+          {/* Top Right: All Interactive Action Buttons (Language, Audio, Account Profile) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
+            {/* 1. Trilingual Language Switcher Buttons */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold shadow-inner">
               <button
                 type="button"
                 onClick={() => switchLang('te')}
@@ -109,7 +102,20 @@ export default function StepLayout({
               </button>
             </div>
 
+            {/* 2. Global Voice ON/Silent and Stop Audio Controls */}
             <GlobalAudioBar onOpenSettings={() => setShowVoiceModal(true)} />
+
+            {/* 3. Account Profile Button (Top Right) */}
+            <Link
+              to="/auth"
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-500 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+              title="Account Profile / Role"
+            >
+              <span>👤</span>
+              <span className="truncate max-w-[140px] sm:max-w-[200px]">
+                {user ? `${user.name} (${user.role === 'officer' ? 'Officer' : 'Borrower'})` : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}
+              </span>
+            </Link>
           </div>
         </div>
 
@@ -131,7 +137,7 @@ export default function StepLayout({
         {/* Main Content Area */}
         <main className="flex-1 flex flex-col">{children}</main>
 
-        {/* Footer: Clean and minimal compliance notice without redundant badges */}
+        {/* Footer */}
         <footer className="mt-8 border-t border-slate-100 pt-4 text-xs font-medium text-slate-500 text-center flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span>🏛️ RBI Key Fact Statement (KFS) & Fair Lending Verification</span>

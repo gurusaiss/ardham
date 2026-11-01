@@ -56,19 +56,20 @@ export default function Home() {
       <div className="mx-auto w-full max-w-6xl rounded-3xl bg-white shadow-xl border border-slate-200/90 p-6 sm:p-10 flex-1 flex flex-col justify-between animate-fade-in">
         {/* Top Header Bar */}
         <div className="w-full flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/auth"
-              className="flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-1.5 rounded-xl transition text-xs sm:text-sm"
-            >
-              <span>👤</span>
-              <span>{user ? `${user.name} (${user.role === 'officer' ? 'Officer' : 'Borrower'})` : (lang === 'en' ? '🔑 Sign In / Demo Account' : lang === 'hi' ? '🔑 साइन इन / डेमो' : '🔑 సైన్ ఇన్ / డెమో ఖాతా')}</span>
-            </Link>
-          </div>
+          {/* Top Left: Brand only */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
+            title="Ardham Home"
+          >
+            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">అర్థం</span>
+            <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>
+          </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            {/* Real-time Language Selector Pills */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
+          {/* Top Right: Buttons (Language, Audio, Account Profile) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
+            {/* 1. Language Buttons */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold shadow-inner">
               <button
                 type="button"
                 onClick={() => switchLang('te')}
@@ -107,11 +108,24 @@ export default function Home() {
               </button>
             </div>
 
+            {/* 2. Audio Voice Control */}
             <GlobalAudioBar onOpenSettings={() => setShowVoiceModal(true)} />
+
+            {/* 3. Account Profile Button (Top Right) */}
+            <Link
+              to="/auth"
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-500 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+              title="Account Profile / Login"
+            >
+              <span>👤</span>
+              <span className="truncate max-w-[140px] sm:max-w-[200px]">
+                {user ? `${user.name} (${user.role === 'officer' ? 'Officer' : 'Borrower'})` : (lang === 'en' ? 'Sign In / Demo' : lang === 'hi' ? 'साइन इन / डेमो' : 'సైన్ ఇన్ / డెమో')}
+              </span>
+            </Link>
           </div>
         </div>
 
-        {/* Hero Section: Centered, clean, prominent typography */}
+        {/* Hero Section */}
         <div className="my-8 text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-bold text-emerald-800 mb-5 shadow-sm">
             <span>🏛️ RBI Key Fact Statement (KFS) Audit Verified</span>
@@ -135,7 +149,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Loan Categories Grid: 3 columns with legible fonts */}
+        {/* Loan Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 my-6">
           <Link
             to="/scan/microfinance-group-loan"
@@ -186,7 +200,7 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Action CTAs: High legibility */}
+        {/* Action CTAs */}
         <div className="mt-4 flex flex-col sm:flex-row gap-3">
           <Link
             to="/choose-loan"
