@@ -114,13 +114,25 @@ export default function Explain() {
           <div className="mt-5 flex gap-2">
             <button
               onClick={toggleAudio}
-              className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold shadow-sm transition active:scale-95 ${
+              className={`flex-1 flex items-center justify-center gap-2.5 rounded-2xl py-3.5 text-sm font-bold shadow-md transition-all active:scale-[0.98] ${
                 speaking
                   ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-emerald-600 text-white hover:bg-emerald-700'
               }`}
             >
-              <span>{speaking ? '⏹️ ఆడియో ఆపు (Stop Audio)' : '🔊 వినండి (Listen in Pure Telugu)'}</span>
+              {speaking ? (
+                <>
+                  <div className="flex items-center gap-0.5 text-white h-3">
+                    <span className="sound-bar h-2"></span>
+                    <span className="sound-bar h-3"></span>
+                    <span className="sound-bar h-1"></span>
+                    <span className="sound-bar h-2.5"></span>
+                  </div>
+                  <span>⏹️ ఆడియో ఆపు (Stop Audio)</span>
+                </>
+              ) : (
+                <span>🔊 వినండి (Listen in Pure Telugu)</span>
+              )}
             </button>
           </div>
         </div>

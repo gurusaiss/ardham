@@ -172,14 +172,25 @@ export default function Quiz() {
               </span>
               <button
                 onClick={toggleAudio}
-                className={`shrink-0 rounded-xl px-3 py-2 text-xs font-bold transition active:scale-95 ${
+                className={`shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition active:scale-95 ${
                   speaking
-                    ? 'bg-red-600 text-white shadow animate-pulse'
+                    ? 'bg-red-600 text-white shadow'
                     : 'bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100'
                 }`}
                 title="వినండి లేదా ఆపండి"
               >
-                {speaking ? '⏹️ ఆడియో ఆపు' : '🔊 వినండి'}
+                {speaking ? (
+                  <>
+                    <div className="flex items-center gap-0.5 text-white h-2.5">
+                      <span className="sound-bar h-1.5"></span>
+                      <span className="sound-bar h-2.5"></span>
+                      <span className="sound-bar h-1"></span>
+                    </div>
+                    <span>⏹️ ఆపు</span>
+                  </>
+                ) : (
+                  <span>🔊 వినండి</span>
+                )}
               </button>
             </div>
             <div className="mt-2 text-sm text-slate-500 font-medium">
