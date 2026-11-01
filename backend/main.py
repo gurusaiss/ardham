@@ -16,7 +16,7 @@ import storage
 from certificate import build_certificate, render_html
 from extract import extract_terms
 from explain import generate_explanation
-from guard import check_consistency
+from guard import check_consistency, compute_fairness_analysis
 from model_client import ModelUnavailableError, get_client
 from quiz import generate_questions, grade_answer
 from schemas import GradeResult, LoanField, LoanTerms, Question
@@ -157,10 +157,12 @@ async def extract(
     storage.save_terms(session_id, terms)
 
     warnings = check_consistency(terms)
+    fairness = compute_fairness_analysis(terms)
     return {
         "session_id": session_id,
         "terms": {k: v.model_dump() for k, v in terms.items()},
         "consistency_warnings": warnings,
+        "fairness_analysis": fairness,
         "latency": {"extract_s": latency_s},
     }
 
@@ -169,6 +171,14 @@ async def extract(
 async def get_terms(session_id: str) -> dict:
     session = _get_session_or_404(session_id)
     return {"terms": session["terms"], "loan_type": session["loan_type"]}
+
+
+@app.get("/sessions/{session_id}/analysis")
+async def get_analysis(session_id: str) -> dict:
+    session = _get_session_or_404(session_id)
+    raw_terms = session.get("terms", {})
+    terms: LoanTerms = {k: LoanField(**v) for k, v in raw_terms.items()}
+    return compute_fairness_analysis(terms)
 
 
 @app.post("/sessions/{session_id}/confirm")

@@ -118,10 +118,39 @@ export async function setBackend(backend: 'local' | 'aistudio' | 'groq'): Promis
 
 // --- Session flow ------------------------------------------------------------------
 
+export interface FairnessAnalysis {
+  sanctioned_amount: number
+  upfront_deductions: number
+  net_in_hand: number
+  total_payable: number
+  total_extra_cost: number
+  stated_interest_rate: number
+  effective_apr: number
+  apr_gap: number
+  tenure_months: number
+  fairness_score: number
+  fairness_label: string
+  fairness_label_te: string
+  moneylender_comparison: {
+    shark_apr: number
+    shark_cost: number
+    borrower_savings: number
+    savings_te: string
+    savings_en: string
+  }
+  warnings_en: string[]
+  warnings_te: string[]
+}
+
 export async function extractTerms(
   loanType: string,
   imageOrImages: File | File[]
-): Promise<{ session_id: string; terms: LoanTerms; consistency_warnings: string[] }> {
+): Promise<{
+  session_id: string
+  terms: LoanTerms
+  consistency_warnings: string[]
+  fairness_analysis?: FairnessAnalysis
+}> {
   const form = new FormData()
   form.append('loan_type', loanType)
   if (Array.isArray(imageOrImages)) {
@@ -138,6 +167,7 @@ export async function extractTerms(
     session_id: string
     terms: LoanTerms
     consistency_warnings: string[]
+    fairness_analysis?: FairnessAnalysis
     latency: { extract_s: number }
   }>(res)
   recordLatency('extract', data.latency?.extract_s)
@@ -146,6 +176,11 @@ export async function extractTerms(
 
 export async function getTerms(sessionId: string): Promise<{ terms: LoanTerms; loan_type: string }> {
   const res = await fetch(`${API_BASE}/sessions/${sessionId}/terms`)
+  return asJson(res)
+}
+
+export async function getAnalysis(sessionId: string): Promise<FairnessAnalysis> {
+  const res = await fetch(`${API_BASE}/sessions/${sessionId}/analysis`)
   return asJson(res)
 }
 

@@ -167,3 +167,131 @@ def filter_explanation(
         else:
             dropped.append((s, reason or "rejected"))
     return kept, dropped
+
+
+def compute_fairness_analysis(terms: LoanTerms) -> dict:
+    """
+    Ardham's Fair Lending & Predatory Trap Analyzer:
+    - Calculates real in-hand cash vs sanctioned loan
+    - Computes Real Effective APR vs Bank's Stated Interest Rate
+    - Evaluates Fair Lending Index (0-100)
+    - Compares cost against local informal moneylenders (వడ్డీ వ్యాపారి)
+    - Emits plain-language warnings in both English & Pure Telugu.
+    """
+    def val(fid: str) -> float | None:
+        f = terms.get(fid)
+        return float(f.value) if f and isinstance(f.value, (int, float)) else None
+
+    sanctioned = val("loan_amount") or 0.0
+    fee = val("processing_fee") or 0.0
+    insurance = val("insurance_premium") or 0.0
+    upfront_deducted = fee + insurance
+    net_in_hand = max(0.0, sanctioned - upfront_deducted)
+
+    stated_rate = val("interest_rate") or 0.0
+    instalment = val("instalment_amount")
+    count = val("num_instalments")
+    total_payable = val("total_payable")
+
+    if total_payable is None and instalment is not None and count is not None:
+        total_payable = instalment * count
+    elif total_payable is None:
+        total_payable = sanctioned
+
+    total_extra_cost = max(0.0, total_payable - net_in_hand)
+
+    # Estimate loan duration in months
+    tenure_months = 12.0
+    if count is not None and count > 0:
+        if count > 20:  # Weekly installments (e.g. 50 weeks)
+            tenure_months = max(3.0, round(count / 4.33, 1))
+        else:  # Monthly installments
+            tenure_months = float(count)
+
+    # Compute Real Effective APR
+    effective_apr = 0.0
+    if net_in_hand > 0:
+        effective_apr = round(((total_extra_cost / net_in_hand) / (tenure_months / 12.0)) * 100, 1)
+
+    # Compute Fair Lending Score (0 to 100)
+    score = 100
+    warnings_en: list[str] = []
+    warnings_te: list[str] = []
+
+    # 1. Upfront deduction shock
+    if sanctioned > 0 and upfront_deducted > 0:
+        deduction_ratio = upfront_deducted / sanctioned
+        if deduction_ratio > 0.08:
+            score -= 20
+            warnings_en.append(
+                f"High Upfront Deductions: ₹{upfront_deducted:g} ({deduction_ratio*100:.1f}%) deducted before disbursal. Borrower receives only ₹{net_in_hand:g} in hand."
+            )
+            warnings_te.append(
+                f"చేతికి తక్కువ నగదు: ప్రాసెసింగ్ & బీమా కొరకు ₹{upfront_deducted:g} ముందే కట్ చేసుకుంటారు. మీకు చేతికి ₹{net_in_hand:g} మాత్రమే అందుతుంది."
+            )
+        elif deduction_ratio > 0.03:
+            score -= 8
+            warnings_en.append(
+                f"Upfront Fees: ₹{upfront_deducted:g} deducted upfront for processing & insurance."
+            )
+            warnings_te.append(
+                f"ఫీజుల మినహాయింపు: ప్రాసెసింగ్ మరియు బీమా కొరకు ₹{upfront_deducted:g} ముందుగానే మినహాయిస్తారు."
+            )
+
+    # 2. Hidden APR Gap
+    apr_gap = effective_apr - stated_rate
+    if stated_rate > 0 and apr_gap > 3.0:
+        score -= 15
+        warnings_en.append(
+            f"Hidden APR Discrepancy: Advertised nominal rate is {stated_rate:g}%, but Real Effective APR is {effective_apr:g}% (+{apr_gap:.1f}% higher due to upfront deductions & compounding)."
+        )
+        warnings_te.append(
+            f"దాచిన వడ్డీ అంతరం: బ్యాంక్ చెప్పిన నామమాత్రపు వడ్డీ {stated_rate:g}%, కానీ ఫీజులన్నీ కలిపితే మీరు చెల్లించే అసలు వార్షిక వడ్డీ {effective_apr:g}%!"
+        )
+
+    # 3. Gold auction / severe penalty check
+    penalty_field = terms.get("penalty")
+    penalty_text = str(penalty_field.value if penalty_field else "").lower()
+    if any(w in penalty_text for w in ["auction", "gold", "బంగారం", "అమ్మేస్తారు", "వేలం"]):
+        score -= 10
+        warnings_en.append(
+            "Gold Auction Risk: Missed payments allow the lender to publicly auction your pledged gold."
+        )
+        warnings_te.append(
+            "బంగారం వేలం ప్రమాదం: వాయిదాలు సకాలంలో కట్టకపోతే తాకట్టు పెట్టిన బంగారాన్ని బ్యాంక్ వేలం వేస్తుంది."
+        )
+
+    score = max(40, min(98, score))
+
+    # Informal Moneylender (వడ్డీ వ్యాపారి) comparison: 36% simple interest
+    shark_interest = round(sanctioned * 0.36 * (tenure_months / 12.0))
+    savings_vs_shark = max(0.0, shark_interest - total_extra_cost)
+
+    return {
+        "sanctioned_amount": sanctioned,
+        "upfront_deductions": upfront_deducted,
+        "net_in_hand": net_in_hand,
+        "total_payable": total_payable,
+        "total_extra_cost": total_extra_cost,
+        "stated_interest_rate": stated_rate,
+        "effective_apr": effective_apr,
+        "apr_gap": round(apr_gap, 1) if stated_rate > 0 else 0.0,
+        "tenure_months": tenure_months,
+        "fairness_score": score,
+        "fairness_label": (
+            "Fair & Transparent" if score >= 80 else "Moderate Risk" if score >= 65 else "High Predatory Risk"
+        ),
+        "fairness_label_te": (
+            "న్యాయమైన రుణం" if score >= 80 else "మధ్యస్థ రుసుములు" if score >= 65 else "అధిక చార్జీల హెచ్చరిక"
+        ),
+        "moneylender_comparison": {
+            "shark_apr": 36.0,
+            "shark_cost": shark_interest,
+            "borrower_savings": round(savings_vs_shark),
+            "savings_te": f"ప్రైవేట్ వడ్డీ వ్యాపారి (నెలకు ₹3 వడ్డీ) కంటే మీరు ₹{round(savings_vs_shark):,} ఆదా చేస్తున్నారు.",
+            "savings_en": f"You save ₹{round(savings_vs_shark):,} compared to an informal private moneylender (36% APR).",
+        },
+        "warnings_en": warnings_en,
+        "warnings_te": warnings_te,
+    }
+

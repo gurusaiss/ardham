@@ -2,7 +2,7 @@
 unreferenced claims get dropped. These are the three behaviors the build doc
 calls out explicitly as the quality bar for guard.py.
 """
-from guard import check_consistency, filter_explanation, validate_sentence
+from guard import check_consistency, compute_fairness_analysis, filter_explanation, validate_sentence
 from schemas import ExplanationSentence, LoanField
 
 SAMPLE_TERMS = {
@@ -84,3 +84,13 @@ def test_high_fee_ratio_is_flagged():
     bad_terms["insurance_premium"] = LoanField(value=1500, source_text="Insurance Premium: Rs. 1,500", confidence=0.9)
     warnings = check_consistency(bad_terms)
     assert any("over 15%" in w for w in warnings)
+
+
+def test_compute_fairness_analysis():
+    fairness = compute_fairness_analysis(SAMPLE_TERMS)
+    assert fairness["sanctioned_amount"] == 30000
+    assert fairness["upfront_deductions"] == 450
+    assert fairness["net_in_hand"] == 29550
+    assert fairness["fairness_score"] >= 75
+    assert fairness["moneylender_comparison"]["borrower_savings"] > 0
+    assert len(fairness["warnings_te"]) >= 0

@@ -39,8 +39,10 @@ export default function Scan() {
       speakTelugu(`${filesToProcess.length} పేజీల లోన్ డాక్యుమెంట్‌ను చదువుతున్నాం... వివరాలు సేకరిస్తున్నాం.`)
     }
     try {
-      const { session_id, terms, consistency_warnings } = await extractTerms(loanType, filesToProcess)
-      navigate(`/review/${session_id}`, { state: { terms, consistencyWarnings: consistency_warnings } })
+      const { session_id, terms, consistency_warnings, fairness_analysis } = await extractTerms(loanType, filesToProcess)
+      navigate(`/review/${session_id}`, {
+        state: { terms, consistencyWarnings: consistency_warnings, fairnessAnalysis: fairness_analysis },
+      })
     } catch (e) {
       setError(e)
     } finally {
