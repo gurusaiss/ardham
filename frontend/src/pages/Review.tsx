@@ -274,9 +274,9 @@ export default function Review() {
         </div>
 
         {/* Right Column (5 cols): Extracted Terms & Confirmation */}
-        <div className="lg:col-span-5 flex flex-col gap-4">
-          <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-md flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="lg:col-span-5 flex flex-col gap-3 sm:gap-4">
+          <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-md flex flex-col gap-3 sm:gap-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 sm:pb-3">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 {lang === 'en' ? 'Extracted Loan Terms' : lang === 'hi' ? 'प्राप्त ऋण शर्तें' : 'సేకరించిన వివరాలు'}
               </span>
@@ -286,15 +286,15 @@ export default function Review() {
             </div>
 
             {lowConfidence.length > 0 && (
-              <div className="rounded-2xl bg-amber-50 p-3 text-xs font-semibold text-amber-800 border border-amber-200">
+              <div className="rounded-xl sm:rounded-2xl bg-amber-50 p-2.5 sm:p-3 text-xs font-semibold text-amber-800 border border-amber-200">
                 ⚠️ {lowConfidence.length} field(s) have lower confidence — please verify against the card.
               </div>
             )}
 
             {/* Extracted Fields Table */}
-            <ul className="flex flex-col gap-2.5 max-h-[480px] overflow-y-auto pr-1">
+            <ul className="flex flex-col gap-2 max-h-[380px] sm:max-h-[480px] overflow-y-auto pr-1">
               {Object.entries(terms).map(([fieldId, field]) => (
-                <li key={fieldId} className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 shadow-sm hover:border-emerald-200 transition">
+                <li key={fieldId} className="rounded-xl sm:rounded-2xl border border-slate-100 bg-slate-50/70 p-3 sm:p-4 shadow-sm hover:border-emerald-200 transition">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold capitalize text-slate-600">
                       {fieldId.replace(/_/g, ' ')}
@@ -305,14 +305,14 @@ export default function Review() {
                       </span>
                     )}
                   </div>
-                  <div className="text-lg sm:text-xl font-black text-slate-900 mt-1">{String(field.value)}</div>
-                  <div className="mt-1 text-xs text-slate-500 font-mono truncate">"{field.source_text}"</div>
+                  <div className="text-base sm:text-xl font-black text-slate-900 mt-1">{String(field.value)}</div>
+                  <div className="mt-0.5 text-xs text-slate-500 font-mono truncate">"{field.source_text}"</div>
                 </li>
               ))}
             </ul>
 
             {error ? (
-              <div className="mt-2">
+              <div className="mt-1">
                 <ErrorBanner error={error} onRetry={onConfirm} />
               </div>
             ) : null}
@@ -321,7 +321,7 @@ export default function Review() {
               data-voice-next="true"
               disabled={confirming || Object.keys(terms).length === 0}
               onClick={onConfirm}
-              className="mt-2 w-full rounded-2xl bg-emerald-700 py-4 px-6 text-base font-bold text-white shadow-lg hover:bg-emerald-800 disabled:opacity-50 active:scale-[0.98] transition flex items-center justify-center gap-2"
+              className="mt-1 w-full rounded-xl sm:rounded-2xl bg-emerald-700 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold text-white shadow-lg hover:bg-emerald-800 disabled:opacity-50 active:scale-[0.98] transition flex items-center justify-center gap-2"
             >
               <span>{confirming ? 'Confirming...' : t('confirm_terms_btn', lang)}</span>
             </button>

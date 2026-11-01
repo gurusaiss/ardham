@@ -145,57 +145,57 @@ export default function Explain() {
           </p>
         </div>
       ) : current ? (
-        <div className="flex flex-col gap-6">
-          {/* Main Card with 100% full width and responsive grid on wider displays */}
-          <div className="rounded-3xl border-2 border-emerald-200/80 bg-white p-6 sm:p-8 md:p-10 shadow-md">
+        <div className="flex flex-col gap-4 sm:gap-6">
+          {/* Main Card with 100% full width and responsive mobile spacing */}
+          <div className="rounded-2xl sm:rounded-3xl border-2 border-emerald-200/80 bg-white p-4 sm:p-6 md:p-8 shadow-md">
             {/* Header info */}
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-bold text-emerald-900 border-b border-emerald-100/70 pb-4">
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-emerald-100 text-emerald-900 px-3.5 py-1 text-xs sm:text-sm font-bold">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-bold text-emerald-900 border-b border-emerald-100/70 pb-3">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="rounded-full bg-emerald-100 text-emerald-900 px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold">
                   {t('item_counter', lang)} {index + 1} / {sentences.length}
                 </span>
-                <span className="rounded-full bg-slate-100 text-slate-700 px-3.5 py-1 text-xs font-mono uppercase tracking-wide">
+                <span className="rounded-full bg-slate-100 text-slate-700 px-2.5 sm:px-3.5 py-0.5 sm:py-1 text-[11px] sm:text-xs font-mono uppercase tracking-wide">
                   {current.field_id.replace('_', ' ')}
                 </span>
               </div>
             </div>
 
             {/* Responsive sentence and compact audio button */}
-            <div className="mt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div className="mt-4 sm:mt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-5">
               <div className="flex-1">
-                <div className="text-xs uppercase font-bold tracking-wider text-emerald-800 mb-2">
+                <div className="text-[11px] sm:text-xs uppercase font-bold tracking-wider text-emerald-800 mb-1.5 sm:mb-2">
                   {lang === 'en' ? 'Spoken Explanation' : lang === 'hi' ? 'मौखिक विवरण' : 'స్పష్టమైన వివరణ'}
                 </div>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 leading-relaxed tracking-tight">
+                <p className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 leading-snug sm:leading-relaxed tracking-tight">
                   {activeText}
                 </p>
               </div>
 
               {/* Compact Audio Button */}
-              <div className="shrink-0 self-start md:self-center">
+              <div className="shrink-0 self-stretch sm:self-auto">
                 <button
                   type="button"
                   onClick={toggleAudio}
-                  className={`flex items-center gap-2 rounded-2xl py-3 px-5 text-sm sm:text-base font-bold shadow-md transition-all active:scale-95 ${
+                  className={`w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base font-bold shadow-md transition-all active:scale-95 ${
                     speaking
-                      ? 'bg-rose-600 text-white hover:bg-rose-700 ring-4 ring-rose-200'
-                      : 'bg-emerald-700 text-white hover:bg-emerald-800 ring-4 ring-emerald-100'
+                      ? 'bg-rose-600 text-white hover:bg-rose-700 ring-2 sm:ring-4 ring-rose-200'
+                      : 'bg-emerald-700 text-white hover:bg-emerald-800 ring-2 sm:ring-4 ring-emerald-100'
                   }`}
                   title={speaking ? 'Stop Audio' : 'Listen'}
                 >
                   {speaking ? (
                     <>
                       <div className="flex items-center gap-1 text-white h-4">
-                        <span className="sound-bar h-3"></span>
-                        <span className="sound-bar h-5"></span>
-                        <span className="sound-bar h-2"></span>
+                        <span className="sound-bar h-2.5"></span>
                         <span className="sound-bar h-4"></span>
+                        <span className="sound-bar h-2"></span>
+                        <span className="sound-bar h-3.5"></span>
                       </div>
                       <span>{t('stop_audio', lang)}</span>
                     </>
                   ) : (
                     <>
-                      <span className="text-lg">🔊</span>
+                      <span className="text-base sm:text-lg">🔊</span>
                       <span>{lang === 'en' ? 'Listen' : lang === 'hi' ? 'सुनें' : 'వినండి'}</span>
                     </>
                   )}
@@ -205,35 +205,35 @@ export default function Explain() {
 
             {/* Source card line quote verification */}
             {sourceField && (
-              <div className="mt-6 rounded-2xl border-l-4 border-amber-400 bg-amber-50/80 p-4 sm:p-5">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-bold uppercase tracking-wider text-amber-900">
+              <div className="mt-4 sm:mt-6 rounded-xl sm:rounded-2xl border-l-4 border-amber-400 bg-amber-50/80 p-3 sm:p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-amber-900">
                     📜 {t('source_on_card', lang)}
                   </div>
-                  <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded">
+                  <span className="text-[10px] sm:text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
                     {lang === 'en' ? '100% Genuine Card Value' : lang === 'hi' ? '100% सटीक विवरण' : 'కార్డులో ఉన్న నిజమైన విలువ'}
                   </span>
                 </div>
-                <div className="mt-2 text-base sm:text-lg font-bold text-amber-950 font-mono">
+                <div className="mt-1.5 sm:mt-2 text-sm sm:text-base md:text-lg font-bold text-amber-950 font-mono">
                   "{sourceField.source_text}"
                 </div>
                 <div className="mt-1 text-xs sm:text-sm text-amber-900 font-medium">
                   {lang === 'en' ? 'Verified Raw Fact:' : 'ధృవీకరించబడిన విలువ:'}{' '}
-                  <strong className="text-amber-950 font-mono text-base">{String(sourceField.value)}</strong>
+                  <strong className="text-amber-950 font-mono text-sm sm:text-base">{String(sourceField.value)}</strong>
                 </div>
               </div>
             )}
           </div>
 
           {/* Navigation Buttons: Responsive full width */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
             <button
               disabled={index === 0}
               onClick={() => {
                 stopSpeaking()
                 setIndex((i) => i - 1)
               }}
-              className="flex-1 rounded-2xl border-2 border-slate-200 bg-white py-4 px-6 text-sm sm:text-base font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 active:scale-95 shadow-sm"
+              className="flex-1 rounded-xl sm:rounded-2xl border-2 border-slate-200 bg-white py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 active:scale-95 shadow-sm"
             >
               {t('back_btn', lang)}
             </button>
@@ -244,7 +244,7 @@ export default function Explain() {
                   stopSpeaking()
                   setIndex((i) => i + 1)
                 }}
-                className="flex-1 rounded-2xl bg-slate-900 py-4 px-6 text-sm sm:text-base font-bold text-white shadow-md hover:bg-slate-800 active:scale-95"
+                className="flex-1 rounded-xl sm:rounded-2xl bg-slate-900 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold text-white shadow-md hover:bg-slate-800 active:scale-95"
               >
                 {t('next_btn', lang)}
               </button>
@@ -254,7 +254,7 @@ export default function Explain() {
                   stopSpeaking()
                   sessionId && navigate(`/result/${sessionId}`)
                 }}
-                className="flex-1 rounded-2xl bg-slate-900 py-4 px-6 text-sm sm:text-base font-bold text-white shadow-md hover:bg-slate-800 active:scale-95"
+                className="flex-1 rounded-xl sm:rounded-2xl bg-slate-900 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold text-white shadow-md hover:bg-slate-800 active:scale-95"
               >
                 {t('view_cert_btn', lang)}
               </button>
@@ -264,7 +264,7 @@ export default function Explain() {
                   stopSpeaking()
                   sessionId && navigate(`/quiz/${sessionId}`)
                 }}
-                className="flex-1 rounded-2xl bg-emerald-700 py-4 px-6 text-sm sm:text-base font-bold text-white shadow-lg hover:bg-emerald-800 active:scale-95"
+                className="flex-1 rounded-xl sm:rounded-2xl bg-emerald-700 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold text-white shadow-lg hover:bg-emerald-800 active:scale-95"
               >
                 {t('start_quiz_btn', lang)}
               </button>

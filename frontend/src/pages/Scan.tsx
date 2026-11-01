@@ -309,18 +309,18 @@ export default function Scan() {
         </div>
       )}
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         {selectedFiles.length === 0 ? (
           <button
             disabled={busy}
             onClick={() => inputRef.current?.click()}
-            className="w-full rounded-3xl bg-slate-900 py-8 px-6 text-xl font-bold text-white shadow-lg hover:bg-slate-800 disabled:opacity-50 active:scale-[0.98] transition flex flex-col items-center justify-center gap-2 group"
+            className="w-full rounded-2xl sm:rounded-3xl bg-slate-900 py-5 sm:py-8 px-4 sm:px-6 text-lg sm:text-xl font-bold text-white shadow-lg hover:bg-slate-800 disabled:opacity-50 active:scale-[0.98] transition flex flex-col items-center justify-center gap-1.5 sm:gap-2 group"
           >
-            <span className="text-3xl">📷</span>
-            <span className="text-lg sm:text-xl font-bold">
+            <span className="text-2xl sm:text-3xl">📷</span>
+            <span className="text-base sm:text-xl font-bold">
               {busy ? (lang === 'en' ? 'Verifying with Gemma 4...' : 'ధృవీకరిస్తున్నాం...') : t('take_photo_btn', lang)}
             </span>
-            <span className="text-xs font-normal text-slate-300">
+            <span className="text-[11px] sm:text-xs font-normal text-slate-300 text-center">
               {lang === 'en'
                 ? 'Select 1 or multiple pages (PNG, JPG, WEBP, PDF up to 15 pages)'
                 : lang === 'hi'
@@ -329,28 +329,28 @@ export default function Scan() {
             </span>
           </button>
         ) : (
-          <div className="rounded-3xl border-2 border-emerald-500 bg-emerald-50/40 p-6 shadow-sm">
+          <div className="rounded-2xl sm:rounded-3xl border-2 border-emerald-500 bg-emerald-50/40 p-4 sm:p-6 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-base font-bold text-slate-900">
+              <span className="text-sm sm:text-base font-bold text-slate-900">
                 📄 {selectedFiles.length} {t('pages_selected', lang)}
               </span>
               <button
                 type="button"
                 onClick={() => addMoreRef.current?.click()}
-                className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow hover:bg-emerald-700 active:scale-95 transition"
+                className="rounded-xl bg-emerald-600 px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-bold text-white shadow hover:bg-emerald-700 active:scale-95 transition"
               >
                 {t('add_another_page', lang)}
               </button>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2.5">
+            <div className="mt-3 sm:mt-4 flex flex-wrap gap-2 sm:gap-2.5">
               {selectedFiles.map((file, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm"
+                  className="flex items-center gap-1.5 sm:gap-2 rounded-xl border border-slate-200 bg-white px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-slate-700 shadow-sm"
                 >
                   <span className="font-bold text-emerald-800">Page {i + 1}</span>
-                  <span className="text-slate-400 text-xs truncate max-w-[120px]">{file.name}</span>
+                  <span className="text-slate-400 text-xs truncate max-w-[100px] sm:max-w-[120px]">{file.name}</span>
                   <span className="text-slate-400 text-[10px]">
                     ({(file.size / 1024).toFixed(0)} KB)
                   </span>
@@ -370,7 +370,7 @@ export default function Scan() {
               data-voice-next="true"
               disabled={busy}
               onClick={() => processFiles(selectedFiles)}
-              className="mt-6 w-full rounded-2xl bg-slate-900 py-4 text-base font-bold text-white shadow-md hover:bg-slate-800 disabled:opacity-50 active:scale-[0.98] transition"
+              className="mt-4 sm:mt-6 w-full rounded-xl sm:rounded-2xl bg-slate-900 py-3 sm:py-4 text-sm sm:text-base font-bold text-white shadow-md hover:bg-slate-800 disabled:opacity-50 active:scale-[0.98] transition"
             >
               {busy ? (lang === 'en' ? 'Verifying all pages with Gemma 4...' : 'వివరాలు ధృవీకరిస్తున్నాం...') : t('analyze_all_btn', lang)}
             </button>
@@ -381,15 +381,15 @@ export default function Scan() {
           data-voice-next="true"
           disabled={busy}
           onClick={useSampleCard}
-          className="w-full rounded-2xl border-2 border-emerald-600 bg-emerald-50 py-4 px-6 text-base font-bold text-emerald-900 shadow-sm hover:bg-emerald-100 disabled:opacity-50 active:scale-[0.98] transition"
+          className="w-full rounded-xl sm:rounded-2xl border-2 border-emerald-600 bg-emerald-50 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold text-emerald-900 shadow-sm hover:bg-emerald-100 disabled:opacity-50 active:scale-[0.98] transition"
         >
           {busy ? (lang === 'en' ? 'Processing sample...' : 'ప్రాసెస్ చేస్తున్నాం...') : t('use_sample_btn', lang)}
         </button>
       </div>
 
       {/* Official Guidelines & Multi-page Explainer */}
-      <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 text-xs sm:text-sm text-slate-600 space-y-2.5">
-        <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
+      <div className="mt-4 sm:mt-6 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-3.5 sm:p-5 text-xs sm:text-sm text-slate-600 space-y-2">
+        <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs sm:text-sm">
           <span>🏛️ {lang === 'en' ? 'Official Loan Transparency Rules:' : lang === 'hi' ? 'आधिकारिक ऋण नियम:' : 'అధికారిక రుణ పారదర్శక నిబంధనలు:'}</span>
         </div>
         <p className="leading-relaxed">
@@ -399,7 +399,7 @@ export default function Scan() {
             ? 'आधिकारिक नियम यह अनिवार्य करते हैं कि ऋणदाता हस्ताक्षर से पहले सभी अग्रिम शुल्क, वास्तविक लागत और हाथ में मिलने वाली राशि स्पष्ट करें।'
             : 'బ్యాంకులు లేదా సంస్థలు రుణం ఇచ్చే ముందు అసలు అప్పు, అన్ని ముందస్తు ఛార్జీలు మరియు చేతికి వచ్చే నికర నగదును స్పష్టంగా తెలపాలి.'}
         </p>
-        <p className="leading-relaxed text-slate-500 text-xs">
+        <p className="leading-relaxed text-slate-500 text-[11px] sm:text-xs">
           {lang === 'en'
             ? '• If you have a summary sheet or passbook card, scanning just that 1 page is enough! • If you received a full multi-page agreement, snap all pages. Ardham scans across every page to find any hidden fees.'
             : lang === 'hi'

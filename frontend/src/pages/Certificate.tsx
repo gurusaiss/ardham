@@ -138,28 +138,28 @@ export default function Certificate() {
               </div>
 
               {/* Verification Metadata */}
-              <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
-                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Product / Category</span>
-                  <p className="font-bold text-slate-900 mt-1 capitalize text-sm sm:text-base">{cert.loan_type.replace(/-/g, ' ')}</p>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
+                <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-2.5 sm:p-4 border border-slate-100">
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Product / Category</span>
+                  <p className="font-bold text-slate-900 mt-0.5 sm:mt-1 capitalize text-xs sm:text-base truncate">{cert.loan_type.replace(/-/g, ' ')}</p>
                 </div>
 
-                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Verified Officer</span>
-                  <p className="font-bold text-slate-900 mt-1 truncate text-sm sm:text-base">
+                <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-2.5 sm:p-4 border border-slate-100">
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Verified Officer</span>
+                  <p className="font-bold text-slate-900 mt-0.5 sm:mt-1 truncate text-xs sm:text-base">
                     {user?.role === 'officer' ? user.name : 'Ramesh Kumar (MFI Officer)'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex justify-between text-xs sm:text-sm text-slate-600 px-1 border-b border-slate-100 pb-3">
+              <div className="flex justify-between text-xs sm:text-sm text-slate-600 px-1 border-b border-slate-100 pb-2.5 sm:pb-3">
                 <span className="font-medium">Verification Timestamp:</span>
                 <span className="font-bold text-slate-800">{new Date(cert.created_at).toLocaleString('en-IN')}</span>
               </div>
 
               {/* Elderly & Benami Proxy Coercion Shield Box */}
-              <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 space-y-1.5 text-blue-950">
-                <div className="flex items-center gap-2 font-bold text-blue-900 text-sm">
+              <div className="rounded-xl sm:rounded-2xl border border-blue-200 bg-blue-50/70 p-3 sm:p-4 space-y-1 sm:space-y-1.5 text-blue-950">
+                <div className="flex items-center gap-1.5 sm:gap-2 font-bold text-blue-900 text-xs sm:text-sm">
                   <span>🛡️ Elderly & Benami Proxy Protection:</span>
                 </div>
                 <p className="leading-relaxed text-xs sm:text-sm text-blue-900">
@@ -172,40 +172,40 @@ export default function Certificate() {
               </div>
 
               {/* Key Loan Metrics Table */}
-              <div className="space-y-2">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <div className="space-y-1.5 sm:space-y-2">
+                <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">
                   {lang === 'en' ? 'Key Loan Details' : lang === 'hi' ? 'मुख्य ऋण विवरण' : 'ముఖ్యమైన రుణ వివరాలు'}
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                  <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                    <span className="text-xs text-slate-500 font-bold uppercase">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 text-center">
+                  <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-2 sm:p-3.5 border border-slate-100">
+                    <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase truncate block">
                       {lang === 'en' ? 'Loan Amount' : 'అసలు అప్పు'}
                     </span>
-                    <p className="text-lg font-black text-slate-900 mt-0.5">
+                    <p className="text-sm sm:text-lg font-black text-slate-900 mt-0.5">
                       ₹{String(cert.terms.loan_amount?.value || '—')}
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                    <span className="text-xs text-slate-500 font-bold uppercase">
+                  <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-2 sm:p-3.5 border border-slate-100">
+                    <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase truncate block">
                       {lang === 'en' ? 'Instalment' : 'వాయిదా'}
                     </span>
-                    <p className="text-lg font-black text-slate-900 mt-0.5">
+                    <p className="text-sm sm:text-lg font-black text-slate-900 mt-0.5">
                       ₹{String(cert.terms.instalment_amount?.value || '—')}
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                    <span className="text-xs text-slate-500 font-bold uppercase">
+                  <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-2 sm:p-3.5 border border-slate-100">
+                    <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase truncate block">
                       {lang === 'en' ? 'Interest Rate' : 'వడ్డీ రేటు'}
                     </span>
-                    <p className="text-lg font-black text-slate-900 mt-0.5">
+                    <p className="text-sm sm:text-lg font-black text-slate-900 mt-0.5">
                       {String(cert.terms.interest_rate?.value || '—')}%
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                    <span className="text-xs text-slate-500 font-bold uppercase">
+                  <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-2 sm:p-3.5 border border-slate-100">
+                    <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase truncate block">
                       {lang === 'en' ? 'Total Payable' : 'మొత్తం చెల్లింపు'}
                     </span>
-                    <p className="text-lg font-black text-slate-900 mt-0.5">
+                    <p className="text-sm sm:text-lg font-black text-slate-900 mt-0.5">
                       ₹{String(cert.terms.total_payable?.value || '—')}
                     </p>
                   </div>
@@ -213,18 +213,18 @@ export default function Certificate() {
               </div>
 
               {/* Live Dynamic QR Code & Tamper-Proof Cryptographic Hash */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 rounded-2xl bg-slate-50 p-4 border border-slate-200">
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 rounded-xl sm:rounded-2xl bg-slate-50 p-3 sm:p-4 border border-slate-200">
                 <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-sm shrink-0">
-                  <QRCodeSvg value={verifyUrl} size={92} />
+                  <QRCodeSvg value={verifyUrl} size={84} />
                 </div>
                 <div className="space-y-1 text-center sm:text-left">
                   <p className="text-xs sm:text-sm font-bold text-slate-800">
                     🔒 {lang === 'en' ? 'Official Digital Verification Seal' : lang === 'hi' ? 'आधिकारिक डिजिटल सत्यापन सील' : 'అధికారిక డిజిటల్ సీల్'}
                   </p>
-                  <p className="font-mono text-xs text-slate-600 break-all select-all">
+                  <p className="font-mono text-[10px] sm:text-xs text-slate-600 break-all select-all">
                     {cert.sha256}
                   </p>
-                  <p className="text-xs text-emerald-800 font-semibold">
+                  <p className="text-[11px] sm:text-xs text-emerald-800 font-semibold">
                     ✓ {lang === 'en' ? 'Securely verified and saved on your device' : lang === 'hi' ? 'सुरक्षित रूप से सत्यापित और आपके डिवाइस पर सहेजा गया' : 'మీ మొబైల్‌లో సురక్షితంగా ధృవీకరించబడి సేవ్ చేయబడింది'}
                   </p>
                 </div>
@@ -233,10 +233,10 @@ export default function Certificate() {
           </div>
 
           {/* Right Column: Actions, Audio Audit Clips & Navigation */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
+          <div className="lg:col-span-5 flex flex-col gap-3 sm:gap-4">
             {/* Action Buttons Box */}
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-md space-y-3">
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-md space-y-2.5 sm:space-y-3">
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-2">
                 Certificate Distribution & Archival
               </div>
 
@@ -244,7 +244,7 @@ export default function Certificate() {
               <button
                 type="button"
                 onClick={handleWhatsAppShare}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-4 px-5 text-base font-bold text-white shadow-md hover:bg-emerald-700 active:scale-95 transition"
+                className="w-full flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-emerald-600 py-3 sm:py-4 px-4 sm:px-5 text-sm sm:text-base font-bold text-white shadow-md hover:bg-emerald-700 active:scale-95 transition"
               >
                 <span>📲 {t('share_whatsapp_btn', lang)}</span>
               </button>
@@ -253,7 +253,7 @@ export default function Certificate() {
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="rounded-xl border border-slate-200 bg-slate-50 py-3 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 active:scale-95 transition"
+                  className="rounded-xl border border-slate-200 bg-slate-50 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 active:scale-95 transition"
                 >
                   {t('print_pdf_btn', lang)}
                 </button>
@@ -261,7 +261,7 @@ export default function Certificate() {
                   href={getCertificateHtmlUrl(cert.session_id)}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-xl border border-slate-200 bg-slate-50 py-3 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 text-center active:scale-95 transition"
+                  className="rounded-xl border border-slate-200 bg-slate-50 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 text-center active:scale-95 transition"
                 >
                   {t('printable_html_btn', lang)}
                 </a>

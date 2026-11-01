@@ -77,23 +77,23 @@ export default function ChooseLoanType() {
           : 'స్కాన్ చేయడానికి లోన్ కార్డు రకాన్ని ఎంచుకోండి:'}
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-5">
         {LOAN_TYPES.map((loan) => (
           <button
             key={loan.id}
             onClick={() => navigate(`/scan/${loan.id}`)}
-            className={`rounded-3xl border-2 ${loan.color} p-6 text-left shadow-sm hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition duration-200 flex flex-col justify-between`}
+            className={`rounded-2xl sm:rounded-3xl border-2 ${loan.color} p-4 sm:p-6 text-left shadow-sm hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition duration-200 flex flex-col justify-between`}
           >
             <div>
-              <div className="text-3xl mb-3">{loan.icon}</div>
-              <div className="text-lg font-black text-slate-900">
+              <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">{loan.icon}</div>
+              <div className="text-base sm:text-lg font-black text-slate-900">
                 {lang === 'en' ? loan.en : lang === 'hi' ? loan.hi : loan.te}
               </div>
-              <div className="text-xs text-slate-600 mt-2 leading-relaxed">
+              <div className="text-xs text-slate-600 mt-1.5 sm:mt-2 leading-relaxed">
                 {lang === 'en' ? loan.desc_en : lang === 'hi' ? loan.desc_hi : loan.desc_te}
               </div>
             </div>
-            <div className="mt-6 flex items-center justify-between text-xs font-bold text-emerald-800 pt-3 border-t border-emerald-200/60">
+            <div className="mt-4 sm:mt-6 flex items-center justify-between text-xs font-bold text-emerald-800 pt-2.5 sm:pt-3 border-t border-emerald-200/60">
               <span>{t('step_scan', lang)} →</span>
               <span>⚡ {lang === 'en' ? 'Start' : lang === 'hi' ? 'शुरू करें' : 'ప్రారంభించండి'}</span>
             </div>

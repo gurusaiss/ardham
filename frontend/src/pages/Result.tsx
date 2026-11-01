@@ -127,15 +127,15 @@ export default function Result() {
       }}
       maxWidthClass="max-w-4xl"
     >
-      <div className="flex flex-col gap-6">
-        <div className="rounded-3xl border-2 border-emerald-200/80 bg-white p-8 text-center shadow-sm">
-          <div className={`text-6xl font-black ${score >= 70 ? 'text-emerald-700' : 'text-amber-600'}`}>
+      <div className="flex flex-col gap-4 sm:gap-6">
+        <div className="rounded-2xl sm:rounded-3xl border-2 border-emerald-200/80 bg-white p-5 sm:p-8 text-center shadow-sm">
+          <div className={`text-5xl sm:text-6xl font-black ${score >= 70 ? 'text-emerald-700' : 'text-amber-600'}`}>
             {score}%
           </div>
-          <div className="mt-2 text-base font-bold text-slate-800">
+          <div className="mt-1.5 sm:mt-2 text-sm sm:text-base font-bold text-slate-800">
             {t('score_label', lang)}
           </div>
-          <p className="mt-2 text-sm text-slate-500 max-w-md mx-auto">
+          <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
             {wrong.length === 0
               ? (lang === 'en'
                   ? '✓ Borrower demonstrated clear oral understanding of all key financial commitments.'
@@ -147,8 +147,8 @@ export default function Result() {
         </div>
 
         {wrong.length > 0 && (
-          <div className="rounded-3xl border border-amber-300 bg-amber-50/80 p-6 shadow-sm">
-            <p className="text-base font-bold text-amber-900 flex items-center gap-2">
+          <div className="rounded-2xl sm:rounded-3xl border border-amber-300 bg-amber-50/80 p-4 sm:p-6 shadow-sm">
+            <p className="text-sm sm:text-base font-bold text-amber-900 flex items-center gap-1.5 sm:gap-2">
               <span>⚠️</span>
               <span>
                 {lang === 'en'
@@ -156,7 +156,7 @@ export default function Result() {
                   : `${wrong.length} సమాధానాలలో స్పష్టత లోపించింది:`}
               </span>
             </p>
-            <ul className="mt-3 list-inside list-disc text-sm text-amber-800 font-medium space-y-1">
+            <ul className="mt-2.5 sm:mt-3 list-inside list-disc text-xs sm:text-sm text-amber-800 font-medium space-y-1">
               {wrong.map((r) => (
                 <li key={r.field_id} className="capitalize">
                   {r.field_id.replace(/_/g, ' ')}
@@ -169,7 +169,7 @@ export default function Result() {
                 sessionId &&
                   navigate(`/explain/${sessionId}?only=${wrong.map((r) => r.field_id).join(',')}`)
               }}
-              className="mt-4 w-full rounded-2xl bg-amber-600 py-3.5 px-6 text-sm font-bold text-white shadow-md hover:bg-amber-700 active:scale-95 transition"
+              className="mt-3 sm:mt-4 w-full rounded-xl sm:rounded-2xl bg-amber-600 py-3 sm:py-3.5 px-4 sm:px-6 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-amber-700 active:scale-95 transition"
             >
               {t('re_explain_btn', lang)}
             </button>
@@ -182,7 +182,7 @@ export default function Result() {
             stopSpeaking()
             sessionId && navigate(`/certificate/${sessionId}`)
           }}
-          className="w-full rounded-2xl bg-slate-900 py-4 px-6 text-base font-bold text-white shadow-lg hover:bg-slate-800 active:scale-[0.98] transition"
+          className="w-full rounded-xl sm:rounded-2xl bg-slate-900 py-3.5 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold text-white shadow-lg hover:bg-slate-800 active:scale-[0.98] transition"
         >
           {t('view_cert_btn', lang)}
         </button>

@@ -160,22 +160,22 @@ export default function Home() {
         </div>
 
         {/* Hero Section */}
-        <div className="my-6 text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-bold text-emerald-800 mb-4 shadow-sm">
-            <span>🏛️ {lang === 'en' ? 'Official Bank Rules Verified' : lang === 'hi' ? 'आधिकारिक बैंक नियम सत्यापित' : 'అధికారిక బ్యాంక్ నిబంధనల రసీదు'}</span>
+        <div className="my-4 sm:my-6 text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-emerald-800 mb-3 sm:mb-4 shadow-sm">
+            <span>🏛️ {lang === 'en' ? 'Official Bank Rules' : lang === 'hi' ? 'बैंक नियम' : 'బ్యాంక్ నిబంధనల రసీదు'}</span>
             <span>•</span>
-            <span>{lang === 'en' ? '100% Genuine Card Details' : lang === 'hi' ? '100% सटीक दस्तावेज़ विवरण' : 'కార్డులో ఉన్న నిజమైన వివరాలు'}</span>
+            <span>{lang === 'en' ? '100% Genuine Card Details' : lang === 'hi' ? '100% सटीक विवरण' : 'నిజమైన వివరాలు'}</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 leading-tight">
+          <h1 className="text-3xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 leading-tight">
             {lang === 'en' ? 'Ardham' : lang === 'hi' ? 'अर्थम' : 'అర్థం'}{' '}
-            {lang !== 'en' && <span className="text-3xl sm:text-5xl font-medium text-emerald-800 font-sans">Ardham</span>}
+            {lang !== 'en' && <span className="text-2xl sm:text-5xl font-medium text-emerald-800 font-sans">Ardham</span>}
           </h1>
 
-          <p className="mt-3 text-lg sm:text-2xl font-bold text-slate-800 leading-snug">
+          <p className="mt-2 sm:mt-3 text-base sm:text-2xl font-bold text-slate-800 leading-snug">
             {t('tagline', lang)}
           </p>
-          <p className="mt-2 text-sm sm:text-base text-slate-500 max-w-2xl mx-auto">
+          <p className="mt-1.5 sm:mt-2 text-xs sm:text-base text-slate-500 max-w-2xl mx-auto">
             {lang === 'en'
               ? 'Ensures rural & visually impaired borrowers understand all loan commitments before signing.'
               : lang === 'hi'
@@ -185,14 +185,14 @@ export default function Home() {
         </div>
 
         {/* Interactive Gemma 4 Multimodal Video Guide Banner */}
-        <div className="my-5 rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div className="space-y-1.5 text-center sm:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
+        <div className="my-4 sm:my-5 rounded-2xl sm:rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white p-4 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-5">
+          <div className="space-y-1 sm:space-y-1.5 text-center sm:text-left">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-emerald-500/20 px-2.5 sm:px-3 py-0.5 text-[11px] sm:text-xs font-bold text-emerald-300 border border-emerald-500/30">
               <span>🎬 {lang === 'en' ? 'AI Guide' : 'AI డెమో'}</span>
               <span>•</span>
               <span>{lang === 'en' ? 'Photo Scan • Voice Readout • Safety Check' : 'ఫోటో స్కాన్ • వాయిస్ రీడౌట్ • భద్రతా తనిఖీ'}</span>
             </div>
-            <h3 className="text-lg sm:text-xl font-extrabold text-white">
+            <h3 className="text-base sm:text-xl font-extrabold text-white">
               {lang === 'en' ? 'Watch How Ardham Operates in 4 Visual Steps' : lang === 'hi' ? 'देखें कि अर्थम 4 चरणों में कैसे कार्य करता है' : 'అర్థం ఎలా పనిచేస్తుందో 4 దశల్లో లైవ్ డెమో చూడండి'}
             </h3>
             <p className="text-xs sm:text-sm text-emerald-100/80 max-w-xl">
@@ -206,25 +206,25 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setShowVideoModal(true)}
-            className="shrink-0 flex items-center gap-2 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black px-5 py-3 text-sm sm:text-base shadow-lg active:scale-95 transition"
+            className="shrink-0 w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base shadow-lg active:scale-95 transition"
           >
-            <span className="text-lg">▶️</span>
+            <span className="text-base sm:text-lg">▶️</span>
             <span>{lang === 'en' ? 'Watch AI Demo Guide' : lang === 'hi' ? 'एआई वीडियो डेमो' : 'AI వీడియో గైడ్'}</span>
           </button>
         </div>
 
         {/* Loan Categories Grid: 100% strictly localized */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 my-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-5 my-4 sm:my-6">
           <Link
             to="/scan/microfinance-group-loan"
-            className="rounded-3xl border-2 border-emerald-500/80 bg-emerald-50/40 p-6 text-left hover:bg-emerald-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
+            className="rounded-2xl sm:rounded-3xl border-2 border-emerald-500/80 bg-emerald-50/40 p-4 sm:p-6 text-left hover:bg-emerald-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
           >
             <div>
-              <span className="text-4xl">👩‍🌾</span>
-              <p className="font-extrabold text-xl text-emerald-950 mt-3">
+              <span className="text-3xl sm:text-4xl">👩‍🌾</span>
+              <p className="font-extrabold text-lg sm:text-xl text-emerald-950 mt-2 sm:mt-3">
                 {lang === 'en' ? 'Self Help Group Loan (SHG)' : lang === 'hi' ? 'स्वयं सहायता समूह ऋण (SHG)' : 'స్వయం సహాయక సంఘాల గ్రూప్ రుణం'}
               </p>
-              <p className="text-sm text-emerald-900 font-semibold leading-relaxed mt-1">
+              <p className="text-xs sm:text-sm text-emerald-900 font-semibold leading-relaxed mt-1">
                 {lang === 'en'
                   ? 'Self Help Group loan • Easy weekly installments • Group support'
                   : lang === 'hi'
@@ -232,21 +232,21 @@ export default function Home() {
                   : 'స్వయం సహాయక సంఘాలు • సులభ వారపు వాయిదాలు • గ్రూప్ మద్దతు'}
               </p>
             </div>
-            <span className="text-sm font-bold text-emerald-800 mt-5 inline-flex items-center gap-1">
+            <span className="text-xs sm:text-sm font-bold text-emerald-800 mt-4 sm:mt-5 inline-flex items-center gap-1">
               {t('quick_demo_card', lang)} →
             </span>
           </Link>
 
           <Link
             to="/scan/gold-loan"
-            className="rounded-3xl border-2 border-amber-300 bg-amber-50/40 p-6 text-left hover:bg-amber-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
+            className="rounded-2xl sm:rounded-3xl border-2 border-amber-300 bg-amber-50/40 p-4 sm:p-6 text-left hover:bg-amber-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
           >
             <div>
-              <span className="text-4xl">💍</span>
-              <p className="font-extrabold text-xl text-amber-950 mt-3">
+              <span className="text-3xl sm:text-4xl">💍</span>
+              <p className="font-extrabold text-lg sm:text-xl text-amber-950 mt-2 sm:mt-3">
                 {lang === 'en' ? 'Gold Loan' : lang === 'hi' ? 'स्वर्ण ऋण (गोल्ड लोन)' : 'బంగారు ఆభరణాల రుణం'}
               </p>
-              <p className="text-sm text-amber-900 font-semibold leading-relaxed mt-1">
+              <p className="text-xs sm:text-sm text-amber-900 font-semibold leading-relaxed mt-1">
                 {lang === 'en'
                   ? 'Gold jewelry collateral • Bullet interest repayment • Auction risk notice'
                   : lang === 'hi'
@@ -254,21 +254,21 @@ export default function Home() {
                   : 'బంగారు ఆభరణాల తాకట్టు • బులెట్ వడ్డీ చెల్లింపు • వేలం హెచ్చరికల ఆడిట్'}
               </p>
             </div>
-            <span className="text-sm font-bold text-amber-900 mt-5 inline-flex items-center gap-1">
+            <span className="text-xs sm:text-sm font-bold text-amber-900 mt-4 sm:mt-5 inline-flex items-center gap-1">
               ⚡ {lang === 'en' ? 'Quick Scan' : lang === 'hi' ? 'त्वरित स्कैन' : 'త్వరిత స్కాన్'} →
             </span>
           </Link>
 
           <Link
             to="/scan/individual-personal-loan"
-            className="rounded-3xl border-2 border-blue-300 bg-blue-50/40 p-6 text-left hover:bg-blue-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
+            className="rounded-2xl sm:rounded-3xl border-2 border-blue-300 bg-blue-50/40 p-4 sm:p-6 text-left hover:bg-blue-100/70 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition shadow-sm flex flex-col justify-between"
           >
             <div>
-              <span className="text-4xl">💼</span>
-              <p className="font-extrabold text-xl text-blue-950 mt-3">
+              <span className="text-3xl sm:text-4xl">💼</span>
+              <p className="font-extrabold text-lg sm:text-xl text-blue-950 mt-2 sm:mt-3">
                 {lang === 'en' ? 'Personal Loan' : lang === 'hi' ? 'व्यक्तिगत ऋण' : 'వ్యక్తిగత వినియోగదారుల రుణం'}
               </p>
-              <p className="text-sm text-blue-900 font-semibold leading-relaxed mt-1">
+              <p className="text-xs sm:text-sm text-blue-900 font-semibold leading-relaxed mt-1">
                 {lang === 'en'
                   ? 'Individual consumer loan • Monthly EMI • Upfront fee audit'
                   : lang === 'hi'
@@ -276,7 +276,7 @@ export default function Home() {
                   : 'వ్యక్తిగత వినియోగదారుల రుణం • నెలవారీ EMI • ముందస్తు ఫీజుల తనిఖీ'}
               </p>
             </div>
-            <span className="text-sm font-bold text-blue-800 mt-5 inline-flex items-center gap-1">
+            <span className="text-xs sm:text-sm font-bold text-blue-800 mt-4 sm:mt-5 inline-flex items-center gap-1">
               ⚡ {lang === 'en' ? 'Quick Scan' : lang === 'hi' ? 'त्वरित स्कैन' : 'త్వరిత స్కాన్'} →
             </span>
           </Link>

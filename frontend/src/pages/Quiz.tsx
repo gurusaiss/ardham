@@ -219,20 +219,20 @@ export default function Quiz() {
       maxWidthClass="max-w-6xl"
     >
       {current ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 items-start">
           {/* Left Column: Question Card & Spoken Audio Control */}
-          <div className="lg:col-span-6 flex flex-col gap-4">
-            <div className="rounded-3xl border-2 border-emerald-200/80 bg-white p-6 sm:p-7 shadow-md">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-100 pb-3 mb-4">
-                <span className="rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 font-bold">
+          <div className="lg:col-span-6 flex flex-col gap-3 sm:gap-4">
+            <div className="rounded-2xl sm:rounded-3xl border-2 border-emerald-200/80 bg-white p-4 sm:p-7 shadow-md">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-100 pb-2.5 sm:pb-3 mb-3 sm:mb-4">
+                <span className="rounded-full bg-emerald-100 text-emerald-800 px-2.5 sm:px-3 py-0.5 sm:py-1 font-bold text-xs">
                   {index + 1} / {questions.length}
                 </span>
-                <span className="font-mono text-slate-500 uppercase tracking-wider">
+                <span className="font-mono text-slate-500 uppercase tracking-wider text-[11px] sm:text-xs">
                   {current.field_id.replace(/_/g, ' ')}
                 </span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 leading-snug sm:leading-tight">
                 {questionTitle}
               </h2>
 
@@ -240,7 +240,7 @@ export default function Quiz() {
               <button
                 type="button"
                 onClick={toggleAudio}
-                className={`mt-6 w-full flex items-center justify-center gap-2.5 rounded-2xl py-4 px-4 text-sm font-bold shadow-md transition-all active:scale-95 ${
+                className={`mt-4 sm:mt-6 w-full flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95 ${
                   speaking
                     ? 'bg-rose-600 text-white hover:bg-rose-700'
                     : 'bg-emerald-700 text-white hover:bg-emerald-800'
@@ -272,12 +272,12 @@ export default function Quiz() {
           </div>
 
           {/* Right Column: Audio Mic, Quick-touch Options & Type Input */}
-          <div className="lg:col-span-6 flex flex-col gap-4">
+          <div className="lg:col-span-6 flex flex-col gap-3 sm:gap-4">
             {/* Option 1: Speak into microphone */}
             <button
               disabled={submitting}
               onClick={recording ? stopRecording : startRecording}
-              className={`w-full rounded-2xl py-5 px-6 text-base font-black text-white shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 ${
+              className={`w-full rounded-xl sm:rounded-2xl py-3.5 sm:py-5 px-4 sm:px-6 text-sm sm:text-base font-black text-white shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2.5 sm:gap-3 ${
                 recording
                   ? 'bg-rose-600 ring-4 ring-rose-300 animate-pulse'
                   : 'bg-slate-900 hover:bg-slate-800'
@@ -294,18 +294,18 @@ export default function Quiz() {
 
             {/* Option 2: Tap option buttons fallback */}
             {options.length > 0 && (
-              <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center justify-between">
+              <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-5 shadow-sm">
+                <div className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5 sm:mb-3 flex items-center justify-between">
                   <span>{t('or_tap_option', lang)}</span>
-                  <span className="text-xs font-normal text-slate-400">1-Touch Answer</span>
+                  <span className="text-[10px] sm:text-xs font-normal text-slate-400">1-Touch Answer</span>
                 </div>
-                <div className="grid grid-cols-1 gap-2.5">
+                <div className="grid grid-cols-1 gap-2 sm:gap-2.5">
                   {options.map((opt, i) => (
                     <button
                       key={i}
                       disabled={submitting}
                       onClick={() => onAnswer(null, opt.value)}
-                      className="w-full rounded-xl border-2 border-slate-200 bg-white p-3.5 text-left text-base font-bold text-slate-800 shadow-sm hover:border-emerald-500 hover:bg-emerald-50/50 disabled:opacity-50 active:scale-[0.99] transition flex items-center justify-between"
+                      className="w-full rounded-xl border-2 border-slate-200 bg-white p-2.5 sm:p-3.5 text-left text-sm sm:text-base font-bold text-slate-800 shadow-sm hover:border-emerald-500 hover:bg-emerald-50/50 disabled:opacity-50 active:scale-[0.99] transition flex items-center justify-between"
                     >
                       <span>{opt.label}</span>
                       <span className="text-slate-300 text-sm">→</span>
@@ -316,8 +316,8 @@ export default function Quiz() {
             )}
 
             {/* Option 3: Type manually */}
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-5 shadow-sm">
+              <div className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                 {t('or_type_answer', lang)}
               </div>
               <TypedAnswer

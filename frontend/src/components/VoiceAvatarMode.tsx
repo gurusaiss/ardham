@@ -399,48 +399,49 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
         </div>
       </header>
 
-      {/* Main Stage: Balanced 3-Column Layout (Left: Step & Voice Guidance | Center: Photorealistic Lakshmi | Right: Verified Facts Card) */}
-      <main className="flex-1 relative flex flex-col md:flex-row items-center justify-between px-4 sm:px-8 lg:px-12 py-3 overflow-y-auto md:overflow-hidden gap-4 lg:gap-8 max-w-7xl mx-auto w-full">
+      {/* Main Stage: Balanced 3-Column on Desktop | Perfectly Ordered & Scaled on Mobile Phone */}
+      {/* Mobile Flow: Top = Step Context Card | Center = Photorealistic Lakshmi | Bottom = Small Facts Card */}
+      <main className="flex-1 relative flex flex-col md:flex-row items-center justify-between px-3 sm:px-6 lg:px-12 py-2 sm:py-4 overflow-y-auto md:overflow-hidden gap-2.5 sm:gap-4 lg:gap-8 max-w-7xl mx-auto w-full">
         {/* Subtle Traditional Gold Kolam / Indian Sacred Geometric Background Watermark */}
         <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-          <div className="w-[380px] h-[380px] sm:w-[680px] sm:h-[680px] rounded-full border-4 sm:border-8 border-dashed border-amber-300" />
+          <div className="w-[300px] h-[300px] sm:w-[680px] sm:h-[680px] rounded-full border-4 sm:border-8 border-dashed border-amber-300" />
         </div>
 
-        {/* LEFT ZONE: Step Context, Live Audio Topic & Voice Commands */}
-        <section aria-label="Step Context" className="w-full md:w-80 lg:w-96 flex flex-col justify-center gap-3 z-20 order-2 md:order-1">
+        {/* TOP ON PHONE / LEFT ON DESKTOP: Step Context & Explanation Card (Optimized for Mobile Phone Screen) */}
+        <section aria-label="Step Context" className="w-full md:w-80 lg:w-96 flex flex-col justify-center z-20 order-1 shrink-0">
           {(() => {
             const meta = STEP_METADATA[currentStep] || STEP_METADATA[0]
             const title = lang === 'en' ? meta.title_en : lang === 'hi' ? meta.title_hi : meta.title_te
             const desc = lang === 'en' ? meta.desc_en : lang === 'hi' ? meta.desc_hi : meta.desc_te
             const cue = lang === 'en' ? meta.cue_en : lang === 'hi' ? meta.cue_hi : meta.cue_te
             return (
-              <div className="rounded-2xl border border-emerald-500/30 bg-slate-950/80 p-4 sm:p-5 backdrop-blur-xl shadow-xl">
-                {/* Step badge */}
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-[10px] sm:text-xs font-black text-amber-300 uppercase tracking-wider">
+              <div className="rounded-xl sm:rounded-2xl border border-emerald-500/30 bg-slate-950/85 p-2.5 sm:p-4 md:p-5 backdrop-blur-xl shadow-lg">
+                {/* Step badge & Engine */}
+                <div className="flex items-center justify-between gap-1.5 mb-1 sm:mb-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-[9px] sm:text-xs font-black text-amber-300 uppercase tracking-wider">
                     <span>{lang === 'en' ? `Step ${meta.step} of 5` : `దశ ${meta.step} / 5`}</span>
                   </span>
-                  <span className="text-[10px] text-emerald-300/80 font-mono">
+                  <span className="text-[9px] sm:text-[10px] text-emerald-300/80 font-mono">
                     Gemma 4 SLM
                   </span>
                 </div>
 
                 {/* Localized Step Title */}
-                <h2 className="text-base sm:text-lg lg:text-xl font-black text-amber-100 leading-snug">
+                <h2 className="text-xs sm:text-base md:text-xl font-black text-amber-100 leading-snug">
                   {title}
                 </h2>
 
                 {/* Localized Live Audio Narration Explanation */}
-                <p className="mt-2 text-xs sm:text-sm text-emerald-100/90 leading-relaxed font-normal">
+                <p className="mt-1 sm:mt-2 text-[11px] sm:text-xs md:text-sm text-emerald-100/90 leading-tight sm:leading-relaxed font-normal">
                   {desc}
                 </p>
 
                 {/* Hands-free Voice Hint Box */}
-                <div className="mt-3.5 flex items-center gap-2 rounded-xl bg-amber-400/10 border border-amber-400/30 px-3 py-2 text-[11px] sm:text-xs text-amber-200">
-                  <span className="text-base shrink-0 animate-bounce">🎙️</span>
-                  <div className="leading-tight">
-                    <span className="font-bold text-amber-300">{lang === 'en' ? 'Voice Cue: ' : 'వాయిస్ సూచన: '}</span>
-                    <span>{cue}</span>
+                <div className="mt-2 sm:mt-3 flex items-center gap-1.5 rounded-lg sm:rounded-xl bg-amber-400/10 border border-amber-400/30 px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs text-amber-200">
+                  <span className="text-sm shrink-0">🎙️</span>
+                  <div className="leading-tight truncate">
+                    <span className="font-bold text-amber-300">{lang === 'en' ? 'Voice: ' : 'వాయిస్: '}</span>
+                    <span className="truncate">{cue}</span>
                   </div>
                 </div>
               </div>
@@ -448,30 +449,30 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           })()}
         </section>
 
-        {/* CENTER ZONE: Photorealistic Human AI Avatar Rig */}
-        <section aria-label="Lakshmi AI Avatar" className="flex-1 flex flex-col items-center justify-center relative z-10 order-1 md:order-2 my-auto">
+        {/* CENTER: Photorealistic Human AI Avatar Rig (Prominent, Never Obstructed) */}
+        <section aria-label="Lakshmi AI Avatar" className="flex-1 flex flex-col items-center justify-center relative z-10 order-2 my-auto shrink-0 py-1">
           <HumanAvatarRig
             isSpeaking={speaking}
             language={lang}
-            sizeClass="w-52 h-52 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px] xl:w-[460px] xl:h-[460px]"
+            sizeClass="w-32 h-32 xs:w-40 xs:h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-96 lg:h-96"
           />
 
           {/* Avatar Identity & Live Status Tag */}
-          <div className="mt-2 flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-black/70 border border-amber-400/50 px-4 sm:px-5 py-1.5 shadow-2xl backdrop-blur-md">
-              <span className={`h-2 w-2 rounded-full ${speaking ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`} />
-              <span className="text-amber-400 font-extrabold text-xs sm:text-sm tracking-wide">
+          <div className="mt-1.5 sm:mt-2 flex flex-col items-center">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-black/75 border border-amber-400/50 px-3 sm:px-5 py-0.5 sm:py-1.5 shadow-xl backdrop-blur-md">
+              <span className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full ${speaking ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`} />
+              <span className="text-amber-400 font-extrabold text-[11px] sm:text-sm tracking-wide">
                 {lang === 'en' ? 'Lakshmi' : lang === 'hi' ? 'लक्ष्मी' : 'లక్ష్మి'}
               </span>
-              <span className="text-xs text-emerald-200">•</span>
-              <span className="text-[11px] sm:text-xs text-emerald-100 font-semibold">
+              <span className="text-[10px] sm:text-xs text-emerald-200">•</span>
+              <span className="text-[10px] sm:text-xs text-emerald-100 font-semibold">
                 {lang === 'en' ? 'Digital Loan Officer' : lang === 'hi' ? 'डिजिटल ऋण अधिकारी' : 'డిజిటల్ లోన్ అధికారి'}
               </span>
             </div>
 
             {/* Recognized Voice Transcript Pill */}
             {transcript && (
-              <div className="mt-2 flex items-center gap-2 rounded-full bg-amber-400/20 border border-amber-400/50 px-3.5 py-1 text-xs text-amber-200 shadow-xl backdrop-blur-md animate-fade-in max-w-[90vw] truncate">
+              <div className="mt-1.5 flex items-center gap-1.5 rounded-full bg-amber-400/20 border border-amber-400/50 px-2.5 sm:px-3.5 py-0.5 text-[10px] sm:text-xs text-amber-200 shadow-xl backdrop-blur-md animate-fade-in max-w-[85vw] truncate">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-300 animate-ping shrink-0" />
                 <span className="truncate">
                   {lang === 'en' ? 'Heard:' : lang === 'hi' ? 'सुना:' : 'విన్నది:'} <strong>"{transcript}"</strong>
@@ -481,46 +482,46 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           </div>
         </section>
 
-        {/* RIGHT ZONE: Verified Document Facts Card */}
-        <section aria-label="Loan document snapshot" className="w-full md:w-80 lg:w-96 flex flex-col justify-center z-20 order-3">
+        {/* BOTTOM ON PHONE / RIGHT ON DESKTOP: Small & Compact Verified Facts Card (Never Covers Avatar) */}
+        <section aria-label="Loan document snapshot" className="w-full md:w-80 lg:w-96 flex flex-col justify-center z-20 order-3 shrink-0">
           {activeFloatingCard ? (
             <div
-              className={`rounded-2xl sm:rounded-3xl border-2 border-amber-400/80 bg-slate-950/95 p-3.5 sm:p-5 shadow-[0_20px_50px_rgba(0,0,0,0.9)] backdrop-blur-2xl relative transition-all duration-500 ease-out ${
+              className={`rounded-xl sm:rounded-2xl border border-amber-400/80 sm:border-2 bg-slate-950/95 p-2 sm:p-3 md:p-5 shadow-xl backdrop-blur-2xl relative transition-all duration-500 ease-out ${
                 cardVisible
                   ? 'opacity-100 translate-y-0 scale-100'
-                  : 'opacity-40 translate-y-2 scale-98'
+                  : 'opacity-50 translate-y-1 scale-98'
               }`}
             >
-              <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
+              <div className="flex items-center justify-between border-b border-amber-500/20 pb-1.5 sm:pb-2.5">
                 <div>
-                  <h3 className="text-sm sm:text-base font-black text-amber-100">
+                  <h3 className="text-xs sm:text-sm md:text-base font-black text-amber-100 truncate">
                     {activeFloatingCard.title}
                   </h3>
-                  <p className="text-[10px] sm:text-[11px] text-emerald-300 font-medium">
+                  <p className="text-[9px] sm:text-[10px] md:text-[11px] text-emerald-300 font-medium truncate">
                     {activeFloatingCard.subtitle}
                   </p>
                 </div>
                 {activeFloatingCard.goldStamp && (
-                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 shadow shrink-0">
+                  <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 shadow shrink-0">
                     {activeFloatingCard.goldStamp}
                   </span>
                 )}
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-2.5 mt-3">
+              {/* Stats Grid: Ultra Compact on Phone Screen */}
+              <div className="grid grid-cols-2 gap-1.5 sm:gap-2 md:gap-2.5 mt-1.5 sm:mt-2.5">
                 {activeFloatingCard.stats.map((s, idx) => (
                   <div
                     key={idx}
-                    className={`p-2 sm:p-2.5 rounded-xl border ${
+                    className={`p-1.5 sm:p-2 md:p-2.5 rounded-lg sm:rounded-xl border ${
                       s.highlight
                         ? 'bg-amber-950/40 border-amber-400/50 text-amber-100'
                         : 'bg-emerald-950/30 border-emerald-800/40 text-emerald-100'
                     }`}
                   >
-                    <div className="text-[9px] sm:text-[10px] font-semibold text-slate-300 truncate">{s.label}</div>
+                    <div className="text-[8px] sm:text-[9px] md:text-[10px] font-semibold text-slate-300 truncate">{s.label}</div>
                     <div
-                      className={`text-sm sm:text-base font-black font-mono mt-0.5 ${
+                      className={`text-xs sm:text-sm md:text-base font-black font-mono mt-0.5 ${
                         s.highlight ? 'text-amber-300' : 'text-white'
                       }`}
                     >
@@ -532,12 +533,12 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
             </div>
           ) : (
             /* Ambient Placeholder Card when no temporary card is actively floating */
-            <div className="rounded-2xl border border-emerald-500/20 bg-slate-950/60 p-4 backdrop-blur-md text-center">
-              <div className="text-2xl mb-1">🛡️</div>
-              <div className="text-xs font-bold text-amber-200">
+            <div className="rounded-xl border border-emerald-500/20 bg-slate-950/60 p-2 sm:p-3 backdrop-blur-md text-center">
+              <div className="text-sm sm:text-xl mb-0.5">🛡️</div>
+              <div className="text-[11px] sm:text-xs font-bold text-amber-200">
                 {lang === 'en' ? 'Gemma 4 Pure Math Guard' : 'గెమ్మా 4 గణిత ధృవీకరణ'}
               </div>
-              <div className="text-[11px] text-emerald-300/70 mt-1">
+              <div className="text-[9px] sm:text-[10px] text-emerald-300/70 mt-0.5">
                 {lang === 'en'
                   ? 'All facts cross-checked against RBI & KFS standards with zero hallucination.'
                   : 'ఆర్బీఐ నిబంధనల ప్రకారం అన్ని వివరాలు ఖచ్చితంగా లెక్కించబడ్డాయి.'}
