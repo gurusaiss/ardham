@@ -50,16 +50,17 @@ export default function Home() {
     setShowVoiceModal(true)
   }
 
-  function switchLang(newLang: AppLanguage) {
+  function cycleLanguage() {
     stopSpeaking()
-    setLanguage(newLang)
+    const nextLang: AppLanguage = lang === 'te' ? 'en' : lang === 'en' ? 'hi' : 'te'
+    setLanguage(nextLang)
   }
 
   return (
     <div className="min-h-screen bg-slate-50/80 sm:bg-gradient-to-br sm:from-slate-100 sm:via-slate-50 sm:to-emerald-50/30 py-4 sm:py-8 px-3 sm:px-6 lg:px-8 flex flex-col justify-between">
       <div className="mx-auto w-full max-w-6xl rounded-3xl bg-white shadow-xl border border-slate-200/90 p-6 sm:p-10 flex-1 flex flex-col justify-between animate-fade-in">
         {/* Top Header Bar */}
-        <div className="w-full flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
+        <div className="w-full flex items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
           {/* Top Left: Brand only */}
           <Link
             to="/"
@@ -72,84 +73,50 @@ export default function Home() {
             {lang !== 'en' && <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>}
           </Link>
 
-          {/* Top Right: Buttons (Video Demo, Language, Audio, Settings, Account Profile) */}
-          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
-            {/* 1. Watch AI Demo Video Button */}
+          {/* Top Right: Clean Minimal Icon Controls (Audio Speaker, Language, Settings, Profile) */}
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            {/* 1. Small Audio Speaker Icon Button */}
+            <GlobalAudioBar />
+
+            {/* 2. Small Language Icon Button */}
             <button
               type="button"
-              onClick={() => setShowVideoModal(true)}
-              className="flex items-center gap-1.5 text-xs font-bold text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl shadow-sm transition active:scale-95"
-              title={lang === 'en' ? 'Watch Multimodal Gemma 4 AI Video Guide' : 'AI వీడియో గైడ్ చూడండి'}
+              onClick={cycleLanguage}
+              className="flex h-9 items-center gap-1.5 px-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-sm transition active:scale-95"
+              title={
+                lang === 'te'
+                  ? 'ప్రస్తుత భాష: తెలుగు (క్లిక్ చేసి మార్చండి)'
+                  : lang === 'hi'
+                  ? 'वर्तमान भाषा: हिंदी (बदलने के लिए क्लिक करें)'
+                  : 'Current Language: English (Click to toggle)'
+              }
             >
-              <span>🎬</span>
-              <span className="hidden sm:inline">
-                {lang === 'en' ? 'AI Video Demo' : lang === 'hi' ? 'एआई वीडियो डेमो' : 'AI వీడియో డెమో'}
+              <span className="text-base">🌐</span>
+              <span className="uppercase text-[11px] font-extrabold text-emerald-800 tracking-wider">
+                {lang}
               </span>
             </button>
 
-            {/* 2. Compact Language Buttons */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold shadow-inner">
-              <button
-                type="button"
-                onClick={() => switchLang('te')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  lang === 'te'
-                    ? 'bg-emerald-700 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="తెలుగు"
-              >
-                తెలుగు
-              </button>
-              <button
-                type="button"
-                onClick={() => switchLang('en')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  lang === 'en'
-                    ? 'bg-emerald-700 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="English"
-              >
-                English
-              </button>
-              <button
-                type="button"
-                onClick={() => switchLang('hi')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  lang === 'hi'
-                    ? 'bg-emerald-700 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="हिंदी"
-              >
-                हिंदी
-              </button>
-            </div>
-
-            {/* 3. Audio Voice Control */}
-            <GlobalAudioBar onOpenSettings={() => setShowSettingsModal(true)} />
-
-            {/* 4. Settings Button */}
+            {/* 3. Settings Icon Button */}
             <button
               type="button"
               onClick={() => setShowSettingsModal(true)}
-              className="flex items-center gap-1 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-sm transition active:scale-95"
               title={lang === 'en' ? 'Platform Settings & Controls' : 'ప్లాట్‌ఫామ్ సెట్టింగ్స్'}
+              aria-label="Open settings"
             >
-              <span>⚙️</span>
-              <span className="hidden md:inline">{lang === 'en' ? 'Settings' : 'సెట్టింగ్స్'}</span>
+              <span className="text-base select-none">⚙️</span>
             </button>
 
-            {/* 5. Account Profile Button (Top Right) */}
+            {/* 4. Account Profile Button */}
             <Link
               to="/auth"
-              className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-500 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+              className="flex h-9 items-center gap-1.5 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold shadow-sm transition active:scale-95"
               title="Account Profile / Login"
             >
-              <span>👤</span>
-              <span className="truncate max-w-[120px] sm:max-w-[180px]">
-                {user ? `${user.name} (${user.role === 'officer' ? (lang === 'en' ? 'Officer' : lang === 'hi' ? 'अधिकारी' : 'అధికారి') : (lang === 'en' ? 'Borrower' : lang === 'hi' ? 'उधारकर्ता' : 'రుణగ్రహీత')})` : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}
+              <span className="text-base">👤</span>
+              <span className="hidden sm:inline truncate max-w-[110px]">
+                {user ? user.name.split(' ')[0] : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}
               </span>
             </Link>
           </div>
