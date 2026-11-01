@@ -184,22 +184,17 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Interactive Gemma 4 Multimodal Video Guide Banner */}
+        {/* Interactive 4-Step Visual Guide Banner */}
         <div className="my-4 sm:my-5 rounded-2xl sm:rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white p-4 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-5">
           <div className="space-y-1 sm:space-y-1.5 text-center sm:text-left">
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-emerald-500/20 px-2.5 sm:px-3 py-0.5 text-[11px] sm:text-xs font-bold text-emerald-300 border border-emerald-500/30">
-              <span>🎬 {lang === 'en' ? 'AI Guide' : 'AI డెమో'}</span>
-              <span>•</span>
-              <span>{lang === 'en' ? 'Photo Scan • Voice Readout • Safety Check' : 'ఫోటో స్కాన్ • వాయిస్ రీడౌట్ • భద్రతా తనిఖీ'}</span>
-            </div>
             <h3 className="text-base sm:text-xl font-extrabold text-white">
-              {lang === 'en' ? 'Watch How Ardham Operates in 4 Visual Steps' : lang === 'hi' ? 'देखें कि अर्थम 4 चरणों में कैसे कार्य करता है' : 'అర్థం ఎలా పనిచేస్తుందో 4 దశల్లో లైవ్ డెమో చూడండి'}
+              {lang === 'en' ? 'How Ardham Works in 4 Steps' : lang === 'hi' ? 'अर्थम 4 चरणों में कैसे कार्य करता है' : 'అర్థం ఎలా పనిచేస్తుందో 4 దశల్లో చూడండి'}
             </h3>
             <p className="text-xs sm:text-sm text-emerald-100/80 max-w-xl">
               {lang === 'en'
                 ? 'Camera photo scanning, upfront fee check, spoken mother tongue explanation, and official verified digital receipt.'
                 : lang === 'hi'
-                ? 'कैमरा फोटो स्कैन, अग्रिम शुल्कों की जांच, मातृभाषा में मौखिक व्याख्या और आधिकारिक डिजिटल रसीद।'
+                ? 'कैमरा फोटो स्कैन, अग्रिम शुल्कों की जांच, मातृभाषा में व्याख्या और आधिकारिक डिजिटल रसीद।'
                 : 'కెమెరా ఫోటో స్కాన్, ముందస్తు ఫీజుల తనిఖీ, మాతృభాషలో స్పష్టమైన వివరణ మరియు అధికారిక డిజిటల్ రసీదు.'}
             </p>
           </div>
@@ -209,7 +204,7 @@ export default function Home() {
             className="shrink-0 w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base shadow-lg active:scale-95 transition"
           >
             <span className="text-base sm:text-lg">▶️</span>
-            <span>{lang === 'en' ? 'Watch AI Demo Guide' : lang === 'hi' ? 'एआई वीडियो डेमो' : 'AI వీడియో గైడ్'}</span>
+            <span>{lang === 'en' ? 'Watch 4-Step Guide' : lang === 'hi' ? '4-चरण गाइड देखें' : '4 దశల గైడ్ చూడండి'}</span>
           </button>
         </div>
 

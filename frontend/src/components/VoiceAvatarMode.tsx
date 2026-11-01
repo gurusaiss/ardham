@@ -419,10 +419,10 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
                 {/* Step badge & Engine */}
                 <div className="flex items-center justify-between gap-1.5 mb-1 sm:mb-2">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-[9px] sm:text-xs font-black text-amber-300 uppercase tracking-wider">
-                    <span>{lang === 'en' ? `Step ${meta.step} of 5` : `దశ ${meta.step} / 5`}</span>
+                    <span>{lang === 'en' ? `Step ${meta.step} of 5` : lang === 'hi' ? `चरण ${meta.step} / 5` : `దశ ${meta.step} / 5`}</span>
                   </span>
                   <span className="text-[9px] sm:text-[10px] text-emerald-300/80 font-mono">
-                    Gemma 4 SLM
+                    {lang === 'en' ? 'Verified' : lang === 'hi' ? 'सत्यापित' : 'ధృవీకరించబడింది'}
                   </span>
                 </div>
 
@@ -440,7 +440,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
                 <div className="mt-2 sm:mt-3 flex items-center gap-1.5 rounded-lg sm:rounded-xl bg-amber-400/10 border border-amber-400/30 px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs text-amber-200">
                   <span className="text-sm shrink-0">🎙️</span>
                   <div className="leading-tight truncate">
-                    <span className="font-bold text-amber-300">{lang === 'en' ? 'Voice: ' : 'వాయిస్: '}</span>
+                    <span className="font-bold text-amber-300">{lang === 'en' ? 'Voice: ' : lang === 'hi' ? 'आवाज़: ' : 'వాయిస్: '}</span>
                     <span className="truncate">{cue}</span>
                   </div>
                 </div>
@@ -536,12 +536,14 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
             <div className="rounded-xl border border-emerald-500/20 bg-slate-950/60 p-2 sm:p-3 backdrop-blur-md text-center">
               <div className="text-sm sm:text-xl mb-0.5">🛡️</div>
               <div className="text-[11px] sm:text-xs font-bold text-amber-200">
-                {lang === 'en' ? 'Gemma 4 Pure Math Guard' : 'గెమ్మా 4 గణిత ధృవీకరణ'}
+                {lang === 'en' ? 'Verified Math Guard' : lang === 'hi' ? 'सटीक वित्तीय सत्यापन' : 'ఖచ్చితమైన గణిత ధృవీకరణ'}
               </div>
               <div className="text-[9px] sm:text-[10px] text-emerald-300/70 mt-0.5">
                 {lang === 'en'
-                  ? 'All facts cross-checked against RBI & KFS standards with zero hallucination.'
-                  : 'ఆర్బీఐ నిబంధనల ప్రకారం అన్ని వివరాలు ఖచ్చితంగా లెక్కించబడ్డాయి.'}
+                  ? 'All facts cross-checked against official bank standards with zero error.'
+                  : lang === 'hi'
+                  ? 'सभी शर्तें आधिकारिक बैंक मानकों के अनुसार जांची गई हैं।'
+                  : 'బ్యాంకు నిబంధనల ప్రకారం అన్ని వివరాలు ఖచ్చితంగా లెక్కించబడ్డాయి.'}
               </div>
             </div>
           )}
@@ -557,7 +559,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
           className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-950/60 hover:bg-emerald-900/80 disabled:opacity-30 text-emerald-200 text-[11px] sm:text-xs transition active:scale-95 border border-emerald-800/40 shrink-0"
         >
           <span>←</span>
-          <span>{lang === 'en' ? 'Back' : 'వెనుకకు'}</span>
+          <span>{lang === 'en' ? 'Back' : lang === 'hi' ? 'पीछे' : 'వెనుకకు'}</span>
         </button>
 
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -567,7 +569,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
             className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-200 text-[11px] sm:text-xs transition active:scale-95 border border-emerald-800/40"
           >
             <span>🔊</span>
-            <span className="hidden xs:inline sm:inline">{lang === 'en' ? 'Replay' : 'మళ్ళీ విను'}</span>
+            <span className="hidden xs:inline sm:inline">{lang === 'en' ? 'Replay' : lang === 'hi' ? 'दोबारा सुनें' : 'మళ్ళీ విను'}</span>
           </button>
 
           {currentStep === 4 ? (
@@ -577,7 +579,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
               className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 text-[11px] sm:text-xs font-black transition active:scale-95 shadow-xl"
             >
               <span>📥</span>
-              <span>{lang === 'en' ? 'Certificate' : 'రసీదు డౌన్‌లోడ్'}</span>
+              <span>{lang === 'en' ? 'Certificate' : lang === 'hi' ? 'प्रमाणपत्र' : 'రసీదు డౌన్‌లోడ్'}</span>
             </button>
           ) : (
             <button
@@ -585,7 +587,7 @@ export default function VoiceAvatarMode({ isOpen, onClose }: Props) {
               onClick={() => advanceStep(1)}
               className="flex items-center gap-1 sm:gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 text-[11px] sm:text-xs font-black transition active:scale-95 shadow-xl"
             >
-              <span>{lang === 'en' ? 'Next' : 'తరువాత'}</span>
+              <span>{lang === 'en' ? 'Next' : lang === 'hi' ? 'आगे' : 'తరువాత'}</span>
               <span>→</span>
             </button>
           )}

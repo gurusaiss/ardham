@@ -4,6 +4,7 @@ import {
   type VoiceStyle,
   getLanguage,
   setLanguage,
+  subscribeLanguage,
   setVoiceAssistantEnabled,
   setVoiceStyle,
   hasAnsweredVoiceModal,
@@ -26,6 +27,10 @@ export default function VoiceAssistantModal({ isOpen: forceOpen, onClose, onOpen
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(getLanguage())
   const [listening, setListening] = useState(false)
   const recognitionRef = useRef<any>(null)
+
+  useEffect(() => {
+    return subscribeLanguage(setSelectedLang)
+  }, [])
 
   useEffect(() => {
     if (forceOpen !== undefined) {

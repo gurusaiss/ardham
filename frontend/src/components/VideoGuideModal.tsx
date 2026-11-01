@@ -3,6 +3,7 @@ import {
   speakText,
   stopSpeaking,
   getLanguage,
+  subscribeLanguage,
   type AppLanguage,
 } from '../lib/speech'
 
@@ -89,8 +90,13 @@ const VIDEO_STEPS: VideoStep[] = [
 export default function VideoGuideModal({ isOpen, onClose, initialSection }: Props) {
   const [currentStepIdx, setCurrentStepIdx] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
-  const [lang] = useState<AppLanguage>(getLanguage())
+  const [lang, setLang] = useState<AppLanguage>(getLanguage())
   const timerRef = useRef<any>(null)
+
+  // Reactive Language Synchronization across all pages & tabs
+  useEffect(() => {
+    return subscribeLanguage(setLang)
+  }, [])
 
   // Map initial section to step
   useEffect(() => {
@@ -166,11 +172,15 @@ export default function VideoGuideModal({ isOpen, onClose, initialSection }: Pro
           <div className="flex items-center gap-2.5">
             <span className="flex h-3 w-3 rounded-full bg-rose-500 animate-pulse" />
             <div>
-              <span className="text-xs sm:text-sm font-extrabold tracking-wide uppercase text-emerald-400">
-                Gemma 4 Multimodal Demo Video
+              <span className="text-xs sm:text-sm font-extrabold tracking-wide text-emerald-400">
+                {lang === 'en' ? 'Ardham 4-Step Process Guide' : lang === 'hi' ? 'अर्थम 4-चरणीय गाइड' : 'అర్థం 4 దశల లైవ్ గైడ్'}
               </span>
               <p className="text-[11px] text-slate-400">
-                {lang === 'en' ? 'AI Voice & Interactive Visual Simulation' : 'AI వీడియో & వాయిస్ డెమో సిమ్యులేషన్'}
+                {lang === 'en'
+                  ? 'Interactive Visual Walkthrough'
+                  : lang === 'hi'
+                  ? 'इंटरैक्टिव दृश्य प्रदर्शन'
+                  : 'ప్రత్యక్ష మార్గదర్శక వివరాలు'}
               </p>
             </div>
           </div>
