@@ -6,13 +6,17 @@ import VoiceAssistantModal from './VoiceAssistantModal'
 import { stopSpeaking, getLanguage, setLanguage, subscribeLanguage, type AppLanguage } from '../lib/speech'
 import { getCurrentUser, subscribeAuth, type User } from '../lib/auth'
 
+export type SubtitleProp = { te: string; en: string; hi?: string } | string
+
 export default function StepLayout({
   title,
+  subtitle,
   teluguTitle,
   children,
   maxWidthClass = 'max-w-6xl',
 }: {
   title: string
+  subtitle?: SubtitleProp
   teluguTitle?: string
   children: ReactNode
   maxWidthClass?: string
@@ -45,24 +49,41 @@ export default function StepLayout({
     setLanguage(newLang)
   }
 
+  // Determine subtitle text based on active language
+  let activeSubtitle = ''
+  if (subtitle) {
+    if (typeof subtitle === 'string') {
+      activeSubtitle = subtitle
+    } else {
+      activeSubtitle = lang === 'en' ? subtitle.en : lang === 'hi' ? (subtitle.hi || subtitle.en) : subtitle.te
+    }
+  } else if (teluguTitle) {
+    // Legacy fallback: only show in Telugu mode
+    if (lang === 'te') {
+      activeSubtitle = teluguTitle
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50/80 sm:bg-gradient-to-br sm:from-slate-100 sm:via-slate-50 sm:to-emerald-50/30 py-3 sm:py-8 px-3 sm:px-6 lg:px-8 flex flex-col justify-between transition-colors">
       <div className={`mx-auto w-full ${maxWidthClass} rounded-3xl bg-white shadow-xl border border-slate-200/90 p-5 sm:p-8 md:p-10 flex-1 flex flex-col animate-fade-in`}>
         {/* Top Header Bar */}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500 border-b border-slate-100 pb-4">
-          {/* Top Left: Brand / Logo only */}
+          {/* Top Left: Brand only */}
           <Link
             to="/"
             className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
             title="Ardham Home"
           >
-            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">అర్థం</span>
-            <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>
+            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">
+              {lang === 'en' ? 'Ardham' : lang === 'hi' ? 'अर्थम' : 'అర్థం'}
+            </span>
+            {lang !== 'en' && <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>}
           </Link>
 
-          {/* Top Right: All Interactive Action Buttons (Language, Audio, Account Profile) */}
+          {/* Top Right: Buttons (Language, Audio, Account Profile) */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
-            {/* 1. Trilingual Language Switcher Buttons */}
+            {/* 1. Language Buttons */}
             <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold shadow-inner">
               <button
                 type="button"
@@ -113,7 +134,7 @@ export default function StepLayout({
             >
               <span>👤</span>
               <span className="truncate max-w-[140px] sm:max-w-[200px]">
-                {user ? `${user.name} (${user.role === 'officer' ? 'Officer' : 'Borrower'})` : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}
+                {user ? `${user.name} (${user.role === 'officer' ? (lang === 'en' ? 'Officer' : lang === 'hi' ? 'अधिकारी' : 'అధికారి') : (lang === 'en' ? 'Borrower' : lang === 'hi' ? 'उधारकर्ता' : 'రుణగ్రహీత')})` : (lang === 'en' ? 'Sign In' : lang === 'hi' ? 'साइन इन' : 'సైన్ ఇన్')}
               </span>
             </Link>
           </div>
@@ -127,9 +148,9 @@ export default function StepLayout({
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             {title}
           </h1>
-          {teluguTitle && (
+          {activeSubtitle && (
             <p className="text-sm sm:text-base text-emerald-800 font-bold leading-normal">
-              {teluguTitle}
+              {activeSubtitle}
             </p>
           )}
         </header>

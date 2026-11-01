@@ -134,7 +134,7 @@ export default function Quiz() {
       mediaRecorder.current = rec
       setRecording(true)
     } catch {
-      alert('మైక్రోఫోన్ అనుమతి ఇవ్వండి / Please allow microphone access')
+      alert(lang === 'en' ? 'Please allow microphone access' : 'మైక్రోఫోన్ అనుమతి ఇవ్వండి')
     }
   }
 
@@ -172,7 +172,14 @@ export default function Quiz() {
 
   if (loadError) {
     return (
-      <StepLayout title="Questions" teluguTitle="అవగాహన ప్రశ్నలు">
+      <StepLayout
+        title={t('quiz_title', lang)}
+        subtitle={{
+          en: 'Comprehension verification questions',
+          te: 'అవగాహన ప్రశ్నలు',
+          hi: 'समझ सत्यापन प्रश्न',
+        }}
+      >
         <ErrorBanner error={loadError} onRetry={loadQuiz} />
       </StepLayout>
     )
@@ -184,7 +191,11 @@ export default function Quiz() {
   return (
     <StepLayout
       title={`${t('quiz_title', lang)} ${index + 1} of ${questions.length}`}
-      teluguTitle="అవగాహన ప్రశ్న — నోటితో సమాధానం చెప్పండి"
+      subtitle={{
+        en: 'Answer verbally into the mic or select a touch option below',
+        te: 'అవగాహన ప్రశ్న — నోటితో సమాధానం చెప్పండి',
+        hi: 'मौखिक रूप से उत्तर दें या नीचे एक विकल्प चुनें',
+      }}
       maxWidthClass="max-w-6xl"
     >
       {current ? (
@@ -205,20 +216,14 @@ export default function Quiz() {
                 {questionTitle}
               </h2>
 
-              {/* Sub-text for multi-lingual reference */}
-              <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1">
-                {lang !== 'te' && <div><span className="font-bold text-slate-700">తెలుగు:</span> {current.prompt_te}</div>}
-                {lang !== 'en' && <div><span className="font-bold text-slate-700">English:</span> {current.prompt_en}</div>}
-              </div>
-
               {/* Spoken Question Audio Button */}
               <button
                 type="button"
                 onClick={toggleAudio}
-                className={`mt-6 w-full flex items-center justify-center gap-2.5 rounded-2xl py-3.5 px-4 text-sm font-bold shadow-md transition-all active:scale-95 ${
+                className={`mt-6 w-full flex items-center justify-center gap-2.5 rounded-2xl py-4 px-4 text-sm font-bold shadow-md transition-all active:scale-95 ${
                   speaking
                     ? 'bg-rose-600 text-white hover:bg-rose-700'
-                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                    : 'bg-emerald-700 text-white hover:bg-emerald-800'
                 }`}
               >
                 {speaking ? (
@@ -259,7 +264,7 @@ export default function Quiz() {
               }`}
             >
               {submitting ? (
-                <span>⏳ సమాధానం ధృవీకరిస్తున్నాం (Grading Answer)...</span>
+                <span>{lang === 'en' ? '⏳ Grading Answer...' : '⏳ సమాధానం ధృవీకరిస్తున్నాం...'}</span>
               ) : recording ? (
                 <span>⏹️ {t('stop_recording_btn', lang)}</span>
               ) : (
@@ -272,7 +277,7 @@ export default function Quiz() {
               <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center justify-between">
                   <span>{t('or_tap_option', lang)}</span>
-                  <span className="text-[11px] font-normal text-slate-400">1-Touch Answer</span>
+                  <span className="text-xs font-normal text-slate-400">1-Touch Answer</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2.5">
                   {options.map((opt, i) => (
@@ -295,7 +300,11 @@ export default function Quiz() {
               <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">
                 {t('or_type_answer', lang)}
               </div>
-              <TypedAnswer disabled={submitting} onSubmit={(text) => onAnswer(null, text)} />
+              <TypedAnswer
+                disabled={submitting}
+                lang={lang}
+                onSubmit={(text) => onAnswer(null, text)}
+              />
             </div>
 
             {error ? <ErrorBanner error={error} onRetry={retryPending} /> : null}
@@ -304,15 +313,26 @@ export default function Quiz() {
       ) : (
         <div className="py-20 text-center text-slate-500">
           <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-emerald-600 border-r-transparent"></div>
-          <p className="mt-4 text-base font-medium">ప్రశ్నలు సిద్ధమవుతున్నాయి (Loading Questions)...</p>
+          <p className="mt-4 text-base font-medium">
+            {lang === 'en' ? 'Loading Questions...' : 'ప్రశ్నలు సిద్ధమవుతున్నాయి...'}
+          </p>
         </div>
       )}
     </StepLayout>
   )
 }
 
-function TypedAnswer({ onSubmit, disabled }: { onSubmit: (text: string) => void; disabled?: boolean }) {
+function TypedAnswer({
+  onSubmit,
+  disabled,
+  lang,
+}: {
+  onSubmit: (text: string) => void
+  disabled?: boolean
+  lang: AppLanguage
+}) {
   const [value, setValue] = useState('')
+  const placeholder = lang === 'en' ? "Type answer (e.g., 690 or Don't know)..." : "రాయండి (ఉదా: 690 లేదా తెలీదు)..."
   return (
     <div className="flex gap-2">
       <input
@@ -320,7 +340,7 @@ function TypedAnswer({ onSubmit, disabled }: { onSubmit: (text: string) => void;
         onChange={(e) => setValue(e.target.value)}
         disabled={disabled}
         className="flex-1 rounded-xl border-2 border-slate-200 px-4 py-3 text-sm font-medium focus:border-emerald-500 focus:outline-none disabled:opacity-50 shadow-inner"
-        placeholder="రాయండి (ఉదా: 690 లేదా తెలీదు)..."
+        placeholder={placeholder}
       />
       <button
         disabled={disabled || !value.trim()}

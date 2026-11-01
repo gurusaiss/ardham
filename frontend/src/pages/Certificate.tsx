@@ -30,16 +30,42 @@ export default function Certificate() {
     const loanAmt = cert.terms.loan_amount?.value || ''
     const emi = cert.terms.instalment_amount?.value || ''
     const total = cert.terms.total_payable?.value || ''
-    const msg = 
-      `*🏛️ అర్థం - లోన్ అవగాహన & KFS రసీదు*\n` +
-      `రుణ రకం: ${cert.loan_type}\n` +
-      `లోన్ మొత్తం: ₹${loanAmt}\n` +
-      `వాయిదా: ₹${emi}\n` +
-      `మొత్తం చెల్లింపు: ₹${total}\n` +
-      `అవగాహన స్కోర్: ${cert.score}% ✓ PASS\n` +
-      `ధృవీకరించిన అధికారి: ${user?.name || 'Ramesh Kumar'}\n\n` +
-      `📜 లైవ్ డిజిటల్ సర్టిఫికెట్ & ఆడిట్ సీల్:\n${verifyUrl}\n\n` +
-      `🔒 SHA-256 హాష్: ${cert.sha256.substring(0, 16)}...`
+
+    let msg = ''
+    if (lang === 'en') {
+      msg =
+        `*🏛️ ARDHAM - Loan Comprehension & KFS Verification Receipt*\n` +
+        `Loan Product: ${cert.loan_type}\n` +
+        `Loan Amount: ₹${loanAmt}\n` +
+        `Installment EMI: ₹${emi}\n` +
+        `Total Repayable: ₹${total}\n` +
+        `Comprehension Score: ${cert.score}% ✓ PASS\n` +
+        `Verifying Officer: ${user?.name || 'Ramesh Kumar'}\n\n` +
+        `📜 Live Digital Certificate & Audit Seal:\n${verifyUrl}\n\n` +
+        `🔒 SHA-256 Hash: ${cert.sha256.substring(0, 16)}...`
+    } else if (lang === 'hi') {
+      msg =
+        `*🏛️ अर्थम - ऋण समझ एवं केएफएस सत्यापन रसीद*\n` +
+        `ऋण उत्पाद: ${cert.loan_type}\n` +
+        `ऋण राशि: ₹${loanAmt}\n` +
+        `किस्त राशि: ₹${emi}\n` +
+        `कुल भुगतान: ₹${total}\n` +
+        `समझ स्कोर: ${cert.score}% ✓ PASS\n` +
+        `सत्यापित अधिकारी: ${user?.name || 'रमेश कुमार'}\n\n` +
+        `📜 लाइव डिजिटल प्रमाणपत्र:\n${verifyUrl}\n\n` +
+        `🔒 SHA-256 हैश: ${cert.sha256.substring(0, 16)}...`
+    } else {
+      msg = 
+        `*🏛️ అర్థం - లోన్ అవగాహన & KFS రసీదు*\n` +
+        `రుణ రకం: ${cert.loan_type}\n` +
+        `లోన్ మొత్తం: ₹${loanAmt}\n` +
+        `వాయిదా: ₹${emi}\n` +
+        `మొత్తం చెల్లింపు: ₹${total}\n` +
+        `అవగాహన స్కోర్: ${cert.score}% ✓ PASS\n` +
+        `ధృవీకరించిన అధికారి: ${user?.name || 'Ramesh Kumar'}\n\n` +
+        `📜 లైవ్ డిజిటల్ సర్టిఫికెట్ & ఆడిట్ సీల్:\n${verifyUrl}\n\n` +
+        `🔒 SHA-256 హాష్: ${cert.sha256.substring(0, 16)}...`
+    }
 
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank')
   }
@@ -61,7 +87,11 @@ export default function Certificate() {
   return (
     <StepLayout
       title={t('cert_title', lang)}
-      teluguTitle="డిజిటల్ రసీదు & RBI KFS ఆడిట్ సర్టిఫికెట్"
+      subtitle={{
+        en: 'Digital Key Fact Statement (KFS) Regulatory Audit Certificate',
+        te: 'డిజిటల్ రసీదు & RBI KFS ఆడిట్ సర్టిఫికెట్',
+        hi: 'डिजिटल केएफएस नियामक ऑडिट प्रमाणपत्र',
+      }}
       maxWidthClass="max-w-6xl"
     >
       {cert ? (
@@ -118,7 +148,11 @@ export default function Certificate() {
                   <span>🛡️ Elderly & Benami Proxy Protection:</span>
                 </div>
                 <p className="leading-relaxed text-xs sm:text-sm text-blue-900">
-                  The primary borrower verbally confirmed their understanding and willingness to enter this contract in their native language, free from third-party family or agent pressure.
+                  {lang === 'en'
+                    ? 'The primary borrower verbally confirmed their understanding and willingness to enter this contract in their native language, free from third-party family or agent pressure.'
+                    : lang === 'hi'
+                    ? 'उधारकर्ता ने बिना किसी बाहरी दबाव के अपनी मातृभाषा में ऋण की सभी शर्तों को समझने की पुष्टि की है।'
+                    : 'దృష్టి లోపం లేదా వృద్ధాప్యం ఉన్న రుణగ్రహీత ఎలాంటి కుటుంబ ఒత్తిడి లేకుండా స్వచ్ఛందంగా నిబంధనలను అర్థం చేసుకున్నారని ధృవీకరించబడింది.'}
                 </p>
               </div>
 
@@ -257,7 +291,11 @@ export default function Certificate() {
               to="/"
               className="w-full block rounded-2xl bg-slate-900 py-4 text-center text-sm sm:text-base font-bold text-white shadow-md hover:bg-slate-800 active:scale-[0.98] transition"
             >
-              కొత్త లోన్ ధృవీకరణ ప్రారంభించండి (Start New Session) →
+              {lang === 'en'
+                ? 'Start New Loan Verification →'
+                : lang === 'hi'
+                ? 'नया ऋण सत्यापन शुरू करें →'
+                : 'కొత్త లోన్ ధృవీకరణ ప్రారంభించండి →'}
             </Link>
           </div>
         </div>

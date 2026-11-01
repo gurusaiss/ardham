@@ -71,7 +71,14 @@ export default function Result() {
 
   if (error) {
     return (
-      <StepLayout title="Result" teluguTitle="అవగాహన ఫలితం">
+      <StepLayout
+        title={t('result_title', lang)}
+        subtitle={{
+          en: 'Comprehension scoring summary',
+          te: 'అవగాహన ఫలితం',
+          hi: 'समझ स्कोर परिणाम',
+        }}
+      >
         <ErrorBanner error={error} onRetry={load} />
       </StepLayout>
     )
@@ -79,7 +86,14 @@ export default function Result() {
 
   if (results === null) {
     return (
-      <StepLayout title="Result" teluguTitle="అవగాహన ఫలితం">
+      <StepLayout
+        title={t('result_title', lang)}
+        subtitle={{
+          en: 'Comprehension scoring summary',
+          te: 'అవగాహన ఫలితం',
+          hi: 'समझ स्कोर परिणाम',
+        }}
+      >
         <div className="py-20 text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-r-transparent"></div>
           <p className="mt-3 text-slate-500">Loading result...</p>
@@ -91,7 +105,11 @@ export default function Result() {
   return (
     <StepLayout
       title={t('result_title', lang)}
-      teluguTitle="రుణ నిబంధనల అవగాహన పరీక్ష ఫలితం"
+      subtitle={{
+        en: 'Borrower comprehension verification score',
+        te: 'రుణ నిబంధనల అవగాహన పరీక్ష ఫలితం',
+        hi: 'ऋण समझ परीक्षा परिणाम',
+      }}
       maxWidthClass="max-w-4xl"
     >
       <div className="flex flex-col gap-6">
@@ -104,8 +122,12 @@ export default function Result() {
           </div>
           <p className="mt-2 text-sm text-slate-500 max-w-md mx-auto">
             {wrong.length === 0
-              ? '✓ Borrower demonstrated clear oral understanding of all key financial commitments.'
-              : 'Some terms were not fully understood. You can re-explain them below before generating the certificate.'}
+              ? (lang === 'en'
+                  ? '✓ Borrower demonstrated clear oral understanding of all key financial commitments.'
+                  : '✓ రుణగ్రహీత అన్ని నిబంధనలను స్పష్టంగా అర్థం చేసుకున్నారు')
+              : (lang === 'en'
+                  ? 'Some terms were not fully understood. You can re-explain them below before generating the certificate.'
+                  : 'కొన్ని అంశాలలో స్పష్టత లోపించింది. సర్టిఫికెట్ జారీ చేయడానికి ముందే వాటిని మళ్లీ వివరించవచ్చు.')}
           </p>
         </div>
 
@@ -113,7 +135,11 @@ export default function Result() {
           <div className="rounded-3xl border border-amber-300 bg-amber-50/80 p-6 shadow-sm">
             <p className="text-base font-bold text-amber-900 flex items-center gap-2">
               <span>⚠️</span>
-              <span>{wrong.length} item(s) missed during the comprehension loop:</span>
+              <span>
+                {lang === 'en'
+                  ? `${wrong.length} term(s) missed during the comprehension loop:`
+                  : `${wrong.length} సమాధానాలలో స్పష్టత లోపించింది:`}
+              </span>
             </p>
             <ul className="mt-3 list-inside list-disc text-sm text-amber-800 font-medium space-y-1">
               {wrong.map((r) => (

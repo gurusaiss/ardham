@@ -90,7 +90,14 @@ export default function Explain() {
 
   if (error) {
     return (
-      <StepLayout title={t('explain_title', lang)} teluguTitle="రుణ వివరాల వివరణ">
+      <StepLayout
+        title={t('explain_title', lang)}
+        subtitle={{
+          en: 'Explanation of loan terms',
+          te: 'రుణ వివరాల వివరణ',
+          hi: 'ऋण विवरण',
+        }}
+      >
         <ErrorBanner error={error} onRetry={load} />
       </StepLayout>
     )
@@ -100,8 +107,12 @@ export default function Explain() {
 
   return (
     <StepLayout
-      title={isReExplain ? 'Re-explaining Missed Terms' : t('explain_title', lang)}
-      teluguTitle="రుణ వివరాలు — స్పష్టమైన మాటల్లో ప్రతి ఒక్క పదం వినండి"
+      title={isReExplain ? (lang === 'en' ? 'Re-explaining Missed Terms' : 'పునఃపరిశీలన') : t('explain_title', lang)}
+      subtitle={{
+        en: 'Clear spoken explanation of each financial commitment',
+        te: 'రుణ వివరాలు — స్పష్టమైన మాటల్లో ప్రతి ఒక్క పదం వినండి',
+        hi: 'प्रत्येक वित्तीय शर्त का स्पष्ट विवरण',
+      }}
       maxWidthClass="max-w-5xl"
     >
       {loading ? (
@@ -112,7 +123,7 @@ export default function Explain() {
               ? 'Generating trilingual explanation sentences...'
               : lang === 'hi'
               ? 'ऋण विवरण तैयार किया जा रहा है...'
-              : 'తెలుగు మరియు ఇతర భాషల వివరణ సిద్ధమవుతోంది...'}
+              : 'వివరణ సిద్ధమవుతోంది...'}
           </p>
         </div>
       ) : current ? (
@@ -171,19 +182,6 @@ export default function Explain() {
                 <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 leading-relaxed tracking-tight">
                   {activeText}
                 </p>
-
-                {/* Sub-translations for multi-lingual clarity */}
-                <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col gap-2 text-xs sm:text-sm text-slate-600">
-                  {lang !== 'te' && (
-                    <div><span className="font-bold text-slate-800">తెలుగు:</span> {current.text_te}</div>
-                  )}
-                  {lang !== 'en' && current.text_en && (
-                    <div><span className="font-bold text-slate-800">English:</span> {current.text_en}</div>
-                  )}
-                  {lang !== 'hi' && current.text_hi && (
-                    <div><span className="font-bold text-slate-800">हिंदी:</span> {current.text_hi}</div>
-                  )}
-                </div>
               </div>
 
               {/* Audio Listen Button Box */}
@@ -212,7 +210,7 @@ export default function Explain() {
                       <span className="text-xl">🔊</span>
                       <span>
                         {lang === 'en'
-                          ? 'Speak All Words & Numbers'
+                          ? 'Speak Sentence Aloud'
                           : lang === 'hi'
                           ? 'पूरा वाक्य सुनें'
                           : 'అన్ని పదాలు & నంబర్లు వినండి'}
@@ -221,7 +219,9 @@ export default function Explain() {
                   )}
                 </button>
                 <div className="text-xs text-center text-slate-500 font-medium">
-                  {speaking ? '🔊 Audio playing clearly word-by-word...' : 'Press to hear full sentence aloud'}
+                  {speaking
+                    ? (lang === 'en' ? '🔊 Speaking sentence clearly...' : '🔊 ఆడియో చదువుతోంది...')
+                    : (lang === 'en' ? 'Press to hear full sentence aloud' : 'పూర్తి వాక్యాన్ని వినడానికి నొక్కండి')}
                 </div>
               </div>
             </div>
@@ -241,7 +241,8 @@ export default function Explain() {
                   "{sourceField.source_text}"
                 </div>
                 <div className="mt-1 text-xs sm:text-sm text-amber-900 font-medium">
-                  Verified Raw Fact: <strong className="text-amber-950 font-mono text-base">{String(sourceField.value)}</strong>
+                  {lang === 'en' ? 'Verified Raw Fact:' : 'ధృవీకరించబడిన విలువ:'}{' '}
+                  <strong className="text-amber-950 font-mono text-base">{String(sourceField.value)}</strong>
                 </div>
               </div>
             )}

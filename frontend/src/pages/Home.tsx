@@ -62,8 +62,10 @@ export default function Home() {
             className="flex items-center gap-2 font-black text-slate-900 hover:text-emerald-700 transition"
             title="Ardham Home"
           >
-            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">అర్థం</span>
-            <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>
+            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">
+              {lang === 'en' ? 'Ardham' : lang === 'hi' ? 'अर्थम' : 'అర్థం'}
+            </span>
+            {lang !== 'en' && <span className="text-base font-bold text-slate-600 hidden sm:inline">Ardham</span>}
           </Link>
 
           {/* Top Right: Buttons (Language, Audio, Account Profile) */}
@@ -119,7 +121,7 @@ export default function Home() {
             >
               <span>👤</span>
               <span className="truncate max-w-[140px] sm:max-w-[200px]">
-                {user ? `${user.name} (${user.role === 'officer' ? 'Officer' : 'Borrower'})` : (lang === 'en' ? 'Sign In / Demo' : lang === 'hi' ? 'साइन इन / डेमो' : 'సైన్ ఇన్ / డెమో')}
+                {user ? `${user.name} (${user.role === 'officer' ? (lang === 'en' ? 'Officer' : lang === 'hi' ? 'अधिकारी' : 'అధికారి') : (lang === 'en' ? 'Borrower' : lang === 'hi' ? 'उधारकर्ता' : 'రుణగ్రహీత')})` : (lang === 'en' ? 'Sign In / Demo' : lang === 'hi' ? 'साइन इन / डेमो' : 'సైన్ ఇన్ / డెమో')}
               </span>
             </Link>
           </div>
@@ -134,7 +136,8 @@ export default function Home() {
           </div>
 
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 leading-tight">
-            అర్థం <span className="text-3xl sm:text-5xl font-medium text-emerald-800 font-sans">Ardham</span>
+            {lang === 'en' ? 'Ardham' : lang === 'hi' ? 'अर्थम' : 'అర్థం'}{' '}
+            {lang !== 'en' && <span className="text-3xl sm:text-5xl font-medium text-emerald-800 font-sans">Ardham</span>}
           </h1>
 
           <p className="mt-4 text-lg sm:text-2xl font-bold text-slate-800 leading-snug">
@@ -149,7 +152,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Loan Categories Grid */}
+        {/* Loan Categories Grid: 100% strictly localized */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 my-6">
           <Link
             to="/scan/microfinance-group-loan"
@@ -157,9 +160,15 @@ export default function Home() {
           >
             <div>
               <span className="text-4xl">👩‍🌾</span>
-              <p className="font-extrabold text-xl text-emerald-950 mt-3">Microfinance (JLG)</p>
+              <p className="font-extrabold text-xl text-emerald-950 mt-3">
+                {lang === 'en' ? 'Microfinance (JLG)' : lang === 'hi' ? 'माइक्रोफाइनेंस (JLG)' : 'మైక్రోఫైనాన్స్ గ్రూప్ రుణం'}
+              </p>
               <p className="text-sm text-emerald-900 font-semibold leading-relaxed mt-1">
-                స్వయం సహాయక సంఘాలు • Weekly reducing installments • Group liability
+                {lang === 'en'
+                  ? 'Self Help Group loan • Weekly reducing installments • Group liability'
+                  : lang === 'hi'
+                  ? 'स्वयं सहायता समूह ऋण • साप्ताहिक घटती किस्तें • समूह देयता'
+                  : 'స్వయం సహాయక సంఘాలు • వారపు వాయిదాలు • గ్రూప్ బాధ్యత'}
               </p>
             </div>
             <span className="text-sm font-bold text-emerald-800 mt-5 inline-flex items-center gap-1">
@@ -173,13 +182,19 @@ export default function Home() {
           >
             <div>
               <span className="text-4xl">💍</span>
-              <p className="font-extrabold text-xl text-amber-950 mt-3">Gold Loan</p>
+              <p className="font-extrabold text-xl text-amber-950 mt-3">
+                {lang === 'en' ? 'Gold Loan' : lang === 'hi' ? 'स्वर्ण ऋण (गोल्ड लोन)' : 'బంగారు ఆభరణాల రుణం'}
+              </p>
               <p className="text-sm text-amber-900 font-semibold leading-relaxed mt-1">
-                బంగారు ఆభరణాల తాకట్టు • Bullet interest repayment • Auction risk warning
+                {lang === 'en'
+                  ? 'Gold jewelry collateral • Bullet interest repayment • Auction risk notice'
+                  : lang === 'hi'
+                  ? 'सोने के गहने गिरवी • एकमुश्त ब्याज भुगतान • नीलामी जोखिम नोटिस'
+                  : 'బంగారు ఆభరణాల తాకట్టు • బులెట్ వడ్డీ చెల్లింపు • వేలం హెచ్చరికల ఆడిట్'}
               </p>
             </div>
             <span className="text-sm font-bold text-amber-900 mt-5 inline-flex items-center gap-1">
-              ⚡ Quick Scan →
+              ⚡ {lang === 'en' ? 'Quick Scan' : lang === 'hi' ? 'त्वरित स्कैन' : 'త్వరిత స్కాన్'} →
             </span>
           </Link>
 
@@ -189,13 +204,19 @@ export default function Home() {
           >
             <div>
               <span className="text-4xl">💼</span>
-              <p className="font-extrabold text-xl text-blue-950 mt-3">Personal Loan</p>
+              <p className="font-extrabold text-xl text-blue-950 mt-3">
+                {lang === 'en' ? 'Personal Loan' : lang === 'hi' ? 'व्यक्तिगत ऋण' : 'వ్యక్తిగత వినియోగదారుల రుణం'}
+              </p>
               <p className="text-sm text-blue-900 font-semibold leading-relaxed mt-1">
-                వ్యక్తిగత వినియోగదారుల రుణం • Monthly EMI • Upfront fee audit
+                {lang === 'en'
+                  ? 'Individual consumer loan • Monthly EMI • Upfront fee audit'
+                  : lang === 'hi'
+                  ? 'मासिक ईएमआई • अग्रिम शुल्क जांच • व्यक्तिगत ऋण'
+                  : 'వ్యక్తిగత వినియోగదారుల రుణం • నెలవారీ EMI • ముందస్తు ఫీజుల తనిఖీ'}
               </p>
             </div>
             <span className="text-sm font-bold text-blue-800 mt-5 inline-flex items-center gap-1">
-              ⚡ Quick Scan →
+              ⚡ {lang === 'en' ? 'Quick Scan' : lang === 'hi' ? 'त्वरित स्कैन' : 'త్వరిత స్కాన్'} →
             </span>
           </Link>
         </div>
@@ -234,7 +255,11 @@ export default function Home() {
         </div>
 
         <p className="mt-5 text-xs text-slate-500 text-center">
-          Ardham protects rural borrowers and visually impaired citizens through transparent oral comprehension verification.
+          {lang === 'en'
+            ? 'Ardham protects rural borrowers and visually impaired citizens through transparent oral comprehension verification.'
+            : lang === 'hi'
+            ? 'अर्थम मौखिक समझ सत्यापन के माध्यम से ग्रामीण और दृष्टिबाधित उधारकर्ताओं की सुरक्षा करता है।'
+            : 'అర్థం గ్రామీణ మరియు దృష్టి లోపం ఉన్న రుణగ్రహీతల కోసం ప్రత్యేక వెరిఫికేషన్ వ్యవస్థను అందిస్తుంది.'}
         </p>
       </div>
 

@@ -287,13 +287,13 @@ export default function VoiceAssistantModal({ isOpen: forceOpen, onClose }: Prop
                 }}
                 className="text-slate-600 hover:underline font-medium"
               >
-                ← భాష మార్చండి (Change Language)
+                {selectedLang === 'en' ? '← Change Language' : selectedLang === 'hi' ? '← भाषा बदलें' : '← భాష మార్చండి'}
               </button>
               <button
                 onClick={() => stopSpeaking()}
-                className="text-red-500 hover:underline font-medium"
+                className="text-rose-600 hover:underline font-medium"
               >
-                ⏹️ ఆడియో ఆపు (Stop Sound)
+                {selectedLang === 'en' ? '⏹️ Stop Audio' : selectedLang === 'hi' ? '⏹️ ऑडियो रोकें' : '⏹️ ఆడియో ఆపు'}
               </button>
             </div>
           </div>
