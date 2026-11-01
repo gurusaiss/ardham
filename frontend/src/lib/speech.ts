@@ -50,6 +50,19 @@ export function stopSpeaking() {
   notify(false)
 }
 
+const SPEED_KEY = 'ardham_speech_speed'
+
+export function getSpeechRate(): number {
+  if (typeof window === 'undefined') return 0.9
+  const r = parseFloat(localStorage.getItem(SPEED_KEY) || '0.9')
+  return isNaN(r) ? 0.9 : r
+}
+
+export function setSpeechRate(rate: number) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(SPEED_KEY, String(rate))
+}
+
 export function getLanguage(): AppLanguage {
   if (typeof window === 'undefined') return 'te'
   const lang = localStorage.getItem(LANG_KEY) as AppLanguage | null
@@ -309,7 +322,7 @@ export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) 
   }
 
   const utterance = new SpeechSynthesisUtterance(textToSpeak)
-  utterance.rate = 0.92 // Natural measured speaking speed
+  utterance.rate = getSpeechRate()
   utterance.pitch = 1.0
   utterance.lang = langTag
   if (voiceToUse) {

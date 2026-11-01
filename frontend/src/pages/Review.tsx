@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import StepLayout from '../components/StepLayout'
 import ErrorBanner from '../components/ErrorBanner'
+import LoanSimulator from '../components/LoanSimulator'
 import { confirmTerms, getAnalysis, type FairnessAnalysis, type LoanTerms } from '../lib/api'
 import { isVoiceAssistantEnabled, speakTelugu, stopSpeaking } from '../lib/speech'
 
@@ -188,6 +189,16 @@ export default function Review() {
           )}
         </div>
       )}
+
+      {/* Interactive What-If Loan Simulator */}
+      <div className="mb-5">
+        <LoanSimulator
+          loanAmount={Number(terms.loan_amount?.value || 30000)}
+          instalmentAmount={Number(terms.instalment_amount?.value || 690)}
+          penalty={Number(terms.penalty?.value || 20)}
+          loanType={String(terms.lender?.source_text || '')}
+        />
+      </div>
 
       {lowConfidence.length > 0 && (
         <div className="mb-4 rounded-xl bg-amber-50 p-3 text-xs text-amber-800 border border-amber-200">
