@@ -17,6 +17,7 @@ export type Question = {
   field_id: string
   prompt_te: string
   prompt_en: string
+  prompt_hi?: string
 }
 
 export type GradeResult = {
@@ -193,14 +194,21 @@ export async function confirmTerms(sessionId: string, terms: LoanTerms) {
   return asJson(res)
 }
 
+export interface ExplanationSentence {
+  field_id: string
+  text_te: string
+  text_en?: string
+  text_hi?: string
+}
+
 export async function getExplanation(
   sessionId: string,
   onlyFieldIds?: string[]
-): Promise<{ sentences: { field_id: string; text_te: string }[]; dropped: { field_id: string; reason: string }[] }> {
+): Promise<{ sentences: ExplanationSentence[]; dropped: { field_id: string; reason: string }[] }> {
   const qs = onlyFieldIds && onlyFieldIds.length ? `?field_ids=${onlyFieldIds.join(',')}` : ''
   const res = await fetch(`${API_BASE}/sessions/${sessionId}/explain${qs}`)
   const data = await asJson<{
-    sentences: { field_id: string; text_te: string }[]
+    sentences: ExplanationSentence[]
     dropped: { field_id: string; reason: string }[]
     latency: { explain_by_field_s: Record<string, number>; total_s: number }
   }>(res)

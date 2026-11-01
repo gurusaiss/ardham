@@ -39,12 +39,15 @@ NUMERIC_FIELD_IDS = [
 class ExplanationSentence(BaseModel):
     field_id: str
     text_te: str
+    text_en: str = ""
+    text_hi: str = ""
 
 
 class Question(BaseModel):
     field_id: str
     prompt_te: str
     prompt_en: str
+    prompt_hi: str = ""
 
 
 class GradeResult(BaseModel):

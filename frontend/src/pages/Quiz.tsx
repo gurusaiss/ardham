@@ -4,44 +4,54 @@ import StepLayout from '../components/StepLayout'
 import ErrorBanner from '../components/ErrorBanner'
 import { getQuiz, getTerms, submitAnswer, type GradeResult, type LoanTerms, type Question } from '../lib/api'
 import {
-  speakTelugu,
+  speakText,
   stopSpeaking,
   subscribeSpeaking,
   isVoiceAssistantEnabled,
+  getLanguage,
+  subscribeLanguage,
+  type AppLanguage,
 } from '../lib/speech'
+import { t } from '../lib/translations'
 
-function getQuickOptions(fieldId: string, terms: LoanTerms): { label: string; value: string }[] {
+function getQuickOptions(fieldId: string, terms: LoanTerms, lang: AppLanguage): { label: string; value: string }[] {
   const field = terms[fieldId]
   const val = field?.value
+
+  const dontKnowLabel = lang === 'en' ? "Don't know" : lang === 'hi' ? 'पता नहीं' : 'తెలీదు'
+  const yesLabel = lang === 'en' ? 'Yes' : lang === 'hi' ? 'हाँ' : 'అవును'
+  const noLabel = lang === 'en' ? 'No' : lang === 'hi' ? 'नहीं' : 'కాదు'
 
   if (typeof val === 'number') {
     const wrongVal = Math.round(val > 50 ? val * 1.3 : val + 10)
     return [
       { label: `₹${val.toLocaleString('en-IN')}`, value: String(val) },
       { label: `₹${wrongVal.toLocaleString('en-IN')}`, value: String(wrongVal) },
-      { label: 'తెలీదు (Don’t know)', value: 'తెలీదు' },
+      { label: dontKnowLabel, value: 'తెలీదు' },
     ]
   }
 
   if (fieldId === 'penalty') {
+    const goldLabel = lang === 'en' ? 'Gold is auctioned' : lang === 'hi' ? 'सोना नीलाम हो जाएगा' : 'బంగారం వేలం వేస్తారు'
+    const noneLabel = lang === 'en' ? 'No consequence' : lang === 'hi' ? 'कुछ नहीं होगा' : 'ఏమీ కాదు'
     return [
-      { label: 'బంగారం వేలం వేస్తారు (Gold auctioned)', value: 'బంగారం అమ్మేస్తారు' },
-      { label: 'ఏమీ కాదు (No consequence)', value: 'ఏమీ కాదు' },
-      { label: 'తెలీదు (Don’t know)', value: 'తెలీదు' },
+      { label: goldLabel, value: 'బంగారం అమ్మేస్తారు' },
+      { label: noneLabel, value: 'ఏమీ కాదు' },
+      { label: dontKnowLabel, value: 'తెలీదు' },
     ]
   }
 
   if (typeof val === 'string' && val.length > 0) {
     return [
       { label: val, value: val },
-      { label: 'తెలీదు (Don’t know)', value: 'తెలీదు' },
+      { label: dontKnowLabel, value: 'తెలీదు' },
     ]
   }
 
   return [
-    { label: 'అవును (Yes)', value: 'అవును' },
-    { label: 'కాదు (No)', value: 'కాదు' },
-    { label: 'తెలీదు (Don’t know)', value: 'తెలీదు' },
+    { label: yesLabel, value: 'అవును' },
+    { label: noLabel, value: 'కాదు' },
+    { label: dontKnowLabel, value: 'తెలీదు' },
   ]
 }
 
@@ -57,14 +67,17 @@ export default function Quiz() {
   const [error, setError] = useState<unknown>(null)
   const [loadError, setLoadError] = useState<unknown>(null)
   const [speaking, setSpeaking] = useState(false)
+  const [lang, setLang] = useState<AppLanguage>(getLanguage())
   const mediaRecorder = useRef<MediaRecorder | null>(null)
   const chunks = useRef<Blob[]>([])
   const pendingAnswer = useRef<{ audio: Blob | null; typed: string | null } | null>(null)
 
   useEffect(() => {
-    const unsub = subscribeSpeaking(setSpeaking)
+    const unsubSpeaking = subscribeSpeaking(setSpeaking)
+    const unsubLang = subscribeLanguage(setLang)
     return () => {
-      unsub()
+      unsubSpeaking()
+      unsubLang()
       stopSpeaking()
     }
   }, [])
@@ -85,18 +98,27 @@ export default function Quiz() {
 
   const current = questions[index]
 
+  function getQuestionText(q?: Question, targetLang: AppLanguage = lang): string {
+    if (!q) return ''
+    if (targetLang === 'en') return q.prompt_en || q.prompt_te
+    if (targetLang === 'hi') return q.prompt_hi || q.prompt_en || q.prompt_te
+    return q.prompt_te
+  }
+
   // Speak question automatically when question changes if voice assistant is ON
   useEffect(() => {
-    if (current?.prompt_te && isVoiceAssistantEnabled()) {
-      speakTelugu(current.prompt_te)
+    if (current && isVoiceAssistantEnabled()) {
+      const text = getQuestionText(current, lang)
+      speakText(text, lang)
     }
-  }, [current])
+  }, [current, index, lang])
 
   function toggleAudio() {
     if (speaking) {
       stopSpeaking()
-    } else if (current?.prompt_te) {
-      speakTelugu(current.prompt_te)
+    } else if (current) {
+      const text = getQuestionText(current, lang)
+      speakText(text, lang)
     }
   }
 
@@ -112,7 +134,7 @@ export default function Quiz() {
       mediaRecorder.current = rec
       setRecording(true)
     } catch {
-      alert('మైక్రోఫోన్ అనుమతి ఇవ్వండి (Please allow microphone access)')
+      alert('మైక్రోఫోన్ అనుమతి ఇవ్వండి / Please allow microphone access')
     }
   }
 
@@ -156,103 +178,133 @@ export default function Quiz() {
     )
   }
 
-  const options = current ? getQuickOptions(current.field_id, terms) : []
+  const options = current ? getQuickOptions(current.field_id, terms, lang) : []
+  const questionTitle = getQuestionText(current, lang)
 
   return (
     <StepLayout
-      title={`Question ${index + 1} of ${questions.length}`}
-      teluguTitle="అవగాహన ప్రశ్న"
+      title={`${t('quiz_title', lang)} ${index + 1} of ${questions.length}`}
+      teluguTitle="అవగాహన ప్రశ్న — నోటితో సమాధానం చెప్పండి"
+      maxWidthClass="max-w-6xl"
     >
       {current ? (
-        <div className="flex flex-col gap-4">
-          <div className="rounded-2xl border-2 border-emerald-100 bg-white p-5 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
-              <span className="text-xl font-bold text-slate-900 leading-snug">
-                {current.prompt_te}
-              </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Question Card & Spoken Audio Control */}
+          <div className="lg:col-span-6 flex flex-col gap-4">
+            <div className="rounded-3xl border-2 border-emerald-200/80 bg-white p-6 sm:p-7 shadow-md">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-100 pb-3 mb-4">
+                <span className="rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 font-bold">
+                  {index + 1} / {questions.length}
+                </span>
+                <span className="font-mono text-slate-500 uppercase tracking-wider">
+                  {current.field_id.replace(/_/g, ' ')}
+                </span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+                {questionTitle}
+              </h2>
+
+              {/* Sub-text for multi-lingual reference */}
+              <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1">
+                {lang !== 'te' && <div><span className="font-bold text-slate-700">తెలుగు:</span> {current.prompt_te}</div>}
+                {lang !== 'en' && <div><span className="font-bold text-slate-700">English:</span> {current.prompt_en}</div>}
+              </div>
+
+              {/* Spoken Question Audio Button */}
               <button
+                type="button"
                 onClick={toggleAudio}
-                className={`shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition active:scale-95 ${
+                className={`mt-6 w-full flex items-center justify-center gap-2.5 rounded-2xl py-3.5 px-4 text-sm font-bold shadow-md transition-all active:scale-95 ${
                   speaking
-                    ? 'bg-red-600 text-white shadow'
-                    : 'bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100'
+                    ? 'bg-rose-600 text-white hover:bg-rose-700'
+                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
                 }`}
-                title="వినండి లేదా ఆపండి"
               >
                 {speaking ? (
                   <>
-                    <div className="flex items-center gap-0.5 text-white h-2.5">
+                    <div className="flex items-center gap-1 text-white h-3.5">
+                      <span className="sound-bar h-2"></span>
+                      <span className="sound-bar h-3.5"></span>
                       <span className="sound-bar h-1.5"></span>
-                      <span className="sound-bar h-2.5"></span>
-                      <span className="sound-bar h-1"></span>
                     </div>
-                    <span>⏹️ ఆపు</span>
+                    <span>{t('stop_audio', lang)}</span>
                   </>
                 ) : (
-                  <span>🔊 వినండి</span>
+                  <>
+                    <span>🔊</span>
+                    <span>
+                      {lang === 'en'
+                        ? 'Hear Question Spoken Aloud'
+                        : lang === 'hi'
+                        ? 'प्रश्न को बोलकर सुनें'
+                        : 'ప్రశ్నను మాటల్లో వినండి'}
+                    </span>
+                  </>
                 )}
               </button>
             </div>
-            <div className="mt-2 text-sm text-slate-500 font-medium">
-              {current.prompt_en}
-            </div>
           </div>
 
-          {/* Option 1: Speak into microphone */}
-          <button
-            disabled={submitting}
-            onClick={recording ? stopRecording : startRecording}
-            className={`w-full rounded-2xl py-4 text-base font-bold text-white shadow-md transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 ${
-              recording
-                ? 'bg-red-600 animate-pulse'
-                : 'bg-slate-900 hover:bg-slate-800'
-            }`}
-          >
-            {submitting ? (
-              <span>సమాధానం ధృవీకరిస్తున్నాం...</span>
-            ) : recording ? (
-              <span>⏹️ రికార్డింగ్ ఆపు (Stop recording)</span>
-            ) : (
-              <span>🎤 నోటితో సమాధానం చెప్పండి (Speak in Telugu)</span>
+          {/* Right Column: Audio Mic, Quick-touch Options & Type Input */}
+          <div className="lg:col-span-6 flex flex-col gap-4">
+            {/* Option 1: Speak into microphone */}
+            <button
+              disabled={submitting}
+              onClick={recording ? stopRecording : startRecording}
+              className={`w-full rounded-2xl py-5 px-6 text-base font-black text-white shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 ${
+                recording
+                  ? 'bg-rose-600 ring-4 ring-rose-300 animate-pulse'
+                  : 'bg-slate-900 hover:bg-slate-800'
+              }`}
+            >
+              {submitting ? (
+                <span>⏳ సమాధానం ధృవీకరిస్తున్నాం (Grading Answer)...</span>
+              ) : recording ? (
+                <span>⏹️ {t('stop_recording_btn', lang)}</span>
+              ) : (
+                <span>{t('speak_mic_btn', lang)}</span>
+              )}
+            </button>
+
+            {/* Option 2: Tap option buttons fallback */}
+            {options.length > 0 && (
+              <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center justify-between">
+                  <span>{t('or_tap_option', lang)}</span>
+                  <span className="text-[11px] font-normal text-slate-400">1-Touch Answer</span>
+                </div>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {options.map((opt, i) => (
+                    <button
+                      key={i}
+                      disabled={submitting}
+                      onClick={() => onAnswer(null, opt.value)}
+                      className="w-full rounded-xl border-2 border-slate-200 bg-white p-3.5 text-left text-base font-bold text-slate-800 shadow-sm hover:border-emerald-500 hover:bg-emerald-50/50 disabled:opacity-50 active:scale-[0.99] transition flex items-center justify-between"
+                    >
+                      <span>{opt.label}</span>
+                      <span className="text-slate-300 text-sm">→</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
-          </button>
 
-          {/* Option 2: Tap option buttons fallback */}
-          {options.length > 0 && (
-            <div className="mt-1">
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
-                <span>లేదా ఒక సమాధానాన్ని నొక్కండి:</span>
-                <span className="text-[11px] font-normal text-slate-400">One-touch Option</span>
+            {/* Option 3: Type manually */}
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">
+                {t('or_type_answer', lang)}
               </div>
-              <div className="grid grid-cols-1 gap-2.5">
-                {options.map((opt, i) => (
-                  <button
-                    key={i}
-                    disabled={submitting}
-                    onClick={() => onAnswer(null, opt.value)}
-                    className="w-full rounded-xl border-2 border-slate-200 bg-white p-3.5 text-left text-base font-bold text-slate-800 shadow-sm hover:border-emerald-500 hover:bg-emerald-50/50 disabled:opacity-50 active:scale-[0.99] transition"
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+              <TypedAnswer disabled={submitting} onSubmit={(text) => onAnswer(null, text)} />
             </div>
-          )}
 
-          {/* Option 3: Type manually */}
-          <div className="mt-1">
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-              లేదా టైప్ చేయండి (Custom Answer):
-            </div>
-            <TypedAnswer disabled={submitting} onSubmit={(text) => onAnswer(null, text)} />
+            {error ? <ErrorBanner error={error} onRetry={retryPending} /> : null}
           </div>
-
-          {error ? <ErrorBanner error={error} onRetry={retryPending} /> : null}
         </div>
       ) : (
-        <div className="py-12 text-center text-slate-500">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-r-transparent"></div>
-          <p className="mt-3 text-sm">ప్రశ్నలు లోడ్ అవుతున్నాయి...</p>
+        <div className="py-20 text-center text-slate-500">
+          <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-emerald-600 border-r-transparent"></div>
+          <p className="mt-4 text-base font-medium">ప్రశ్నలు సిద్ధమవుతున్నాయి (Loading Questions)...</p>
         </div>
       )}
     </StepLayout>
@@ -267,7 +319,7 @@ function TypedAnswer({ onSubmit, disabled }: { onSubmit: (text: string) => void;
         value={value}
         onChange={(e) => setValue(e.target.value)}
         disabled={disabled}
-        className="flex-1 rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm font-medium focus:border-emerald-500 focus:outline-none disabled:opacity-50"
+        className="flex-1 rounded-xl border-2 border-slate-200 px-4 py-3 text-sm font-medium focus:border-emerald-500 focus:outline-none disabled:opacity-50 shadow-inner"
         placeholder="రాయండి (ఉదా: 690 లేదా తెలీదు)..."
       />
       <button
@@ -278,7 +330,7 @@ function TypedAnswer({ onSubmit, disabled }: { onSubmit: (text: string) => void;
             setValue('')
           }
         }}
-        className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50 active:scale-95 transition"
+        className="rounded-xl bg-slate-900 px-6 py-3 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50 active:scale-95 transition shadow"
       >
         Submit
       </button>

@@ -3,7 +3,15 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import StepLayout from '../components/StepLayout'
 import ErrorBanner from '../components/ErrorBanner'
 import { getCertificate, type GradeResult } from '../lib/api'
-import { isVoiceAssistantEnabled, speakTelugu, stopSpeaking } from '../lib/speech'
+import {
+  isVoiceAssistantEnabled,
+  speakText,
+  stopSpeaking,
+  getLanguage,
+  subscribeLanguage,
+  type AppLanguage,
+} from '../lib/speech'
+import { t } from '../lib/translations'
 
 export default function Result() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -13,6 +21,11 @@ export default function Result() {
 
   const [results, setResults] = useState<GradeResult[] | null>(stateResults)
   const [error, setError] = useState<unknown>(null)
+  const [lang, setLang] = useState<AppLanguage>(getLanguage())
+
+  useEffect(() => {
+    return subscribeLanguage(setLang)
+  }, [])
 
   function load() {
     if (!sessionId) return
@@ -36,13 +49,25 @@ export default function Result() {
 
   useEffect(() => {
     if (results && isVoiceAssistantEnabled()) {
-      if (wrong.length === 0) {
-        speakTelugu(`అభినందనలు! రుణ అవగాహన స్కోర్ ${score} శాతం. అన్ని నిబంధనలు విజయవంతంగా ధృవీకరించబడ్డాయి.`)
+      if (lang === 'en') {
+        const msg = wrong.length === 0
+          ? `Congratulations! Comprehension score is ${score} percent. All terms successfully verified.`
+          : `Comprehension score is ${score} percent. ${wrong.length} term(s) require re-explanation.`
+        speakText(msg, 'en')
+      } else if (lang === 'hi') {
+        const msg = wrong.length === 0
+          ? `बधाई हो! समझ स्कोर ${score} प्रतिशत है। सभी शर्तें सफलतापूर्वक सत्यापित हो गईं।`
+          : `समझ स्कोर ${score} प्रतिशत है। ${wrong.length} शर्तों को दोबारा समझने की आवश्यकता है।`
+        speakText(msg, 'hi')
       } else {
-        speakTelugu(`రుణ అవగాహన స్కోర్ ${score} శాతం. ${wrong.length} అంశాలలో స్పష్టత అవసరం.`)
+        if (wrong.length === 0) {
+          speakText(`అభినందనలు! రుణ అవగాహన స్కోర్ ${score} శాతం. అన్ని నిబంధనలు విజయవంతంగా ధృవీకరించబడ్డాయి.`, 'te')
+        } else {
+          speakText(`రుణ అవగాహన స్కోర్ ${score} శాతం. ${wrong.length} అంశాలలో స్పష్టత అవసరం.`, 'te')
+        }
       }
     }
-  }, [results])
+  }, [results, lang])
 
   if (error) {
     return (
@@ -55,57 +80,71 @@ export default function Result() {
   if (results === null) {
     return (
       <StepLayout title="Result" teluguTitle="అవగాహన ఫలితం">
-        <p className="text-slate-500">Loading result...</p>
+        <div className="py-20 text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-r-transparent"></div>
+          <p className="mt-3 text-slate-500">Loading result...</p>
+        </div>
       </StepLayout>
     )
   }
 
   return (
-    <StepLayout title="Understanding Result" teluguTitle="రుణ అవగాహన ఫలితం">
-      <div className="rounded-2xl border-2 border-emerald-100 bg-white p-6 text-center shadow-sm">
-        <div className="text-5xl font-extrabold text-slate-900">{score}%</div>
-        <div className="mt-1 text-sm font-semibold text-emerald-800">
-          అవగాహన స్కోర్ (Understanding Score)
-        </div>
-        <p className="mt-2 text-xs text-slate-400">
-          {wrong.length === 0
-            ? '✓ రుణగ్రహీత అన్ని నిబంధనలను స్పష్టంగా అర్థం చేసుకున్నారు'
-            : 'కొన్ని అంశాలలో మరింత అవగాహన అవసరం'}
-        </p>
-      </div>
-
-      {wrong.length > 0 && (
-        <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
-          <p className="text-sm font-bold text-amber-900">
-            {wrong.length} సమాధానాలలో స్పష్టత లోపించింది:
+    <StepLayout
+      title={t('result_title', lang)}
+      teluguTitle="రుణ నిబంధనల అవగాహన పరీక్ష ఫలితం"
+      maxWidthClass="max-w-4xl"
+    >
+      <div className="flex flex-col gap-6">
+        <div className="rounded-3xl border-2 border-emerald-200/80 bg-white p-8 text-center shadow-sm">
+          <div className={`text-6xl font-black ${score >= 70 ? 'text-emerald-700' : 'text-amber-600'}`}>
+            {score}%
+          </div>
+          <div className="mt-2 text-base font-bold text-slate-800">
+            {t('score_label', lang)}
+          </div>
+          <p className="mt-2 text-sm text-slate-500 max-w-md mx-auto">
+            {wrong.length === 0
+              ? '✓ Borrower demonstrated clear oral understanding of all key financial commitments.'
+              : 'Some terms were not fully understood. You can re-explain them below before generating the certificate.'}
           </p>
-          <ul className="mt-2 list-inside list-disc text-sm text-amber-800 font-medium">
-            {wrong.map((r) => (
-              <li key={r.field_id}>{r.field_id.replace(/_/g, ' ')}</li>
-            ))}
-          </ul>
-          <button
-            onClick={() => {
-              stopSpeaking()
-              sessionId &&
-                navigate(`/explain/${sessionId}?only=${wrong.map((r) => r.field_id).join(',')}`)
-            }}
-            className="mt-3 w-full rounded-xl bg-amber-600 py-3 text-sm font-bold text-white shadow hover:bg-amber-700 active:scale-95 transition"
-          >
-            ఈ అంశాలను మళ్లీ వివరించండి (Re-explain)
-          </button>
         </div>
-      )}
 
-      <button
-        onClick={() => {
-          stopSpeaking()
-          sessionId && navigate(`/certificate/${sessionId}`)
-        }}
-        className="mt-6 w-full rounded-2xl bg-slate-900 py-4 text-base font-bold text-white shadow-md hover:bg-slate-800 active:scale-[0.98] transition"
-      >
-        సర్టిఫికెట్ చూడండి (Comprehension Certificate) →
-      </button>
+        {wrong.length > 0 && (
+          <div className="rounded-3xl border border-amber-300 bg-amber-50/80 p-6 shadow-sm">
+            <p className="text-base font-bold text-amber-900 flex items-center gap-2">
+              <span>⚠️</span>
+              <span>{wrong.length} item(s) missed during the comprehension loop:</span>
+            </p>
+            <ul className="mt-3 list-inside list-disc text-sm text-amber-800 font-medium space-y-1">
+              {wrong.map((r) => (
+                <li key={r.field_id} className="capitalize">
+                  {r.field_id.replace(/_/g, ' ')}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => {
+                stopSpeaking()
+                sessionId &&
+                  navigate(`/explain/${sessionId}?only=${wrong.map((r) => r.field_id).join(',')}`)
+              }}
+              className="mt-4 w-full rounded-2xl bg-amber-600 py-3.5 px-6 text-sm font-bold text-white shadow-md hover:bg-amber-700 active:scale-95 transition"
+            >
+              {t('re_explain_btn', lang)}
+            </button>
+          </div>
+        )}
+
+        <button
+          onClick={() => {
+            stopSpeaking()
+            sessionId && navigate(`/certificate/${sessionId}`)
+          }}
+          className="w-full rounded-2xl bg-slate-900 py-4 px-6 text-base font-bold text-white shadow-lg hover:bg-slate-800 active:scale-[0.98] transition"
+        >
+          {t('view_cert_btn', lang)}
+        </button>
+      </div>
     </StepLayout>
   )
 }

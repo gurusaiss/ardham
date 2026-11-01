@@ -1,17 +1,20 @@
 [
   {
     "field_id": "interest_rate",
-    "prompt_te": "ఈ అప్పుకు సంవత్సరానికి ఎంత శాతం వడ్డీ కడతారు?",
-    "prompt_en": "What yearly interest rate are you paying on this loan?"
+    "prompt_te": "మీ లోన్‌పై వార్షిక వడ్డీ రేటు ఎంత శాతం?",
+    "prompt_en": "What yearly interest rate are you paying on this loan?",
+    "prompt_hi": "इस ऋण पर आप कितना वार्षिक ब्याज दर दे रहे हैं?"
   },
   {
     "field_id": "total_payable",
     "prompt_te": "మొత్తం మీద మీరు ఎంత రూపాయలు కడతారు?",
-    "prompt_en": "In total, how much will you pay back?"
+    "prompt_en": "In total, how much will you pay back?",
+    "prompt_hi": "कुल मिलाकर आपको कितने रुपये चुकाने होंगे?"
   },
   {
     "field_id": "penalty",
-    "prompt_te": "మీరు కట్టకపోతే ఏమి జరుగుతుంది?",
-    "prompt_en": "What happens if you don't pay?"
+    "prompt_te": "మీరు రుణం కట్టకపోతే బంగారం ఏమవుతుంది?",
+    "prompt_en": "What happens if you don't repay the loan?",
+    "prompt_hi": "यदि आप ऋण नहीं चुकाते हैं तो सोने का क्या होगा?"
   }
 ]

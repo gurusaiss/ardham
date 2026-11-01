@@ -4,7 +4,15 @@ import StepLayout from '../components/StepLayout'
 import ErrorBanner from '../components/ErrorBanner'
 import LoanSimulator from '../components/LoanSimulator'
 import { confirmTerms, getAnalysis, type FairnessAnalysis, type LoanTerms } from '../lib/api'
-import { isVoiceAssistantEnabled, speakTelugu, stopSpeaking } from '../lib/speech'
+import {
+  isVoiceAssistantEnabled,
+  speakText,
+  stopSpeaking,
+  getLanguage,
+  subscribeLanguage,
+  type AppLanguage,
+} from '../lib/speech'
+import { t } from '../lib/translations'
 
 export default function Review() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -21,6 +29,11 @@ export default function Review() {
   const [fairness, setFairness] = useState<FairnessAnalysis | null>(state?.fairnessAnalysis ?? null)
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<unknown>(null)
+  const [lang, setLang] = useState<AppLanguage>(getLanguage())
+
+  useEffect(() => {
+    return subscribeLanguage(setLang)
+  }, [])
 
   useEffect(() => {
     if (!fairness && sessionId) {
@@ -30,13 +43,27 @@ export default function Review() {
 
   useEffect(() => {
     if (fairness && isVoiceAssistantEnabled()) {
-      const topWarning = fairness.warnings_te[0] || ''
-      speakTelugu(
-        `రుణ వివరాలు సేకరించబడ్డాయి. నికరంగా చేతికి అందే మొత్తం ₹${fairness.net_in_hand.toLocaleString('en-IN')}. ${topWarning}`
-      )
+      if (lang === 'en') {
+        const topWarn = fairness.warnings_te[0] ? ' Please review predatory alerts.' : ''
+        speakText(
+          `Loan review loaded. Net cash in hand is ₹${fairness.net_in_hand.toLocaleString('en-IN')}. Total repayment is ₹${fairness.total_payable.toLocaleString('en-IN')}.${topWarn}`,
+          'en'
+        )
+      } else if (lang === 'hi') {
+        speakText(
+          `ऋण समीक्षा लोड हो गई है। हाथ में मिलने वाली राशि ₹${fairness.net_in_hand.toLocaleString('en-IN')} है। कुल भुगतान ₹${fairness.total_payable.toLocaleString('en-IN')} है।`,
+          'hi'
+        )
+      } else {
+        const topWarning = fairness.warnings_te[0] || ''
+        speakText(
+          `రుణ వివరాలు సేకరించబడ్డాయి. నికరంగా చేతికి అందే మొత్తం ₹${fairness.net_in_hand.toLocaleString('en-IN')}. ${topWarning}`,
+          'te'
+        )
+      }
     }
     return () => stopSpeaking()
-  }, [fairness])
+  }, [fairness, lang])
 
   const lowConfidence = Object.entries(terms).filter(([, f]) => f.confidence < 0.7)
 
@@ -56,19 +83,35 @@ export default function Review() {
 
   function speakWarnings() {
     if (!fairness) return
-    if (fairness.warnings_te.length > 0) {
-      speakTelugu(fairness.warnings_te.join('. '))
+    if (lang === 'en') {
+      const text = fairness.warnings_te.length > 0
+        ? `Alerts found: Net cash in hand is ₹${fairness.net_in_hand}. Extra interest and fees are ₹${fairness.total_extra_cost}. Compare against informal lenders.`
+        : 'This loan meets fair lending guidelines. No hidden penalty traps detected.'
+      speakText(text, 'en')
+    } else if (lang === 'hi') {
+      const text = fairness.warnings_te.length > 0
+        ? `चेतावनी: हाथ में आने वाली राशि ₹${fairness.net_in_hand} है। अतिरिक्त ब्याज और शुल्क ₹${fairness.total_extra_cost} हैं।`
+        : 'यह ऋण निष्पक्ष दिशानिर्देशों के अनुरूप है। कोई छिपा हुआ शुल्क नहीं मिला।'
+      speakText(text, 'hi')
     } else {
-      speakTelugu('ఈ రుణంలో ఎలాంటి దాచిన ఛార్జీలు లేదా అదనపు ఫీజులు కనిపించలేదు. ఇది న్యాయమైన రుణం.')
+      if (fairness.warnings_te.length > 0) {
+        speakText(fairness.warnings_te.join('. '), 'te')
+      } else {
+        speakText('ఈ రుణంలో ఎలాంటి దాచిన ఛార్జీలు లేదా అదనపు ఫీజులు కనిపించలేదు. ఇది న్యాయమైన రుణం.', 'te')
+      }
     }
   }
 
   return (
-    <StepLayout title="Loan Review & Fairness Analysis" teluguTitle="రుణ వివరాలు & మోసపూరిత వడ్డీ విశ్లేషణ">
+    <StepLayout
+      title={t('review_title', lang)}
+      teluguTitle="రుణ వివరాలు, నికరంగా చేతికి అందే నగదు & దాచిన ఛార్జీల విశ్లేషణ"
+      maxWidthClass="max-w-7xl"
+    >
       {/* Consistency Warnings from Guard */}
       {consistencyWarnings.length > 0 && (
-        <div className="mb-4 rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-800 shadow-sm">
-          <p className="font-bold flex items-center gap-1.5">
+        <div className="mb-6 rounded-2xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900 shadow-sm">
+          <p className="font-bold flex items-center gap-1.5 text-rose-900">
             <span>⚠️ Guard Consistency Alert ({consistencyWarnings.length}):</span>
           </p>
           <ul className="mt-2 list-inside list-disc text-xs space-y-1">
@@ -79,169 +122,187 @@ export default function Review() {
         </div>
       )}
 
-      {/* Predatory Trap & Fairness Analysis Card */}
-      {fairness && (
-        <div className="mb-5 rounded-2xl border-2 border-emerald-500 bg-white p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b pb-3">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Fair Lending Score
-              </span>
-              <div className="text-2xl font-black text-slate-900">
-                {fairness.fairness_score}/100{' '}
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                  fairness.fairness_score >= 80
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : fairness.fairness_score >= 65
-                    ? 'bg-amber-100 text-amber-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {fairness.fairness_label_te}
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={speakWarnings}
-              className="rounded-xl bg-emerald-50 border border-emerald-300 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100 active:scale-95 transition flex items-center gap-1"
-            >
-              <span>🔊 విశ్లేషణ వినండి</span>
-            </button>
-          </div>
-
-          {/* Visual Money Flow Card */}
-          <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-              డబ్బు ప్రయాణం (Visual Money Flow)
-            </div>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="rounded-xl bg-emerald-50 p-2.5 border border-emerald-200">
-                <div className="text-[10px] font-semibold text-emerald-800">చేతికి వచ్చేది</div>
-                <div className="text-base font-bold text-emerald-950">
-                  ₹{fairness.net_in_hand.toLocaleString('en-IN')}
+      {/* Responsive Grid: Left Column = Analysis & Simulator, Right Column = Terms & Action */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column (7 cols): Analysis & Simulator */}
+        <div className="lg:col-span-7 flex flex-col gap-6">
+          {/* Predatory Trap & Fairness Analysis Card */}
+          {fairness && (
+            <div className="rounded-3xl border-2 border-emerald-500 bg-white p-6 shadow-md space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    {t('fairness_score', lang)}
+                  </span>
+                  <div className="text-3xl font-black text-slate-900 flex items-center gap-3">
+                    <span>{fairness.fairness_score}/100</span>
+                    <span
+                      className={`text-xs font-bold px-3 py-1 rounded-full ${
+                        fairness.fairness_score >= 80
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : fairness.fairness_score >= 65
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-rose-100 text-rose-800'
+                      }`}
+                    >
+                      {fairness.fairness_label_te}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-[9px] text-emerald-700">Net in Hand</div>
+
+                <button
+                  type="button"
+                  onClick={speakWarnings}
+                  className="rounded-2xl bg-emerald-50 border border-emerald-300 px-4 py-2.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100 active:scale-95 transition flex items-center gap-2 shadow-sm"
+                >
+                  <span>{t('listen_analysis_btn', lang)}</span>
+                </button>
               </div>
 
-              <div className="rounded-xl bg-amber-50 p-2.5 border border-amber-200">
-                <div className="text-[10px] font-semibold text-amber-800">అదనపు ఖర్చు</div>
-                <div className="text-base font-bold text-amber-950">
-                  ₹{fairness.total_extra_cost.toLocaleString('en-IN')}
+              {/* Visual Money Flow Card */}
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                  {t('money_flow_title', lang)}
                 </div>
-                <div className="text-[9px] text-amber-700">Interest + Fees</div>
-              </div>
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="rounded-2xl bg-emerald-50/90 p-3.5 border border-emerald-200 shadow-sm">
+                    <div className="text-xs font-semibold text-emerald-800">{t('net_in_hand', lang)}</div>
+                    <div className="text-lg sm:text-xl font-black text-emerald-950 mt-1">
+                      ₹{fairness.net_in_hand.toLocaleString('en-IN')}
+                    </div>
+                    <div className="text-[10px] text-emerald-700 font-medium">Disbursed</div>
+                  </div>
 
-              <div className="rounded-xl bg-slate-50 p-2.5 border border-slate-200">
-                <div className="text-[10px] font-semibold text-slate-700">మొత్తం చెల్లింపు</div>
-                <div className="text-base font-bold text-slate-900">
-                  ₹{fairness.total_payable.toLocaleString('en-IN')}
+                  <div className="rounded-2xl bg-amber-50/90 p-3.5 border border-amber-200 shadow-sm">
+                    <div className="text-xs font-semibold text-amber-800">{t('extra_cost', lang)}</div>
+                    <div className="text-lg sm:text-xl font-black text-amber-950 mt-1">
+                      ₹{fairness.total_extra_cost.toLocaleString('en-IN')}
+                    </div>
+                    <div className="text-[10px] text-amber-700 font-medium">Interest + Fees</div>
+                  </div>
+
+                  <div className="rounded-2xl bg-slate-50/90 p-3.5 border border-slate-200 shadow-sm">
+                    <div className="text-xs font-semibold text-slate-700">{t('total_repayment', lang)}</div>
+                    <div className="text-lg sm:text-xl font-black text-slate-900 mt-1">
+                      ₹{fairness.total_payable.toLocaleString('en-IN')}
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-medium">Total Repaid</div>
+                  </div>
                 </div>
-                <div className="text-[9px] text-slate-500">Total Repaid</div>
+
+                {/* Proportional visual bar */}
+                <div className="mt-4">
+                  <div className="flex justify-between text-xs font-semibold text-slate-600 mb-1.5">
+                    <span>{t('principal_ratio', lang)}: {Math.round((fairness.net_in_hand / (fairness.total_payable || 1)) * 100)}%</span>
+                    <span>{t('fees_ratio', lang)}: {Math.round((fairness.total_extra_cost / (fairness.total_payable || 1)) * 100)}%</span>
+                  </div>
+                  <div className="flex h-3.5 w-full overflow-hidden rounded-full bg-slate-100 shadow-inner">
+                    <div
+                      style={{ width: `${(fairness.net_in_hand / (fairness.total_payable || 1)) * 100}%` }}
+                      className="bg-emerald-500 transition-all duration-500"
+                    />
+                    <div
+                      style={{ width: `${(fairness.total_extra_cost / (fairness.total_payable || 1)) * 100}%` }}
+                      className="bg-amber-500 transition-all duration-500"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Proportional visual bar */}
-            <div className="mt-3">
-              <div className="flex justify-between text-[10px] font-semibold text-slate-500 mb-1">
-                <span>అసలు (Principal: {Math.round((fairness.net_in_hand / (fairness.total_payable || 1)) * 100)}%)</span>
-                <span>వడ్డీ & ఫీజులు (Extra: {Math.round((fairness.total_extra_cost / (fairness.total_payable || 1)) * 100)}%)</span>
-              </div>
-              <div className="flex h-3 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  style={{ width: `${(fairness.net_in_hand / (fairness.total_payable || 1)) * 100}%` }}
-                  className="bg-emerald-500"
-                />
-                <div
-                  style={{ width: `${(fairness.total_extra_cost / (fairness.total_payable || 1)) * 100}%` }}
-                  className="bg-amber-500"
-                />
-              </div>
-            </div>
-          </div>
+              {/* Hidden APR Gap / Predatory Alerts */}
+              {fairness.warnings_te.length > 0 && (
+                <div className="rounded-2xl border border-amber-300 bg-amber-50/90 p-4 space-y-2">
+                  <div className="text-xs font-bold text-amber-900 flex items-center gap-2">
+                    <span>🚨 దాచిన షరతులు & హెచ్చరికలు (Hidden Traps Detected):</span>
+                  </div>
+                  {fairness.warnings_te.map((w, i) => (
+                    <p key={i} className="text-xs text-amber-950 leading-relaxed font-medium">
+                      • {w}
+                    </p>
+                  ))}
+                </div>
+              )}
 
-          {/* Hidden APR Gap / Predatory Alerts */}
-          {fairness.warnings_te.length > 0 && (
-            <div className="rounded-xl border border-amber-300 bg-amber-50/80 p-3 space-y-1.5">
-              <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-                <span>🚨 దాచిన షరతులు & హెచ్చరికలు (Hidden Traps Detected):</span>
-              </div>
-              {fairness.warnings_te.map((w, i) => (
-                <p key={i} className="text-xs text-amber-950 leading-relaxed font-medium">
-                  • {w}
-                </p>
-              ))}
-            </div>
-          )}
-
-          {/* Informal Moneylender Savings Comparison */}
-          {fairness.moneylender_comparison.borrower_savings > 0 && (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 text-xs text-emerald-950">
-              <p className="font-bold flex items-center gap-1 text-emerald-900">
-                <span>💰 వడ్డీ వ్యాపారి కంటే ఎంత ఆదా? (Moneylender Savings):</span>
-              </p>
-              <p className="mt-1 font-medium text-emerald-800">
-                {fairness.moneylender_comparison.savings_te}
-              </p>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                {fairness.moneylender_comparison.savings_en}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Interactive What-If Loan Simulator */}
-      <div className="mb-5">
-        <LoanSimulator
-          loanAmount={Number(terms.loan_amount?.value || 30000)}
-          instalmentAmount={Number(terms.instalment_amount?.value || 690)}
-          penalty={Number(terms.penalty?.value || 20)}
-          loanType={String(terms.lender?.source_text || '')}
-        />
-      </div>
-
-      {lowConfidence.length > 0 && (
-        <div className="mb-4 rounded-xl bg-amber-50 p-3 text-xs text-amber-800 border border-amber-200">
-          ⚠️ {lowConfidence.length} field(s) had low confidence — please verify against the card.
-        </div>
-      )}
-
-      {/* Extracted Fields Table */}
-      <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-        సేకరించిన లోన్ వివరాలు (Extracted Terms)
-      </div>
-      <ul className="flex flex-col gap-2">
-        {Object.entries(terms).map(([fieldId, field]) => (
-          <li key={fieldId} className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold capitalize text-slate-600">
-                {fieldId.replace(/_/g, ' ')}
-              </span>
-              {field.confidence < 0.7 && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                  check
-                </span>
+              {/* Informal Moneylender Savings Comparison */}
+              {fairness.moneylender_comparison.borrower_savings > 0 && (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 text-xs text-emerald-950">
+                  <p className="font-bold flex items-center gap-1.5 text-emerald-900 text-sm">
+                    <span>💰 వడ్డీ వ్యాపారి కంటే ఎంత ఆదా? (Moneylender Savings):</span>
+                  </p>
+                  <p className="mt-1.5 font-semibold text-emerald-800 text-sm">
+                    {fairness.moneylender_comparison.savings_te}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    {fairness.moneylender_comparison.savings_en}
+                  </p>
+                </div>
               )}
             </div>
-            <div className="text-lg font-bold text-slate-900 mt-0.5">{String(field.value)}</div>
-            <div className="mt-1 text-[11px] text-slate-400 font-mono">source: "{field.source_text}"</div>
-          </li>
-        ))}
-      </ul>
+          )}
 
-      {error ? (
-        <div className="mt-4">
-          <ErrorBanner error={error} onRetry={onConfirm} />
+          {/* Interactive What-If Loan Simulator */}
+          <LoanSimulator
+            loanAmount={Number(terms.loan_amount?.value || 30000)}
+            instalmentAmount={Number(terms.instalment_amount?.value || 690)}
+            penalty={Number(terms.penalty?.value || 20)}
+            loanType={String(terms.lender?.source_text || '')}
+          />
         </div>
-      ) : null}
 
-      <button
-        disabled={confirming || Object.keys(terms).length === 0}
-        onClick={onConfirm}
-        className="mt-6 w-full rounded-2xl bg-slate-900 py-4 text-base font-bold text-white shadow-md hover:bg-slate-800 disabled:opacity-50 active:scale-[0.98] transition"
-      >
-        {confirming ? 'Confirming...' : 'వివరాలు సరిగ్గా ఉన్నాయి — కొనసాగించండి (Confirm Terms) →'}
-      </button>
+        {/* Right Column (5 cols): Extracted Terms & Confirmation */}
+        <div className="lg:col-span-5 flex flex-col gap-4">
+          <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-md flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                సేకరించిన వివరాలు (Extracted Terms)
+              </span>
+              <span className="text-xs font-bold text-slate-400">
+                {Object.keys(terms).length} Fields
+              </span>
+            </div>
+
+            {lowConfidence.length > 0 && (
+              <div className="rounded-2xl bg-amber-50 p-3 text-xs text-amber-800 border border-amber-200">
+                ⚠️ {lowConfidence.length} field(s) have lower confidence — please verify against the card.
+              </div>
+            )}
+
+            {/* Extracted Fields Table */}
+            <ul className="flex flex-col gap-2.5 max-h-[480px] overflow-y-auto pr-1">
+              {Object.entries(terms).map(([fieldId, field]) => (
+                <li key={fieldId} className="rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5 shadow-sm hover:border-emerald-200 transition">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold capitalize text-slate-600">
+                      {fieldId.replace(/_/g, ' ')}
+                    </span>
+                    {field.confidence < 0.7 && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                        Check
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-lg font-black text-slate-900 mt-1">{String(field.value)}</div>
+                  <div className="mt-1 text-[11px] text-slate-400 font-mono truncate">"{field.source_text}"</div>
+                </li>
+              ))}
+            </ul>
+
+            {error ? (
+              <div className="mt-2">
+                <ErrorBanner error={error} onRetry={onConfirm} />
+              </div>
+            ) : null}
+
+            <button
+              disabled={confirming || Object.keys(terms).length === 0}
+              onClick={onConfirm}
+              className="mt-2 w-full rounded-2xl bg-emerald-600 py-4 px-6 text-base font-bold text-white shadow-lg hover:bg-emerald-700 disabled:opacity-50 active:scale-[0.98] transition flex items-center justify-center gap-2"
+            >
+              <span>{confirming ? 'Confirming...' : t('confirm_terms_btn', lang)}</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </StepLayout>
   )
 }

@@ -39,6 +39,55 @@ EXPLAIN_FIELD_ORDER = [
 ]
 
 
+EXPLAIN_TEMPLATES: dict[str, dict[str, str]] = {
+    "loan_amount": {
+        "te": "మీకు మంజూరైన లోన్ మొత్తం {value} రూపాయలు.",
+        "en": "Your sanctioned loan amount is {value} rupees.",
+        "hi": "आपकी स्वीकृत ऋण राशि {value} रुपये है।",
+    },
+    "instalment_amount": {
+        "te": "మీరు ప్రతి వాయిదాకి {value} రూపాయలు చెల్లించాలి.",
+        "en": "You need to pay an installment of {value} rupees each cycle.",
+        "hi": "आपको प्रत्येक किस्त में {value} रुपये का भुगतान करना होगा।",
+    },
+    "interest_rate": {
+        "te": "మీ లోన్ వార్షిక వడ్డీ రేటు {value} శాతం.",
+        "en": "The annual interest rate on your loan is {value} percent.",
+        "hi": "आपके ऋण पर वार्षिक ब्याज दर {value} प्रतिशत है।",
+    },
+    "num_instalments": {
+        "te": "ఈ రుణం మొత్తం {value} వాయిదాలలో చెల్లించాలి.",
+        "en": "This loan must be repaid across {value} installments.",
+        "hi": "यह ऋण कुल {value} किश्तों में चुकाया जाना है।",
+    },
+    "processing_fee": {
+        "te": "ప్రాసెసింగ్ రుసుముగా {value} రూపాయలు ముందుగానే మినహాయిస్తారు.",
+        "en": "A processing fee of {value} rupees is deducted upfront.",
+        "hi": "प्रोसेसिंग शुल्क के रूप में {value} रुपये पहले ही काट लिए जाते हैं।",
+    },
+    "insurance_premium": {
+        "te": "బీమా ప్రీమియం కొరకు {value} రూపాయలు చెల్లించాల్సి ఉంటుంది.",
+        "en": "An insurance premium of {value} rupees is charged for protection.",
+        "hi": "बीमा प्रीमियम के लिए {value} रुपये का शुल्क लिया जाता है।",
+    },
+    "total_payable": {
+        "te": "అప్పు మరియు వడ్డీ కలిపి మొత్తం మీద {value} రూపాయలు చెల్లించాలి.",
+        "en": "In total across all repayments, you will pay back {value} rupees.",
+        "hi": "मूलधन और ब्याज मिलाकर कुल मिलाकर {value} रुपये चुकाने होंगे।",
+    },
+    "penalty": {
+        "te": "వాయిదా ఆలస్యమైతే అపరాధ రుసుము {value} రూపాయలు పడుతుంది.",
+        "en": "If an installment is delayed, a penalty fee of {value} rupees applies.",
+        "hi": "किस्त में देरी होने पर {value} रुपये का जुर्माना लागू होगा।",
+    },
+    "tenure": {
+        "te": "ఈ లోన్ కాలపరిమితి {value} నెలలు.",
+        "en": "The total tenure of this loan is {value} months.",
+        "hi": "इस ऋण की कुल अवधि {value} महीने है।",
+    },
+}
+
+
 def generate_explanation(
     client: GemmaClient, terms: LoanTerms, skill: Skill, only_field_ids: list[str] | None = None
 ) -> tuple[list[ExplanationSentence], list[tuple[ExplanationSentence, str]], dict[str, float]]:
@@ -58,7 +107,18 @@ def generate_explanation(
             glossary_entry=skill.glossary.get(field_id, ""),
         )
         result = client.generate(prompt)
-        drafts.append(ExplanationSentence(field_id=field_id, text_te=result["text"].strip()))
+        text_te = result["text"].strip()
+        val_str = str(field.value)
+        tmpl = EXPLAIN_TEMPLATES.get(field_id, {})
+        text_en = tmpl.get("en", f"The value for {field_id.replace('_', ' ')} is {val_str}.").format(value=val_str)
+        text_hi = tmpl.get("hi", f"{field_id.replace('_', ' ')} का मूल्य {val_str} है।").format(value=val_str)
+
+        drafts.append(ExplanationSentence(
+            field_id=field_id,
+            text_te=text_te,
+            text_en=text_en,
+            text_hi=text_hi,
+        ))
         latency_by_field[field_id] = float(result.get("latency_s", 0.0))
 
     kept, dropped = filter_explanation(drafts, terms)
