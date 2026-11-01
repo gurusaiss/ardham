@@ -11,9 +11,11 @@
  */
 
 export type AppLanguage = 'te' | 'en' | 'hi'
+export type VoiceStyle = 'voice_only' | 'voice_and_text'
 
 const LANG_KEY = 'ardham_app_language'
 const VOICE_PREF_KEY = 'ardham_voice_assistant'
+const VOICE_STYLE_KEY = 'ardham_voice_style'
 const MODAL_ANSWERED_KEY = 'ardham_voice_modal_answered'
 
 type SpeakingListener = (speaking: boolean) => void
@@ -111,6 +113,35 @@ export function setSpeechRate(_rate: number) {
 export function isVoiceAssistantEnabled(): boolean {
   if (typeof window === 'undefined') return false
   return localStorage.getItem(VOICE_PREF_KEY) === 'true'
+}
+
+type VoiceStyleListener = (style: VoiceStyle) => void
+const voiceStyleListeners = new Set<VoiceStyleListener>()
+
+export function getVoiceStyle(): VoiceStyle {
+  if (typeof window === 'undefined') return 'voice_and_text'
+  const style = localStorage.getItem(VOICE_STYLE_KEY)
+  return style === 'voice_only' ? 'voice_only' : 'voice_and_text'
+}
+
+export function setVoiceStyle(style: VoiceStyle) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(VOICE_STYLE_KEY, style)
+  voiceStyleListeners.forEach((fn) => {
+    try {
+      fn(style)
+    } catch {
+      // ignore
+    }
+  })
+}
+
+export function subscribeVoiceStyle(fn: VoiceStyleListener): () => void {
+  voiceStyleListeners.add(fn)
+  fn(getVoiceStyle())
+  return () => {
+    voiceStyleListeners.delete(fn)
+  }
 }
 
 export function setVoiceAssistantEnabled(enabled: boolean) {

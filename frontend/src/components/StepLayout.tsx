@@ -5,7 +5,10 @@ import StepProgress from './StepProgress'
 import VoiceAssistantModal from './VoiceAssistantModal'
 import SettingsModal from './SettingsModal'
 import VideoGuideModal from './VideoGuideModal'
+import VoiceAvatarMode from './VoiceAvatarMode'
+import VoiceAgentWidget from './VoiceAgentWidget'
 import { stopSpeaking, getLanguage, setLanguage, subscribeLanguage, type AppLanguage } from '../lib/speech'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 import { getCurrentUser, subscribeAuth, type User } from '../lib/auth'
 
 export type SubtitleProp = { te: string; en: string; hi?: string } | string
@@ -28,6 +31,7 @@ export default function StepLayout({
   const [showVoiceModal, setShowVoiceModal] = useState(false)
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [showVideoModal, setShowVideoModal] = useState(false)
+  const [showAvatarModal, setShowAvatarModal] = useState(false)
   const [user, setUser] = useState<User | null>(getCurrentUser())
   const [lang, setLangState] = useState<AppLanguage>(getLanguage())
 
@@ -38,6 +42,20 @@ export default function StepLayout({
   useEffect(() => {
     return subscribeLanguage(setLangState)
   }, [])
+
+  // Hands-free voice command routing across all steps
+  useEffect(() => {
+    const unsubCmd = subscribeVoiceCommands((action) => {
+      if (action === 'back' && location.pathname !== '/') {
+        navigate(-1)
+      } else if (action === 'avatar') {
+        setShowAvatarModal(true)
+      } else if (action === 'screen') {
+        setShowAvatarModal(false)
+      }
+    })
+    return () => unsubCmd()
+  }, [location.pathname, navigate])
 
   // Global key listener: Escape stops speech instantly
   useEffect(() => {
@@ -190,6 +208,7 @@ export default function StepLayout({
       <VoiceAssistantModal
         isOpen={showVoiceModal}
         onClose={() => setShowVoiceModal(false)}
+        onOpenAvatar={() => setShowAvatarModal(true)}
       />
 
       {/* Platform Settings Modal */}
@@ -206,6 +225,15 @@ export default function StepLayout({
       <VideoGuideModal
         isOpen={showVideoModal}
         onClose={() => setShowVideoModal(false)}
+      />
+
+      {/* Floating Hands-Free Voice Agent Status Widget */}
+      <VoiceAgentWidget onOpenAvatar={() => setShowAvatarModal(true)} />
+
+      {/* Autonomous AI Avatar Mode (100% Hands-Free for Blind Users) */}
+      <VoiceAvatarMode
+        isOpen={showAvatarModal}
+        onClose={() => setShowAvatarModal(false)}
       />
     </div>
   )

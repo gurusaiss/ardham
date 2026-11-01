@@ -13,6 +13,7 @@ import {
   type AppLanguage,
 } from '../lib/speech'
 import { t } from '../lib/translations'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 
 function getQuickOptions(fieldId: string, terms: LoanTerms, lang: AppLanguage): { label: string; value: string }[] {
   const field = terms[fieldId]
@@ -112,6 +113,24 @@ export default function Quiz() {
       speakText(text, lang)
     }
   }, [current, index, lang])
+
+  // Hands-free voice recognition: blind borrowers speak their answer directly!
+  useEffect(() => {
+    const unsubCmd = subscribeVoiceCommands((action, rawText) => {
+      if (action === 'repeat') {
+        if (current) speakText(getQuestionText(current, lang), lang)
+      } else if (action === 'back') {
+        if (index > 0) setIndex((i) => i - 1)
+        else navigate(-1)
+      } else if (rawText && !submitting && current) {
+        const cleanAnswer = rawText.trim()
+        if (cleanAnswer.length > 0 && !['next', 'back', 'repeat', 'stop', 'help'].includes(action || '')) {
+          onAnswer(null, cleanAnswer)
+        }
+      }
+    })
+    return () => unsubCmd()
+  }, [current, index, submitting, lang, navigate])
 
   function toggleAudio() {
     if (speaking) {

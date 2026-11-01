@@ -7,12 +7,12 @@ import {
   speakText,
   stopSpeaking,
   subscribeSpeaking,
-  isVoiceAssistantEnabled,
   getLanguage,
   subscribeLanguage,
   type AppLanguage,
 } from '../lib/speech'
 import { t } from '../lib/translations'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 
 export default function Explain() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -71,13 +71,31 @@ export default function Explain() {
     return item.text_te
   }
 
-  // Auto-play when voice assistant enabled or item changes
+  // Hands-free voice commands in Explain
   useEffect(() => {
-    if (current && isVoiceAssistantEnabled()) {
-      const text = getCurrentText(current, lang)
-      speakText(text, lang)
-    }
-  }, [current, index, lang])
+    const unsubCmd = subscribeVoiceCommands((action) => {
+      if (action === 'next') {
+        stopSpeaking()
+        if (index < sentences.length - 1) {
+          setIndex((i) => i + 1)
+        } else {
+          navigate(isReExplain ? `/quiz/${sessionId}?only=${onlyFieldIds!.join(',')}` : `/quiz/${sessionId}`)
+        }
+      } else if (action === 'back') {
+        stopSpeaking()
+        if (index > 0) {
+          setIndex((i) => i - 1)
+        } else {
+          navigate(-1)
+        }
+      } else if (action === 'repeat') {
+        if (current) {
+          speakText(getCurrentText(current, lang), lang)
+        }
+      }
+    })
+    return () => unsubCmd()
+  }, [current, index, sentences.length, isReExplain, onlyFieldIds, sessionId, lang, navigate])
 
   function toggleAudio() {
     if (speaking) {

@@ -5,6 +5,7 @@ import QRCodeSvg from '../components/QRCodeSvg'
 import { getCertificate, getCertificateHtmlUrl, getAnswerAudioUrl, type Certificate as CertType } from '../lib/api'
 import { getCurrentUser } from '../lib/auth'
 import { getLanguage, subscribeLanguage, type AppLanguage } from '../lib/speech'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 import { t } from '../lib/translations'
 
 export default function Certificate() {
@@ -22,6 +23,18 @@ export default function Certificate() {
     if (!sessionId) return
     getCertificate(sessionId).then(setCert)
   }, [sessionId])
+
+  // Hands-free voice commands in Certificate
+  useEffect(() => {
+    const unsubCmd = subscribeVoiceCommands((action) => {
+      if (action === 'download') {
+        window.print()
+      } else if (action === 'share') {
+        handleWhatsAppShare()
+      }
+    })
+    return () => unsubCmd()
+  }, [cert, lang])
 
   const verifyUrl = typeof window !== 'undefined' ? window.location.href : `https://ardham.app/certificate/${sessionId}`
 

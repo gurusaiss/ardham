@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import GlobalAudioBar from '../components/GlobalAudioBar'
 import VoiceAssistantModal from '../components/VoiceAssistantModal'
 import SettingsModal from '../components/SettingsModal'
 import VideoGuideModal from '../components/VideoGuideModal'
+import VoiceAvatarMode from '../components/VoiceAvatarMode'
+import VoiceAgentWidget from '../components/VoiceAgentWidget'
 import {
   isVoiceAssistantEnabled,
   speakText,
@@ -14,13 +16,16 @@ import {
   subscribeLanguage,
   type AppLanguage,
 } from '../lib/speech'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 import { getCurrentUser, subscribeAuth, type User } from '../lib/auth'
 import { t } from '../lib/translations'
 
 export default function Home() {
+  const navigate = useNavigate()
   const [showVoiceModal, setShowVoiceModal] = useState(false)
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [showVideoModal, setShowVideoModal] = useState(false)
+  const [showAvatarModal, setShowAvatarModal] = useState(false)
   const [user, setUser] = useState<User | null>(getCurrentUser())
   const [lang, setLang] = useState<AppLanguage>(getLanguage())
 
@@ -31,6 +36,20 @@ export default function Home() {
   useEffect(() => {
     return subscribeLanguage(setLang)
   }, [])
+
+  // Hands-free voice commands on Home
+  useEffect(() => {
+    const unsubCmd = subscribeVoiceCommands((action) => {
+      if (action === 'start') {
+        navigate('/choose-loan')
+      } else if (action === 'avatar') {
+        setShowAvatarModal(true)
+      } else if (action === 'screen') {
+        setShowAvatarModal(false)
+      }
+    })
+    return () => unsubCmd()
+  }, [navigate])
 
   useEffect(() => {
     if (isVoiceAssistantEnabled()) {
@@ -290,6 +309,7 @@ export default function Home() {
       <VoiceAssistantModal
         isOpen={showVoiceModal ? true : undefined}
         onClose={() => setShowVoiceModal(false)}
+        onOpenAvatar={() => setShowAvatarModal(true)}
       />
 
       {/* Platform Settings Modal */}
@@ -306,6 +326,15 @@ export default function Home() {
       <VideoGuideModal
         isOpen={showVideoModal}
         onClose={() => setShowVideoModal(false)}
+      />
+
+      {/* Floating Hands-Free Voice Agent Status Widget */}
+      <VoiceAgentWidget onOpenAvatar={() => setShowAvatarModal(true)} />
+
+      {/* Autonomous AI Avatar Mode (100% Hands-Free for Blind Users) */}
+      <VoiceAvatarMode
+        isOpen={showAvatarModal}
+        onClose={() => setShowAvatarModal(false)}
       />
     </div>
   )
