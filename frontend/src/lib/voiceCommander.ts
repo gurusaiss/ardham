@@ -3,10 +3,10 @@
  * 
  * - 100% On-device, offline-compatible Web Speech Recognition loop.
  * - Multi-dialect voice recognition for Telugu, English, and Hindi.
+ * - Eagerly evaluates both interim and final speech so "Go to next" triggers immediately.
  * - Dispatches navigation, reading, and interaction commands without touching the screen:
- *   - "Start" / "ప్రారంభించు" / "शुरू"
- *   - "Next" / "తరువాత" / "आगे"
- *   - "Back" / "వెనుకకు" / "पीछे"
+ *   - "Go to next" / "Next" / "తరువాత" / "आगे"
+ *   - "Go back" / "Back" / "వెనుకకు" / "पीछे"
  *   - "Repeat" / "మళ్ళీ చెప్పు" / "फिर से" / "Listen"
  *   - "Stop" / "ఆపు" / "रुको"
  *   - "Download" / "డౌన్‌లోడ్" / "डाउनलोड"
@@ -34,6 +34,9 @@ const commandHandlers = new Set<CommandHandler>()
 let recognitionInstance: any = null
 let isListeningActive = false
 let lastTranscript = ''
+let lastTriggerTime = 0
+let lastTriggerAction = ''
+
 type TranscriptListener = (transcript: string, isFinal: boolean) => void
 const transcriptListeners = new Set<TranscriptListener>()
 
@@ -63,14 +66,76 @@ function notifyTranscript(text: string, isFinal: boolean) {
   })
 }
 
-function notifyCommand(action: VoiceCommandAction, rawText: string) {
+/**
+ * Executes a recognized voice command with debouncing and universal fallback.
+ */
+export function triggerVoiceCommand(action: VoiceCommandAction, rawText: string) {
+  const now = Date.now()
+  // Debounce triggers within 1000ms for identical actions
+  if (now - lastTriggerTime < 1000 && lastTriggerAction === action) {
+    return
+  }
+  lastTriggerTime = now
+  lastTriggerAction = action
+
+  console.log(`[VoiceCommander] Fired action: "${action}" (input: "${rawText}")`)
+
+  if (action === 'stop') {
+    stopSpeaking()
+  }
+
+  // 1. Notify subscribed page listeners
   commandHandlers.forEach((fn) => {
     try {
       fn(action, rawText)
-    } catch {
-      // ignore
+    } catch (e) {
+      console.warn('[VoiceCommander] Listener error:', e)
     }
   })
+
+  // 2. Universal fallback for 'next' / 'go to next':
+  // If no custom page handler prevented default, find and click the next/proceed button
+  if (action === 'next') {
+    setTimeout(() => {
+      // Check explicit data-voice-next elements first
+      const explicitNext = document.querySelector<HTMLButtonElement | HTMLAnchorElement>(
+        '[data-voice-next="true"], button.voice-next-btn, a.voice-next-btn'
+      )
+      if (explicitNext && !explicitNext.hasAttribute('disabled')) {
+        stopSpeaking()
+        explicitNext.click()
+        return
+      }
+
+      // Check standard buttons with next/confirm/proceed labels
+      const allButtons = Array.from(
+        document.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>('button, a')
+      )
+      const nextMatch = allButtons.find((el) => {
+        if (el.hasAttribute('disabled')) return false
+        const text = (el.textContent || '').trim().toLowerCase()
+        return (
+          text.includes('next') ||
+          text.includes('proceed') ||
+          text.includes('continue') ||
+          text.includes('confirm') ||
+          text.includes('view certificate') ||
+          text.includes('start') ||
+          text.includes('తరువాత') ||
+          text.includes('ముందుకు') ||
+          text.includes('వివరణ') ||
+          text.includes('ధృవీకరించు') ||
+          text.includes('आगे') ||
+          text.includes('शुरू')
+        )
+      })
+
+      if (nextMatch) {
+        stopSpeaking()
+        nextMatch.click()
+      }
+    }, 120)
+  }
 }
 
 /**
@@ -79,25 +144,43 @@ function notifyCommand(action: VoiceCommandAction, rawText: string) {
 export function parseVoiceCommand(text: string): VoiceCommandAction | null {
   const t = text.trim().toLowerCase()
 
-  // 1. Next / Advance
+  // 1. Next / Advance / Go to next
   if (
     t.includes('next') ||
-    t.includes('తరువాత') ||
+    t.includes('go to next') ||
+    t.includes('goto next') ||
+    t.includes('go next') ||
+    t.includes('move to next') ||
+    t.includes('move next') ||
+    t.includes('గో టు నెక్స్ట్') ||
+    t.includes('గో నెక్స్ట్') ||
     t.includes('నెక్స్ట్') ||
+    t.includes('తరువాత') ||
+    t.includes('తర్వాతి') ||
+    t.includes('తరువాతి') ||
     t.includes('ముందుకు') ||
+    t.includes('ముందు') ||
+    t.includes('ముందుకు వెళ్ళు') ||
     t.includes('आगे') ||
     t.includes('अगला') ||
+    t.includes('आगे बढ़ो') ||
     t.includes('continue') ||
-    t.includes('proceed')
+    t.includes('proceed') ||
+    t.includes('forward')
   ) {
     return 'next'
   }
 
-  // 2. Back / Previous
+  // 2. Back / Go back / Previous
   if (
     t.includes('back') ||
-    t.includes('వెనుకకు') ||
+    t.includes('go back') ||
+    t.includes('goback') ||
+    t.includes('గో బ్యాక్') ||
     t.includes('బ్యాక్') ||
+    t.includes('వెనుకకు') ||
+    t.includes('వెనక్కి') ||
+    t.includes('వెనక') ||
     t.includes('పీచే') ||
     t.includes('पीछे') ||
     t.includes('previous')
@@ -127,7 +210,7 @@ export function parseVoiceCommand(text: string): VoiceCommandAction | null {
     t.includes('ఆపు') ||
     t.includes('సైలెంట్') ||
     t.includes('ఆగండి') ||
-    t.includes('रुको') ||
+    t.includes('రుకో') ||
     t.includes('रोकें') ||
     t.includes('चुप') ||
     t.includes('quiet')
@@ -210,12 +293,11 @@ export function parseVoiceCommand(text: string): VoiceCommandAction | null {
  */
 export function startVoiceCommander() {
   if (typeof window === 'undefined') return
-  if (!isVoiceAssistantEnabled()) return
   if (isListeningActive) return
 
   const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
   if (!SpeechRec) {
-    console.warn('SpeechRecognition API not supported on this browser.')
+    console.warn('[VoiceCommander] SpeechRecognition API not supported on this browser.')
     return
   }
 
@@ -229,6 +311,7 @@ export function startVoiceCommander() {
 
     recognition.onstart = () => {
       isListeningActive = true
+      console.log(`[VoiceCommander] Active on language: ${recognition.lang}`)
     }
 
     recognition.onresult = (event: any) => {
@@ -238,28 +321,25 @@ export function startVoiceCommander() {
 
         notifyTranscript(transcript, isFinal)
 
-        if (isFinal && transcript.length > 0) {
+        // Eager evaluation: Check BOTH interim and final for instant response!
+        if (transcript.length > 0) {
           const action = parseVoiceCommand(transcript)
           if (action) {
-            if (action === 'stop') {
-              stopSpeaking()
-            }
-            notifyCommand(action, transcript)
+            triggerVoiceCommand(action, transcript)
           }
         }
       }
     }
 
     recognition.onerror = (e: any) => {
-      // Don't kill loop on no-speech
-      if (e.error !== 'no-speech') {
-        console.warn('Speech recognition status:', e.error)
+      if (e.error !== 'no-speech' && e.error !== 'audio-capture') {
+        console.warn('[VoiceCommander] Status:', e.error)
       }
     }
 
     recognition.onend = () => {
       isListeningActive = false
-      // Automatically keep listening if Voice Assistant is still enabled
+      // Automatically keep listening if Voice Assistant is enabled
       if (isVoiceAssistantEnabled()) {
         setTimeout(() => {
           try {
@@ -267,14 +347,14 @@ export function startVoiceCommander() {
           } catch {
             // ignore
           }
-        }, 300)
+        }, 150)
       }
     }
 
     recognitionInstance = recognition
     recognition.start()
   } catch (err) {
-    console.warn('Could not start continuous speech recognition:', err)
+    console.warn('[VoiceCommander] Could not start speech recognition:', err)
   }
 }
 

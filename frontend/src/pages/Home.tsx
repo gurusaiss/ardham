@@ -40,7 +40,7 @@ export default function Home() {
   // Hands-free voice commands on Home
   useEffect(() => {
     const unsubCmd = subscribeVoiceCommands((action) => {
-      if (action === 'start') {
+      if (action === 'start' || action === 'next') {
         navigate('/choose-loan')
       } else if (action === 'avatar') {
         setShowAvatarModal(true)

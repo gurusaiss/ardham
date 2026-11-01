@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StepLayout from '../components/StepLayout'
 import { getLanguage, subscribeLanguage, type AppLanguage } from '../lib/speech'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 import { t } from '../lib/translations'
 
 const LOAN_TYPES = [
@@ -47,6 +48,16 @@ export default function ChooseLoanType() {
   useEffect(() => {
     return subscribeLanguage(setLang)
   }, [])
+
+  // Hands-free voice selection: saying "next" picks default JLG loan
+  useEffect(() => {
+    const unsubCmd = subscribeVoiceCommands((action) => {
+      if (action === 'next' || action === 'start') {
+        navigate('/scan/microfinance-group-loan')
+      }
+    })
+    return () => unsubCmd()
+  }, [navigate])
 
   return (
     <StepLayout

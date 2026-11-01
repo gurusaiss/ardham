@@ -13,6 +13,7 @@ import {
   type AppLanguage,
 } from '../lib/speech'
 import { t } from '../lib/translations'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 
 export default function Review() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -64,6 +65,17 @@ export default function Review() {
     }
     return () => stopSpeaking()
   }, [fairness, lang])
+
+  useEffect(() => {
+    const unsubCmd = subscribeVoiceCommands((action) => {
+      if (action === 'next') {
+        if (!confirming && Object.keys(terms).length > 0) {
+          onConfirm()
+        }
+      }
+    })
+    return () => unsubCmd()
+  }, [confirming, terms])
 
   const lowConfidence = Object.entries(terms).filter(([, f]) => f.confidence < 0.7)
 
@@ -299,6 +311,7 @@ export default function Review() {
             ) : null}
 
             <button
+              data-voice-next="true"
               disabled={confirming || Object.keys(terms).length === 0}
               onClick={onConfirm}
               className="mt-2 w-full rounded-2xl bg-emerald-700 py-4 px-6 text-base font-bold text-white shadow-lg hover:bg-emerald-800 disabled:opacity-50 active:scale-[0.98] transition flex items-center justify-center gap-2"

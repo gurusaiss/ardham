@@ -5,6 +5,7 @@ import {
   isVoiceAssistantEnabled,
   setVoiceAssistantEnabled,
 } from '../lib/speech'
+import { startVoiceCommander, stopVoiceCommander } from '../lib/voiceCommander'
 
 export default function GlobalAudioBar() {
   const [speaking, setSpeaking] = useState(false)
@@ -25,6 +26,9 @@ export default function GlobalAudioBar() {
     setVoiceAssistantEnabled(next)
     if (!next) {
       stopSpeaking()
+      stopVoiceCommander()
+    } else {
+      startVoiceCommander()
     }
   }
 

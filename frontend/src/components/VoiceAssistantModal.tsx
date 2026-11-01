@@ -402,27 +402,35 @@ export default function VoiceAssistantModal({ isOpen: forceOpen, onClose, onOpen
               </div>
             )}
 
-            <div className="mt-4 grid grid-cols-1 gap-3 text-left">
+            <div className="mt-5 grid grid-cols-1 gap-3.5 text-left">
               <button
                 type="button"
                 autoFocus
                 onClick={() => handleSelectStyle('voice_only')}
-                className="w-full rounded-2xl border-2 border-emerald-500 bg-emerald-50/70 p-4 shadow-sm hover:bg-emerald-100 active:scale-[0.98] transition flex items-start gap-3"
+                className="w-full rounded-2xl border-2 border-amber-500 bg-amber-50/70 p-4 shadow-md hover:bg-amber-100/90 active:scale-[0.98] transition flex items-start gap-3.5 group"
               >
-                <span className="text-3xl mt-0.5">🤖</span>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-600 to-yellow-500 text-white text-2xl shadow-sm">
+                  👩‍💼
+                </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-base text-emerald-950">
-                      {selectedLang === 'en' ? 'Voice Only (AI Avatar)' : selectedLang === 'hi' ? 'केवल वॉयस (एआई अवतार)' : 'వాయిస్ ఓన్లీ (AI అవతార్)'}
+                    <span className="font-extrabold text-base text-amber-950">
+                      {selectedLang === 'en'
+                        ? 'Lakshmi AI Avatar (Voice Only)'
+                        : selectedLang === 'hi'
+                        ? 'लक्ष्मी एआई अवतार (केवल आवाज)'
+                        : 'లక్ష్మి AI అవతార్ (వాయిస్ ఓన్లీ)'}
                     </span>
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded bg-emerald-600 text-white uppercase">
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-600 text-white uppercase tracking-wider">
                       Blind Mode
                     </span>
                   </div>
-                  <p className="text-xs text-emerald-800 font-medium mt-1 leading-relaxed">
+                  <p className="text-xs text-amber-900 font-medium mt-1 leading-relaxed">
                     {selectedLang === 'en'
-                      ? '100% Hands-Free. AI Avatar talks, floats facts, and evaluates answers. Zero touching needed.'
-                      : 'చేతులతో తాకాల్సిన పనిలేదు. AI అవతార్ మొత్తం పూర్తి చేస్తుంది.'}
+                      ? '100% Eyes-Free. Human-like avatar speaks, listens, and displays 5-second floating loan cards. Zero touching required.'
+                      : selectedLang === 'hi'
+                      ? 'दृष्टिबाधित और ग्रामीण उधारकर्ताओं के लिए। वास्तविक अवतार बोलकर सभी शर्तें समझाता है।'
+                      : 'చేతులతో తాకాల్సిన పనిలేదు. మానవరూప AI అవతార్ మాట్లాడి, 5 సెకన్ల ఫ్లోటింగ్ కార్డులతో మొత్తం పూర్తి చేస్తుంది.'}
                   </p>
                 </div>
               </button>
@@ -430,22 +438,30 @@ export default function VoiceAssistantModal({ isOpen: forceOpen, onClose, onOpen
               <button
                 type="button"
                 onClick={() => handleSelectStyle('voice_and_text')}
-                className="w-full rounded-2xl border-2 border-slate-200 bg-white p-4 shadow-sm hover:bg-slate-50 active:scale-[0.98] transition flex items-start gap-3"
+                className="w-full rounded-2xl border-2 border-emerald-600/70 bg-emerald-50/60 p-4 shadow-sm hover:bg-emerald-100/80 active:scale-[0.98] transition flex items-start gap-3.5 group"
               >
-                <span className="text-3xl mt-0.5">📱</span>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-800 text-white text-2xl shadow-sm">
+                  📜
+                </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-base text-slate-900">
-                      {selectedLang === 'en' ? 'Voice + Screen' : selectedLang === 'hi' ? 'वॉयस + स्क्रीन' : 'వాయిస్ + స్క్రీన్'}
+                    <span className="font-extrabold text-base text-emerald-950">
+                      {selectedLang === 'en'
+                        ? 'Interactive Passbook (Voice + Screen)'
+                        : selectedLang === 'hi'
+                        ? 'डिजिटल पासबुक (वॉयस + स्क्रीन)'
+                        : 'డిజిటల్ పాస్‌బుక్ (వాయిస్ + స్క్రీన్)'}
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                       Guided
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 font-medium mt-1 leading-relaxed">
+                  <p className="text-xs text-emerald-900 font-medium mt-1 leading-relaxed">
                     {selectedLang === 'en'
-                      ? 'Standard visual UI screens with automatic voice readouts and voice commands.'
-                      : 'సాధారణ స్క్రీన్‌లతో పాటు వాయిస్ వివరణ మరియు వాయిస్ ఆదేశాలు.'}
+                      ? 'Visual step-by-step screens with complete audio narration and hands-free voice commands.'
+                      : selectedLang === 'hi'
+                      ? 'स्पष्ट विज़ुअल स्क्रीन के साथ स्वचालित ऑडियो और मौखिक नियंत्रण।'
+                      : 'స్పష్టమైన స్క్రీన్‌లు మరియు బటన్లతో పాటు స్వచ్ఛమైన వాయిస్ రీడౌట్ మరియు వాయిస్ ఆదేశాలు.'}
                   </p>
                 </div>
               </button>

@@ -12,6 +12,7 @@ import {
   type AppLanguage,
 } from '../lib/speech'
 import { t } from '../lib/translations'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 
 export default function Scan() {
   const { loanType } = useParams<{ loanType: string }>()
@@ -39,6 +40,22 @@ export default function Scan() {
     }
     return () => stopSpeaking()
   }, [lang])
+
+  // Hands-free voice command to process/next
+  useEffect(() => {
+    const unsubCmd = subscribeVoiceCommands((action) => {
+      if (action === 'next' || action === 'start') {
+        if (!busy) {
+          if (selectedFiles.length > 0) {
+            processFiles(selectedFiles)
+          } else {
+            useSampleCard()
+          }
+        }
+      }
+    })
+    return () => unsubCmd()
+  }, [busy, selectedFiles, loanType])
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || [])
@@ -170,6 +187,7 @@ export default function Scan() {
             </div>
 
             <button
+              data-voice-next="true"
               disabled={busy}
               onClick={() => processFiles(selectedFiles)}
               className="mt-6 w-full rounded-2xl bg-slate-900 py-4 text-base font-bold text-white shadow-md hover:bg-slate-800 disabled:opacity-50 active:scale-[0.98] transition"
@@ -180,6 +198,7 @@ export default function Scan() {
         )}
 
         <button
+          data-voice-next="true"
           disabled={busy}
           onClick={useSampleCard}
           className="w-full rounded-2xl border-2 border-emerald-600 bg-emerald-50 py-4 px-6 text-base font-bold text-emerald-900 shadow-sm hover:bg-emerald-100 disabled:opacity-50 active:scale-[0.98] transition"

@@ -12,6 +12,7 @@ import {
   type AppLanguage,
 } from '../lib/speech'
 import { t } from '../lib/translations'
+import { subscribeVoiceCommands } from '../lib/voiceCommander'
 
 export default function Result() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -26,6 +27,19 @@ export default function Result() {
   useEffect(() => {
     return subscribeLanguage(setLang)
   }, [])
+
+  // Hands-free voice commands in Result
+  useEffect(() => {
+    const unsubCmd = subscribeVoiceCommands((action) => {
+      if (action === 'next') {
+        stopSpeaking()
+        if (sessionId) {
+          navigate(`/certificate/${sessionId}`)
+        }
+      }
+    })
+    return () => unsubCmd()
+  }, [sessionId, navigate])
 
   function load() {
     if (!sessionId) return
@@ -162,6 +176,7 @@ export default function Result() {
         )}
 
         <button
+          data-voice-next="true"
           onClick={() => {
             stopSpeaking()
             sessionId && navigate(`/certificate/${sessionId}`)
