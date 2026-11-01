@@ -80,11 +80,15 @@ export function setLanguage(lang: AppLanguage) {
 }
 
 export function getSpeechRate(): number {
-  return 1.0
+  return 0.96
+}
+
+export function getSpeechPitch(): number {
+  return 1.12
 }
 
 export function setSpeechRate(_rate: number) {
-  // Speed permanently locked to standard natural 1.0x
+  // Speed tuned to soft, calm 0.96x
 }
 
 export function isVoiceAssistantEnabled(): boolean {
@@ -283,8 +287,142 @@ export function teluguToPhonetic(text: string): string {
 }
 
 /**
+ * Pre-warms and eagerly caches TTS voices on load.
+ */
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    try {
+      window.speechSynthesis.getVoices()
+    } catch {
+      // ignore
+    }
+  }
+}
+
+/**
+ * Detects if a TTS voice is female based on name, URI, and voice metadata.
+ */
+export function isFemaleVoice(v: SpeechSynthesisVoice): boolean {
+  const name = (v.name + ' ' + (v.voiceURI || '')).toLowerCase()
+
+  // Exclude explicit male indicators
+  const hasMale = /\b(male|david|ravi|mark|george|richard|james|stefan|guy|sean|daniel|alex|fred|tom|paul|john|kumar|ajay|kiran)\b/i.test(
+    name
+  )
+  if (hasMale) return false
+
+  // Check explicit female indicators or known warm female personas
+  const hasFemale =
+    /\b(female|woman|girl|heera|neerja|swara|priya|kalpana|aditi|ananya|shruti|sunita|veena|kavya|aria|jenny|zira|samantha|victoria|karen|moira|tessa|fiona|serena|ava|allison|susan|cora|hazel|sangeeta|sita|radha)\b/i.test(
+      name
+    ) ||
+    name.includes('female') ||
+    (v as any).gender === 'female'
+
+  return hasFemale
+}
+
+/**
+ * Intelligent selector for a young, pleasing, soft female voice.
+ * Prioritizes natural female voices (e.g. Microsoft Heera, Neerja, Aria, Jenny, Google UK/IN Female).
+ */
+export function getYoungFemaleVoice(
+  voices: SpeechSynthesisVoice[],
+  targetLang: AppLanguage
+): SpeechSynthesisVoice | null {
+  if (!voices || voices.length === 0) return null
+
+  // 1. Target: Telugu (te)
+  if (targetLang === 'te') {
+    // 1a. Native Telugu female voice
+    const teFemale = voices.find(
+      (v) => (v.lang.toLowerCase().startsWith('te') || v.name.toLowerCase().includes('telugu')) && isFemaleVoice(v)
+    )
+    if (teFemale) return teFemale
+
+    // 1b. Any native Telugu voice
+    const teAny = voices.find(
+      (v) => v.lang.toLowerCase().startsWith('te') || v.name.toLowerCase().includes('telugu')
+    )
+    if (teAny) return teAny
+
+    // 1c. Warm Indian English female voice (Heera, Veena, Aditi, Priya)
+    const inEnFemale = voices.find(
+      (v) => v.lang.toLowerCase().startsWith('en-in') && isFemaleVoice(v)
+    )
+    if (inEnFemale) return inEnFemale
+
+    // 1d. Edge Natural / Online female voices (Jenny, Aria)
+    const naturalFemale = voices.find(
+      (v) => isFemaleVoice(v) && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online'))
+    )
+    if (naturalFemale) return naturalFemale
+
+    // 1e. Any English female voice
+    const enFemale = voices.find(
+      (v) => v.lang.toLowerCase().startsWith('en') && isFemaleVoice(v)
+    )
+    if (enFemale) return enFemale
+  }
+
+  // 2. Target: Hindi (hi)
+  if (targetLang === 'hi') {
+    // 2a. Native Hindi female voice (Neerja, Swara, Kalpana, Aditi)
+    const hiFemale = voices.find(
+      (v) => (v.lang.toLowerCase().startsWith('hi') || v.name.toLowerCase().includes('hindi')) && isFemaleVoice(v)
+    )
+    if (hiFemale) return hiFemale
+
+    // 2b. Any native Hindi voice
+    const hiAny = voices.find(
+      (v) => v.lang.toLowerCase().startsWith('hi') || v.name.toLowerCase().includes('hindi')
+    )
+    if (hiAny) return hiAny
+
+    // 2c. Indian English female voice
+    const inEnFemale = voices.find(
+      (v) => v.lang.toLowerCase().startsWith('en-in') && isFemaleVoice(v)
+    )
+    if (inEnFemale) return inEnFemale
+  }
+
+  // 3. Target: English (en)
+  if (targetLang === 'en') {
+    // 3a. Indian English female voice (Heera, Veena)
+    const inEnFemale = voices.find(
+      (v) => v.lang.toLowerCase().startsWith('en-in') && isFemaleVoice(v)
+    )
+    if (inEnFemale) return inEnFemale
+
+    // 3b. Natural soft female voice (Jenny, Aria, Google UK English Female)
+    const naturalFemale = voices.find(
+      (v) => isFemaleVoice(v) && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online'))
+    )
+    if (naturalFemale) return naturalFemale
+
+    // 3c. Standard English female voice (Zira, Samantha, etc.)
+    const enFemale = voices.find(
+      (v) => v.lang.toLowerCase().startsWith('en') && isFemaleVoice(v)
+    )
+    if (enFemale) return enFemale
+  }
+
+  // Fallback 1: Any female voice available on the system
+  const anyFemale = voices.find(isFemaleVoice)
+  if (anyFemale) return anyFemale
+
+  // Fallback 2: Best matching language voice
+  return (
+    voices.find((v) => v.lang.toLowerCase().startsWith(targetLang === 'hi' ? 'hi' : targetLang === 'te' ? 'te' : 'en-in')) ||
+    voices.find((v) => v.lang.toLowerCase().startsWith('en')) ||
+    voices[0] ||
+    null
+  )
+}
+
+/**
  * Universal Speech Synthesizer:
- * Speaks all words, text, and numbers with perfect phonetic fallback.
+ * Speaks with a young, soft, attractive, and reassuring female voice persona.
  */
 export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
@@ -298,47 +436,35 @@ export function speakText(text: string, lang?: AppLanguage, onEnd?: () => void) 
   const sanitized = targetLang === 'te' ? sanitizeTeluguText(text) : text
   const voices = window.speechSynthesis.getVoices()
 
-  let voiceToUse: SpeechSynthesisVoice | null = null
+  const voiceToUse = getYoungFemaleVoice(voices, targetLang)
   let textToSpeak = sanitized
   let langTag = 'en-IN'
 
   if (targetLang === 'te') {
-    const teVoice = voices.find(
-      (v) => v.lang.toLowerCase().startsWith('te') || v.name.toLowerCase().includes('telugu')
-    )
-    if (teVoice) {
-      voiceToUse = teVoice
+    const hasNativeTeVoice =
+      voiceToUse &&
+      (voiceToUse.lang.toLowerCase().startsWith('te') || voiceToUse.name.toLowerCase().includes('telugu'))
+
+    if (hasNativeTeVoice) {
       textToSpeak = sanitized
       langTag = 'te-IN'
     } else {
-      // No native Telugu voice installed on OS -> use clean phonetic transliteration!
-      const enIn = voices.find(
-        (v) => v.lang.toLowerCase().startsWith('en-in') || v.lang.toLowerCase().startsWith('en')
-      )
-      voiceToUse = enIn || null
+      // Use phonetic transliteration so Indian English female voice speaks every single word
       textToSpeak = teluguToPhonetic(sanitized)
       langTag = 'en-IN'
     }
   } else if (targetLang === 'hi') {
-    const hiVoice = voices.find(
-      (v) => v.lang.toLowerCase().startsWith('hi') || v.name.toLowerCase().includes('hindi')
-    )
-    voiceToUse = hiVoice || null
     textToSpeak = sanitized
     langTag = 'hi-IN'
   } else {
-    // English
-    const enVoice = voices.find(
-      (v) => v.lang.toLowerCase().startsWith('en-in') || v.lang.toLowerCase().startsWith('en')
-    )
-    voiceToUse = enVoice || null
     textToSpeak = sanitized
     langTag = 'en-IN'
   }
 
   const utterance = new SpeechSynthesisUtterance(textToSpeak)
   utterance.rate = getSpeechRate()
-  utterance.pitch = 1.0
+  utterance.pitch = getSpeechPitch()
+  utterance.volume = 1.0
   utterance.lang = langTag
   if (voiceToUse) {
     utterance.voice = voiceToUse
